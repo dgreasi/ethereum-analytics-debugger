@@ -1,0 +1,94 @@
+GET STARTED UBUNTU-BLOCKCHAIN-GRIDLABD-SMART_GRID
+
+1) Blockchain:
+sudo apt-get install software-properties-common
+sudo add-apt-repository -y ppa:ethereum/ethereum
+sudo apt-get update
+sudo apt-get install ethereum
+
+
+1.1) Create genesis.json:
+```
+{
+    "config": {
+        "chainId": 1923,
+        "homesteadBlock": 0,
+        "eip155Block": 0,
+        "eip158Block": 0
+    },
+    "difficulty": "20",
+    "gasLimit": "210000000",
+    "alloc": {
+	"0xad56cedb7d9ee48b3b93f682a9e2d87f80221768": { "balance": "20000000000000000000000" } 
+    }
+}
+```
+
+1.2) Init central node:
+```
+geth --datadir /home/ubuntu/tmp/eth/1923/00 init /home/ubuntu/tmp/eth/1923/genesis.json
+```
+
+1.3) Start central node:
+```
+geth --datadir /home/ubuntu/tmp/eth/1923/00 --identity mynode-00 --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr "127.0.0.1" --rpccorsdomain "*" --ipcpath /home/ubuntu/tmp/eth/1923/00/geth.ipc --networkid 1923 console
+```
+
+1.4) Connect to other Central nodes
+```
+// Magda Central Node
+admin.addPeer("enode://ad625f1c7ece8b15786d39d3116c57eb7a40922bc3e3c90b4991f2bfa56a11fb1985e6d222d2e30c051dfb700fb535c89d0492671c638b5457c5268023367cdb@10.64.83.61:30299")
+
+// Dimitris Central Node
+admin.addPeer("enode://9222941eb46bd45d7876891f4d3eba37e3762f8abf53051d4c45cee683a4a26c967a2f15ebaeb71f54f15721bce1977154b3c8d9c8a01f614cf36f5da6e40e40@10.64.83.132:30299")
+
+```
+
+2)GridLabd:
+```
+sudo apt install git
+sudo apt install autoconf
+sudo apt install libtool-bin
+sudo apt-get install build-essential
+sudo apt-get update
+sudo apt-get install libjsonrpccpp-dev libjsonrpccpp-tools
+
+sudo apt-get install libjsoncpp1
+sudo apt-get install libjsoncpp-dev
+sudo apt-get install libcurl4-gnutls-dev
+sudo apt-get install libxerces-c-dev
+
+git clone https://github.com/mafoti/blockchain-gridlabd.git
+```
+
+*****Customize to your path*****
+*****Change bootnode to your Central Node*****
+*****Connect to bootnode*****
+
+2.1) Config BootNode
+```
+// File: /market/blockNode.cpp line 154:
+systemString += "/geth.ipc --bootnodes enode://myNode@myExternalIP:myPort --networkid 1923 2>&1 &\"";
+```
+
+2.2) Config Gridlabd
+```
+autoreconf -isf
+./configure --prefix=/home/ubuntu/blockchain-gridlabd/install
+make
+make install
+rm ./gridlabd.bin
+export PATH=$PATH:/home/ubuntu/blockchain-gridlabd/install/bin
+export GLPATH=/home/ubuntu/blockchain-gridlabd/install/lib/gridlabd:/home/ubuntu/blockchain-gridlabd/install/share/gridlabd
+```
+
+2.3) Copy network.glm in /home/ubuntu/network_glm/
+
+### Start:
+```
+gridlabd /home/ubuntu/network_glm/network.glm
+```
+
+*************************************************************************
+*************************************************************************
+*************************************************************************

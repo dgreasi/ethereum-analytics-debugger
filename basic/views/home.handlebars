@@ -1,0 +1,240 @@
+<div class="container">
+    <h1>{{> page/title}}</h1>
+    <form method="get" action="/">
+      <button class="astext">
+        Uth
+      </button>
+    </form>
+    <hr>
+    <br>
+
+    <button class="btn btn-default blue_btn" data-toggle="modal" data-target="#get_transactions">Get Experiment</button>
+    
+  	<button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_balance">Get Balance</button>
+
+    <button class="btn btn-default red_btn" data-toggle="modal" data-target="#get_accounts">Get Accounts</button>
+
+    <button class="btn btn-default" data-toggle="modal" data-target="#get_gas_spent">Get Gas Spent of Account</button>
+
+    <form method="post" action="/get_clearing">
+      <button class="btn btn-default">Get Clearing</button>
+    </form>
+    
+
+    <button class="btn btn-default" data-toggle="modal" data-target="#myModal">Button Modal</button>
+ 
+    <form method="post" action="/get_transactions">
+      <div id="get_transactions" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Get Transactions of Specified Blocks</h4>
+                  </div>
+
+                 
+
+                  <div class="modal-body">
+                    <p>
+                      Specify the range of the blocks you want to check for transactions.
+                    </p>
+
+                    <p>
+                      You can leave <b>End Block</b> blank to check until the last block.
+                    </p>
+
+                    <div class="form-group">
+                        <label for="pwd">Start Block:</label>
+                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pwd">End Block:</label>
+                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number" default="null">
+                    </div>
+
+                    <p style="color: red;">
+                      If the range of the blocks is too big, there is high possibility that the ethereum Node can't answer. Just specify a smaller range of blocks.
+                    </p>
+                  </div>
+                  <div class="modal-footer">
+                      <input type="submit" value="Get" class="btn btn-default" ></input>
+                  </div>
+
+              </div>
+          </div>
+      </div>
+    </form>
+
+    <form method="post" action="/get_balance">
+      <div id="get_balance" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Get Balance of Account</h4>
+                  </div>
+
+                  <div class="modal-body">
+                    <div class="form-group">
+                        <label for="pwd">Account in Hex:</label>
+                        <input type="string" class="form-control" id="account" name="account" placeholder="Enter account">
+                    </div>
+
+                  </div>
+                  <div class="modal-footer">
+                      <input type="submit" value="Get" class="btn btn-default" ></input>
+                  </div>
+
+              </div>
+          </div>
+      </div>
+    </form>
+
+    <form method="post" action="/get_accounts">
+      <div id="get_accounts" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Get Accounts through Specified Blocks</h4>
+                  </div>
+
+                 
+
+                  <div class="modal-body">
+                    <p>
+                      Specify the range of the blocks you want to check for accounts.
+                    </p>
+
+                    <div class="form-group">
+                        <label for="pwd">Start Block:</label>
+                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pwd">End Block:</label>
+                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number" default="null">
+                    </div>
+
+                    <p style="color: red;">
+                      If the range of the blocks is too big, there is high possibility that the ethereum Node can't answer. Just specify a smaller range of blocks.
+                    </p>
+                  </div>
+                  <div class="modal-footer">
+                      <input type="submit" value="Get" class="btn btn-default" ></input>
+                  </div>
+
+              </div>
+          </div>
+      </div>
+    </form>
+
+    <form method="post" action="/get_gas_spent">
+      <div id="get_gas_spent" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Get Gas Spent of Account through Specified Blocks</h4>
+                  </div>
+
+                 
+
+                  <div class="modal-body">
+                    <div class="form-group">
+                        <label for="pwd">Account in Hex:</label>
+                        <input type="string" class="form-control" id="account" name="account" placeholder="Enter account">
+                    </div>
+
+                    <p>
+                      Specify the range of the blocks you want to check for accounts.
+                    </p>
+
+                    <div class="form-group">
+                        <label for="pwd">Start Block:</label>
+                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pwd">End Block:</label>
+                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number" default="null">
+                    </div>
+
+                    <p style="color: red;">
+                      If the range of the blocks is too big, there is high possibility that the ethereum Node can't answer. Just specify a smaller range of blocks.
+                    </p>
+                  </div>
+
+                  <div class="modal-footer">
+                      <input type="submit" value="Get" class="btn btn-default" ></input>
+                  </div>
+
+              </div>
+          </div>
+      </div>
+    </form>
+
+
+
+    <form method="post" action="/route4">
+      <div id="myModal" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Modal</h4>
+                  </div>
+
+                  <div class="modal-body">
+                    <div class="form-group">
+                        <label for="pwd">Number Input:</label>
+                        <input type="number" class="form-control" id="days" name="days" placeholder="Enter number">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pwd">Password:</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                      <input type="submit" value="Log In" class="btn btn-default" ></input>
+                  </div>
+
+              </div>
+          </div>
+      </div>
+    </form>
+
+    <br>
+    <hr>
+    
+    <div class="inline">
+      <h4 class="inline" style="padding-right:10em;">
+        Start Block: <b>{{start}}</b>
+      </h4>
+
+      <h4 class="inline">
+        End Block: <b>{{end}}</b>
+      </h4>
+    </div>
+    
+    <hr>
+    
+    <div>
+      {{data}}
+    </div>
+
+
+    <!-- {{> page/nav}} -->
+</div>

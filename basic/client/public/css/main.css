@@ -1,0 +1,42 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.inline {
+	display: inline-block;
+}
+
+form{
+    display:inline-block;
+}
+
+.green_btn {
+	color: green;	
+}
+
+.red_btn {
+	color: red;	
+}
+
+.blue_btn {
+	color: blue;	
+}
+
+.astext {
+    background:none;
+    border:none;
+    margin:0;
+    padding:0;
+}
+/*.container {
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+*/
