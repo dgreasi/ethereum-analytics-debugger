@@ -1,10 +1,6 @@
 var fs = require("fs");
 var Web3 = require('web3'); 
 
-// Create a web3 connection to a running geth node over JSON-RPC running at
-// http://localhost:8545
-// For geth VPS server + SSH tunneling see
-// https://gist.github.com/miohtama/ce612b35415e74268ff243af645048f4
 var web3 = new Web3();
 web3.setProvider(new web3.providers.HttpProvider('http://localhost:8100'));
 
@@ -24,6 +20,11 @@ module.exports = {
   printPaok: function() {
     // console.log('PAOK');
     return 'PAOK';
+  },
+
+
+  getPeersNumber: function() {
+    return web3.net.peerCount();
   },
 
 
@@ -60,15 +61,11 @@ module.exports = {
       if (endBlockNumber == null) {
         endBlockNumber = res;
         end = res;
-        if (startBlockNumber == null) {
-          startBlockNumber = endBlockNumber - 1000;
-          start = startBlockNumber;
-        }
-      } else {
-        if (startBlockNumber == null || startBlockNumber > endBlockNumber) {
-          startBlockNumber = endBlockNumber - 1000;
-          start = startBlockNumber;
-        }
+      }
+
+      if (startBlockNumber == null || startBlockNumber > endBlockNumber) {
+        startBlockNumber = endBlockNumber/10;
+        start = startBlockNumber;
       }
 
       console.log("Using startBlockNumber: " + startBlockNumber);
@@ -201,84 +198,74 @@ module.exports = {
     return web3.eth.call({to: contract, data: "0xbc3d513f"});
   },
 
+  getTransactionReceiptFunAccount: function(txHash, account) {
+
+    return  web3.eth.getTransactionReceipt(txHash).then(res => {
+      if (res != null && account == res.from) {
+        gasAccounts(res.from, res.gasUsed);
+      }  
+    }).catch(err => {
+      console.log("ERROR getTransactionReceipt: " + err);
+    });
+  },
+
+
   getTransactionsByAccount: function(myaccount, startBlockNumber, endBlockNumber) {
-    if (endBlockNumber == null) {
-      web3.eth.getBlockNumber().then(res => {
+    var getBlockPromises = [];
+    var blockNumberPromise = [];
+    blockNumberPromise.push(web3.eth.getBlockNumber());
+
+    Promise.all(blockNumberPromise).then(res => {
+      if (endBlockNumber == null) {
         endBlockNumber = res;
         end = res;
-        if (startBlockNumber == null) {
-          startBlockNumber = endBlockNumber - 1000;
-          start = startBlockNumber;
-        }
-        console.log("Using startBlockNumber: " + startBlockNumber);
-        console.log("Using endBlockNumber: " + endBlockNumber);
+      }
 
-        for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-          web3.eth.getBlock(i, true).then(res => {
-            if (res != null && res.transactions != null) {
-              res.transactions.forEach( function(e) {
-                if (myaccount == "*" || myaccount == e.from) {
-                  getTransactionReceiptFun(e.hash);
-                }
-              })
-            }
-          }).catch(err => {
-            console.log("ERROR getBlock: " + err);
-          });
-        }
-        
-      }).catch(err => {
-        console.log("ERROR getBlockNumber: " + err);
-      });
-
-    } else {
-      if (startBlockNumber == null) {
-        startBlockNumber = endBlockNumber - 1000;
+      if (startBlockNumber == null || startBlockNumber > endBlockNumber) {
+        startBlockNumber = endBlockNumber/10;
         start = startBlockNumber;
       }
+
       console.log("Using startBlockNumber: " + startBlockNumber);
       console.log("Using endBlockNumber: " + endBlockNumber);
 
       for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-
-        web3.eth.getBlock(i, true).then(res => {
-          // console.log("Block: " + res.transactions);
-          if (res != null && res.transactions != null) {
-            res.transactions.forEach( function(e) {
-              if (myaccount == "*" || myaccount == e.from) {
-                getTransactionReceiptFun(e.hash);
-              }
-            })
-          }
-        }).catch(err => {
-          console.log("ERROR getBlock: " + err);
-        });
+        var getBlock = web3.eth.getBlock(i, true);
+        getBlockPromises.push(getBlock);
       }
-    }
-  }
+
+      Promise.all(getBlockPromises).then(blocks => {
+        var receiptsPromises = [];
+        blocks.forEach(block => {
+
+          if (block != null && block.transactions != null) {
+
+            block.transactions.forEach(e => {
+              if (e.input != "0x") {
+                // console.log("");
+                // console.log("Account: " + e.from + " ,TO: " + e.to  + " , called FUNCTION: " + e.input);
+                // console.log("");
+                receiptsPromises.push(getTransactionReceiptFunAccount(e.hash, myaccount));
+              }
+            });
+
+            
+          }
+        });
+
+        Promise.all(receiptsPromises).then(res => {
+          getContractResults();
+          prints();
+        }).catch(err => {
+          console.log("ERROR receiptsPromises: " + err);
+        });
+      }).catch(err => {
+        console.log("ERROR getBlockPromises: " + err);
+      });
+    }).catch(err => {
+      console.log("ERROR getBlockNumber: " + err);
+    });
+
 };
-      // console.log("  tx hash          : " + res.hash + "\n"
-      //   + "   cumulativeGas   : " + res.cumulativeGasUsed + "\n"
-      //   + "   gasUsed         : " + res.gasUsed + "\n"
-      // + "   blockHash       : " + res.blockHash + "\n"
-      // + "   blockNumber     : " + res.blockNumber + "\n"
-      // + "   transactionIndex: " + res.transactionIndex + "\n"
-      //   + "   from            : " + res.from + "\n"
-      //   + "   to              : " + res.to);
-
-      
 
 
-
-            // console.log("  tx hash          : " + e.hash + "\n"
-            //   + "   nonce           : " + e.nonce + "\n"
-            //   + "   blockHash       : " + e.blockHash + "\n"
-            //   + "   blockNumber     : " + e.blockNumber + "\n"
-            //   + "   transactionIndex: " + e.transactionIndex + "\n"
-            //   + "   from            : " + e.from + "\n" 
-            //   + "   to              : " + e.to + "\n"
-            //   + "   value           : " + e.value + "\n"
-            //   + "   time            : " + res.timestamp + " " + new Date(res.timestamp * 1000).toGMTString() + "\n"
-            //   + "   gasPrice        : " + e.gasPrice + "\n"
-            //   + "   gas             : " + e.gas + "\n"
-            //   + "   input           : " + e.input);

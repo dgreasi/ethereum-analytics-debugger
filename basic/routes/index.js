@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var app = require('../server.js');
 var analytics = require('../analytics.js');
+var localforage = require('localforage');
 
 
 router.get('/', function(req, res, next) {
@@ -66,7 +67,6 @@ router.post('/get_clearing', function(req, res, next) {
 router.post('/route4', function(req, res, next) {
 	var pass = req.body.password;
 	
-	route4();
 
 	if (pass == "paok1994") {
 		// exitAll();
