@@ -6,6 +6,10 @@ var exphbs  = require('express-handlebars');
 
 // *** routes *** //
 var routes = require('./routes/index.js');
+var Web3 = require('web3'); 
+
+var web3 = new Web3();
+web3.setProvider(new web3.providers.HttpProvider('http://localhost:8100'));
 
 // *** express instance *** //
 var app = express();

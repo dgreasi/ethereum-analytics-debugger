@@ -24,7 +24,7 @@ module.exports = {
 
 
   getPeersNumber: function() {
-    return web3.net.peerCount();
+    return web3.net.peerCount;
   },
 
 
@@ -156,7 +156,7 @@ module.exports = {
   },
 
   printBalance: function(account) {
-    getBalanceOfAccount(account).then(bal => {
+    getBalanceOfAccount(account, web3).then(bal => {
       console.log("Account: " + account + " ,balance: " + bal);
     }).catch(err => {
       console.log("ERROR: " + err);
@@ -265,7 +265,6 @@ module.exports = {
     }).catch(err => {
       console.log("ERROR getBlockNumber: " + err);
     });
+  }
 
-};
-
-
+}

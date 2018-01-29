@@ -3,6 +3,22 @@ var router = express.Router();
 var app = require('../server.js');
 var analytics = require('../analytics.js');
 var localforage = require('localforage');
+// var fs = require("fs");
+var Web3 = require('web3'); 
+
+var web3 = new Web3();
+web3.setProvider(new web3.providers.HttpProvider('http://localhost:8100'));
+
+var accounts = []; // Account hash - Gas spent - # Transactions
+
+var start = 8000;
+// var start = 0;
+
+// var end = 8000;
+var end = null;
+
+var contract = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
+var numberOfBlocks = 0;
 
 
 router.get('/', function(req, res, next) {
@@ -15,8 +31,8 @@ router.post('/get_transactions', function(req, res, next) {
 	var start_block = req.body.start_block;
   var end_block = req.body.end_block;
 
-  console.log("Start block: " + start_block);
-  console.log("End block: " + end_block);
+  // console.log("Start block: " + start_block);
+  // console.log("End block: " + end_block);
 	
 	// val = route1();
   val = analytics.printPaok();
@@ -62,6 +78,15 @@ router.post('/get_gas_spent', function(req, res, next) {
 router.post('/get_clearing', function(req, res, next) {
 
   res.render('home', { title: 'Ethereum Analytics Debugger - Get Clearing' });
+});
+
+router.post('/get_peers', function(req, res, next) {
+  peers = "Number of Peers: " + analytics.getPeersNumber(web3);
+
+  res.render('home', { 
+    title: 'Ethereum Analytics Debugger - Get Peers',
+    data: peers
+  });
 });
 
 router.post('/route4', function(req, res, next) {
