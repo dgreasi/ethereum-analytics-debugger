@@ -30,6 +30,8 @@ getAccountTransactionsGasSpentClearings(start, end);
 /////////////////// Smart Contract - Smart Grid Functions /////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
+////////// Get only transactions that are calls to functions of a Contract /////
+///////////// IE a send Gas transaction will not be shown here /////////////////
 function getAccountTransactionsGasSpentClearings(startBlockNumber, endBlockNumber) {
   var getBlockPromises = [];
   var blockNumberPromise = web3.eth.getBlockNumber();
