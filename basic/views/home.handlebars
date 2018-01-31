@@ -10,21 +10,31 @@
 
     <button class="btn btn-default blue_btn" data-toggle="modal" data-target="#get_transactions">Get Experiment</button>
     
-  	<button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_balance">Get Balance</button>
 
-    <button class="btn btn-default red_btn" data-toggle="modal" data-target="#get_accounts">Get Accounts</button>
 
-    <button class="btn btn-default" data-toggle="modal" data-target="#get_gas_spent">Get Gas Spent of Account</button>
+<!--     <button class="btn btn-default red_btn" data-toggle="modal" data-target="#get_accounts">Get Accounts</button> -->
+
 
     <form method="post" action="/get_clearing">
-      <button class="btn btn-default">Get Clearing</button>
+      <button class="btn btn-default blue_btn">Get Clearing</button>
     </form>
 
-    <form method="post" action="/get_peers">
-      <button class="btn btn-default">Get # Peers</button>
-    </form>
+<!--     <button class="btn btn-default" data-toggle="modal" data-target="#myModal">Button Modal</button> -->
+    
 
-    <button class="btn btn-default" data-toggle="modal" data-target="#myModal">Button Modal</button>
+    <div>
+
+      <br>
+      
+      <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_balance">Get Balance of Account</button>
+      
+      <!-- <button class="btn btn-default" data-toggle="modal" data-target="#get_gas_spent">Get Gas Spent of Account</button> -->
+      
+      <form method="post" action="/get_peers">
+        <button class="btn btn-default green_btn">Get # Peers</button>
+      </form>
+    </div>
+
  
     <form method="post" action="/get_transactions">
       <div id="get_transactions" class="modal fade" role="dialog">
@@ -50,12 +60,12 @@
 
                     <div class="form-group">
                         <label for="pwd">Start Block:</label>
-                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number">
+                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number" value="22000">
                     </div>
 
                     <div class="form-group">
                         <label for="pwd">End Block:</label>
-                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number" default="null">
+                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number" value="22500">
                     </div>
 
                     <p style="color: red;">
@@ -85,7 +95,7 @@
                   <div class="modal-body">
                     <div class="form-group">
                         <label for="pwd">Account in Hex:</label>
-                        <input type="string" class="form-control" id="account" name="account" placeholder="Enter account">
+                        <input type="string" class="form-control" id="account" name="account" placeholder="Enter account" value="0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768">
                     </div>
 
                   </div>
@@ -220,6 +230,7 @@
     <br>
     <hr>
     
+    {{#if start}}
     <div class="inline">
       <h4 class="inline" style="padding-right:10em;">
         Start Block: <b>{{start}}</b>
@@ -229,13 +240,70 @@
         End Block: <b>{{end}}</b>
       </h4>
     </div>
-    
     <hr>
-    
-    <div>
-      {{data}}
-    </div>
+    {{/if}}
 
+
+    {{#if account}}
+      <h4>Selected Account: {{ account }}</h4>
+      <hr>
+    {{/if}}
+
+    {{#if balance}}
+      <div>
+        Balance: {{ balance }}
+      </div>
+      <hr>
+    {{/if}}    
+
+    
+<!--     <div>
+      {{data}}
+    </div> -->
+
+    {{#if infoP}}
+      <div>
+        Number of peers: {{ peers }}
+      </div>
+    {{/if}}
+    
+    {{#if data}}
+    <table>
+      <thead>
+          <th>#</th> 
+          <th>Account</th> 
+          <th>Spent Gas</th> 
+          <th># Transactions</th> 
+      </thead> 
+      <tbody> 
+          {{#each data}} 
+          <tr>
+            <td>{{ @index }}</td>
+            {{#each this}}
+              <td>{{ this }}</td> 
+            {{/each}}
+          </tr> 
+          {{/each}}
+      </tbody> 
+    </table>
+    {{/if}}
+
+    {{#if clearings}}
+      <table>
+      <thead>
+          <th>Price</th> 
+          <th>Quantity</th> 
+          <th>Type</th> 
+      </thead> 
+      <tbody> 
+          <tr>
+          {{#each clearings}} 
+            <td>{{ this }}</td> 
+          {{/each}}
+          </tr> 
+      </tbody> 
+    </table>
+    {{/if}}
 
     <!-- {{> page/nav}} -->
 </div>

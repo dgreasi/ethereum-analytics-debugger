@@ -235,6 +235,9 @@ function getclearingType() {
 ////////////////////// Get Storage on Previous Blocks /////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
+// More info about storage at specified block here:
+// https://medium.com/aigang-network/how-to-read-ethereum-contract-storage-44252c8af925
+
 function getClearingsThroughTime(startBlockNumber, endBlockNumber) {
   var blockNumberPromise = web3.eth.getBlockNumber();
 

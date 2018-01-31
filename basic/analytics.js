@@ -1,19 +1,19 @@
 var fs = require("fs");
-var Web3 = require('web3'); 
+var Web3 = require('web3');
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////// GLOBAL VARIABLES ////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 var web3 = new Web3();
 web3.setProvider(new web3.providers.HttpProvider('http://localhost:8100'));
 
 var accounts = []; // Account hash - Gas spent - # Transactions
-
-var start = 8000;
-// var start = 0;
-
-// var end = 8000;
-var end = null;
-
 var contract = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
-var numberOfBlocks = 0;
+var accountOfCentralNode = "0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768";
+
+var start = 22000;
+var end = 22600;
 
 module.exports = {
 
@@ -22,13 +22,139 @@ module.exports = {
     return 'PAOK';
   },
 
-
-  getPeersNumber: function() {
-    return web3.net.peerCount;
+  printAek: function() {
+    console.log("AEK");
+    this.printPaok();
   },
 
+///////////////////////////////////////////////////////////////////////////////
+/////////////////// Smart Contract - Smart Grid Functions /////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
-  gasAccounts: function(account, gas) {
+  ////////// Get only transactions that are calls to functions of a Contract /////
+  ///////////// IE a send Gas transaction will not be shown here /////////////////
+  getAccountTransactionsGasSpentClearings: function(startBlockNumber, endBlockNumber) {
+    return new Promise((resolve, reject)=> {
+
+      var getBlockPromises = [];
+      var blockNumberPromise = web3.eth.getBlockNumber();
+
+      blockNumberPromise.then(res => {
+        this.checkStartEndInput(startBlockNumber, endBlockNumber, res);
+        startBlockNumber = start;
+        endBlockNumber = end;
+
+        // console.log("Using startBlockNumber: " + startBlockNumber);
+        // console.log("Using endBlockNumber: " + endBlockNumber);
+
+        for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+          var getBlock = web3.eth.getBlock(i, true);
+          getBlockPromises.push(getBlock);
+        }
+
+        Promise.all(getBlockPromises).then(blocks => {
+          var receiptsPromises = [];
+          blocks.forEach(block => {
+            // console.log("BLOCK: " + block.number + " Number of transactions: " + block.transactions.length);
+            if (block != null && block.transactions != null) {
+              // if ((block.number-start)%10 == 0) {
+              //   getContractResults(block.number);
+              // }
+
+              block.transactions.forEach(e => {
+                if (e.input != "0x") {
+                  // printTransactionInfo(e);
+                  receiptsPromises.push(this.getTransactionReceiptFun(e.hash));
+                }
+              });
+              
+            }
+          });
+
+          Promise.all(receiptsPromises).then(res => {
+            // getContractResults();
+            // printsAccountsResults();
+            // console.log("ACCOUNTS: " + accounts);
+
+            resolve(accounts)
+            // return accounts;
+          }).catch(err => {
+            console.log("ERROR receiptsPromises: " + err);
+            reject(err);
+          });
+        }).catch(err => {
+          console.log("ERROR getBlockPromises: " + err);
+          reject(err);
+        });
+      }).catch(err => {
+        console.log("ERROR getBlockNumber: " + err);
+        reject(err);
+      });
+
+    });
+  },
+
+  getNumberOfTranscationsOfAccountPerBlock: function(startBlockNumber, endBlockNumber, account) {
+    var getBlockPromises = [];
+    var blockNumberPromise = web3.eth.getBlockNumber();
+
+    blockNumberPromise.then(res => {
+      checkStartEndInput(startBlockNumber, endBlockNumber, res);
+      startBlockNumber = start;
+      endBlockNumber = end;
+
+      console.log("Using startBlockNumber: " + startBlockNumber);
+      console.log("Using endBlockNumber: " + endBlockNumber);
+
+      for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+        var getBlock = web3.eth.getBlock(i, true);
+        getBlockPromises.push(getBlock);
+      }
+
+      Promise.all(getBlockPromises).then(blocks => {
+        var receiptsPromises = [];
+        blocks.forEach(block => {
+
+          if (block != null && block.transactions != null) {
+
+            var numOfTran = 0;
+
+            block.transactions.forEach(e => {
+              var fromA = e.from.toUpperCase();
+              account = account.toUpperCase();
+              if (e.input != "0x" && fromA == account) {
+                numOfTran++;
+              }
+            });
+
+            console.log(block.number + "," + numOfTran);
+            
+          } else {
+            console.log(block.number + "," + 0);          
+          }
+
+
+        });
+
+      }).catch(err => {
+        console.log("ERROR getBlockPromises: " + err);
+      });
+    }).catch(err => {
+      console.log("ERROR getBlockNumber: " + err);
+    });
+  },
+
+  getTransactionReceiptFun: function(txHash) {
+    return  web3.eth.getTransactionReceipt(txHash).then(res => {
+      if (res != null) {
+        this.saveAccountTransactionsSpentGas(res.from, res.gasUsed);
+      }  
+    }).catch(err => {
+      console.log("ERROR getTransactionReceipt: " + err);
+    });
+  },
+
+  saveAccountTransactionsSpentGas: function(account, gas) {
     var found = false;
 
     for (var i = 0; i < accounts.length; i++) {
@@ -48,142 +174,59 @@ module.exports = {
       newAccount = new Object([account, gas, 1]);
       accounts.push(newAccount);
     }
-
-    // prints();
   },
 
-  getAllTransactions: function(startBlockNumber, endBlockNumber) {
-    var getBlockPromises = [];
-    var blockNumberPromise = [];
-    blockNumberPromise.push(web3.eth.getBlockNumber());
-
-    Promise.all(blockNumberPromise).then(res => {
-      if (endBlockNumber == null) {
-        endBlockNumber = res;
-        end = res;
-      }
-
-      if (startBlockNumber == null || startBlockNumber > endBlockNumber) {
-        startBlockNumber = endBlockNumber/10;
-        start = startBlockNumber;
-      }
-
-      console.log("Using startBlockNumber: " + startBlockNumber);
-      console.log("Using endBlockNumber: " + endBlockNumber);
-
-      for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-        var getBlock = web3.eth.getBlock(i, true);
-        getBlockPromises.push(getBlock);
-      }
-
-      Promise.all(getBlockPromises).then(blocks => {
-        var receiptsPromises = [];
-        blocks.forEach(block => {
-
-          if (block != null && block.transactions != null) {
-            // if ((block.number-start)%10 == 0) {
-            //   getContractResults(block.number);
-            // }
-            
-
-            block.transactions.forEach(e => {
-              if (e.input != "0x") {
-                // console.log("");
-                // console.log("Account: " + e.from + " ,TO: " + e.to  + " , called FUNCTION: " + e.input);
-                // console.log("");
-                receiptsPromises.push(getTransactionReceiptFun(e.hash));
-              }
-            });
-
-            
-          }
-        });
-
-        Promise.all(receiptsPromises).then(res => {
-          getContractResults();
-          prints();
-        }).catch(err => {
-          console.log("ERROR receiptsPromises: " + err);
-        });
-      }).catch(err => {
-        console.log("ERROR getBlockPromises: " + err);
-      });
-    }).catch(err => {
-      console.log("ERROR getBlockNumber: " + err);
-    });
-
-  },
-
-  getTransactionReceiptFun: function(txHash) {
-    // return web3.eth.getTransactionReceipt(txHash);
-
-    return  web3.eth.getTransactionReceipt(txHash).then(res => {
-      if (res != null) {
-        gasAccounts(res.from, res.gasUsed);
-        // console.log("REs: " + res.blockNumber + " , End: " + end);
-      }  
-    }).catch(err => {
-      console.log("ERROR getTransactionReceipt: " + err);
-    });
-  },
-
-  prints: function() {
-    // console.log("accounts.length: " + accounts.length);
+  printsAccountsResults: function() {
     console.log("");
     for (var i = 0; i < accounts.length; i++) {
       console.log((i+1) + ")" + "Account: " + accounts[i][0] + " , gas spent: " + accounts[i][1] + " , # of transactions: " + accounts[i][2]);
     }
     console.log("");
-    // console.log("");
-    // console.log("");
   },
 
-  printBalanceOfAccounts: function() {
-    // var balancePromises = [];
-    console.log("BALANCES");
-    for (var i = 0; i < accounts.length; i++) {
-      web3.eth.getBalance(accounts[i][0]).then(bal => {
-        console.log("Account: " + accounts[i][0] + " ,balance: " + bal);
-      }).catch(err => {
-        console.log("ERROR: " + err);
-      });
-      // balancePromises.push(getBalanceOfAccount(accounts[i][0]));
+  printTransactionInfo: function(e) {
+    console.log("");
+    console.log("Account: " + e.from + " ,TO: " + e.to  + " , called FUNCTION: " + e.input);
+    console.log("");
+  },
+
+  ////////////////////////// Fix START && END block /////////////////////////
+
+  checkStartEndInput: function(startBlockNumber, endBlockNumber, endOfBlockEth) {
+    if (endBlockNumber == null) {
+      endBlockNumber = endOfBlockEth;
+      end = endOfBlockEth;
+      if (startBlockNumber == null) {
+        startBlockNumber = endBlockNumber - 1000;
+        start = startBlockNumber;
+      }
+    } else {
+      if (startBlockNumber == null || startBlockNumber > endBlockNumber) {
+        startBlockNumber = endBlockNumber - 1000;
+        start = startBlockNumber;
+      }
     }
-
-    // Promise.all(balancePromises).then(balances => {
-    //   // balances.
-    // })
   },
 
-  printBalance: function(account) {
-    getBalanceOfAccount(account, web3).then(bal => {
-      console.log("Account: " + account + " ,balance: " + bal);
-    }).catch(err => {
-      console.log("ERROR: " + err);
-    });
-  },
-
-  getBalanceOfAccount: function(account) {
-    return web3.eth.getBalance(account);
-  },
+  /////////////////////////// Get Clearing Values //////////////////////////////
 
   getContractResults: function() {
-    var promisesAllgetClearing = [];
+    return new Promise((resolve, reject) => {
+      var promisesAllgetClearing = [];
 
-    promisesAllgetClearing.push(getClearingPrice());
-    promisesAllgetClearing.push(getclearingQuantity());
-    promisesAllgetClearing.push(getclearingType());
+      promisesAllgetClearing.push(this.getClearingPrice());
+      promisesAllgetClearing.push(this.getclearingQuantity());
+      promisesAllgetClearing.push(this.getclearingType());
 
-    Promise.all(promisesAllgetClearing).then(clearings => {
-      console.log("");
-      console.log("Clearing Price: " + parseInt(clearings[0]));
-      console.log("Clearing Quantity: " + parseInt(clearings[1]));
-      console.log("Clearing Type: " + parseInt(clearings[2]));
-      console.log("");
-    }).catch(err => {
-      console.log("ERROR: " + err);
+      Promise.all(promisesAllgetClearing).then(clearings => {
+        resolve(clearings);
+
+      }).catch(err => {
+        reject(err);
+        console.log("ERROR: " + err);
+      });
+
     });
-
   },
 
   getClearingPrice: function() {
@@ -198,33 +241,110 @@ module.exports = {
     return web3.eth.call({to: contract, data: "0xbc3d513f"});
   },
 
-  getTransactionReceiptFunAccount: function(txHash, account) {
+  ///////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////
 
-    return  web3.eth.getTransactionReceipt(txHash).then(res => {
-      if (res != null && account == res.from) {
-        gasAccounts(res.from, res.gasUsed);
-      }  
-    }).catch(err => {
-      console.log("ERROR getTransactionReceipt: " + err);
+  ///////////////////////////////////////////////////////////////////////////////
+  ////////////////////// Get Storage on Previous Blocks /////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////
+
+  // More info about storage at specified block here:
+  // https://medium.com/aigang-network/how-to-read-ethereum-contract-storage-44252c8af925
+
+  getClearingsThroughTime: function(startBlockNumber, endBlockNumber) {
+    var blockNumberPromise = web3.eth.getBlockNumber();
+
+    blockNumberPromise.then(res => {
+      checkStartEndInput(startBlockNumber, endBlockNumber, res);
+      startBlockNumber = start;
+      endBlockNumber = end;
+
+      console.log("Using startBlockNumber: " + startBlockNumber);
+      console.log("Using endBlockNumber: " + endBlockNumber);
+      console.log("");
+
+      for (var i = end; i > start ; i=i-40) {
+        getStorageAtBlock(i);
+      }
+
     });
   },
 
+  getStorageAtBlock: function(block) {
 
-  getTransactionsByAccount: function(myaccount, startBlockNumber, endBlockNumber) {
+    var promiseGetStorageAll = [];
+    promiseGetStorageAll.push(getStorageAtBlockPrice(block));
+    promiseGetStorageAll.push(getStorageAtBlockQuantity(block));
+    promiseGetStorageAll.push(getStorageAtBlockType(block));
+
+    Promise.all(promiseGetStorageAll).then(clearings => {
+      console.log("BLOCK: " + block);
+      console.log("Clearing Price: " + parseInt(clearings[0]));
+      console.log("Clearing Quantity: " + parseInt(clearings[1]));
+      console.log("Clearing Type: " + parseInt(clearings[2]));
+      console.log("");
+    }).catch(err => {
+      console.log("ERROR: " + err);
+    });
+  },
+
+  getStorageAtBlockPrice: function(block) {
+    return web3.eth.getStorageAt(contract, 6, block).catch(err => {
+      return -99;
+    });
+  },
+
+  getStorageAtBlockQuantity: function(block) {
+    return web3.eth.getStorageAt(contract, 5, block).catch(err => {
+      return -99;
+    });
+  },
+
+  getStorageAtBlockType: function(block) {
+    return web3.eth.getStorageAt(contract, 7,block).catch(err => {
+      return -99;
+    });
+  },
+
+  checkPositionStorage: function() {
+    for (var i = 0; i < 10; i++) {
+      web3.eth.getStorageAt(contract, i).then(res => {
+        // console.log("Index: " + i +" , val: " + res);
+        console.log("Index: " + i +" , val: " + parseInt(res));
+      });
+    }
+  },
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ////////////////////////// EXTRA HELP FUNCTIONS ///////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////
+
+  printBalanceOfAccounts: function() {
+    console.log("BALANCES");
+    for (var i = 0; i < accounts.length; i++) {
+      web3.eth.getBalance(accounts[i][0]).then(bal => {
+        console.log("Account: " + accounts[i][0] + " ,balance: " + bal);
+      }).catch(err => {
+        console.log("ERROR: " + err);
+      });
+    }
+  },
+
+  getBalance: function(account) {
+    return web3.eth.getBalance(account);
+  },
+
+  getTransactionsByAccount: function(startBlockNumber, endBlockNumber, myaccount) {
     var getBlockPromises = [];
-    var blockNumberPromise = [];
-    blockNumberPromise.push(web3.eth.getBlockNumber());
+    var blockNumberPromise = web3.eth.getBlockNumber();
 
-    Promise.all(blockNumberPromise).then(res => {
-      if (endBlockNumber == null) {
-        endBlockNumber = res;
-        end = res;
-      }
-
-      if (startBlockNumber == null || startBlockNumber > endBlockNumber) {
-        startBlockNumber = endBlockNumber/10;
-        start = startBlockNumber;
-      }
+    blockNumberPromise.then(res => {
+      checkStartEndInput(startBlockNumber, endBlockNumber, res);
+      startBlockNumber = start;
+      endBlockNumber = end;
 
       console.log("Using startBlockNumber: " + startBlockNumber);
       console.log("Using endBlockNumber: " + endBlockNumber);
@@ -241,21 +361,21 @@ module.exports = {
           if (block != null && block.transactions != null) {
 
             block.transactions.forEach(e => {
-              if (e.input != "0x") {
-                // console.log("");
-                // console.log("Account: " + e.from + " ,TO: " + e.to  + " , called FUNCTION: " + e.input);
-                // console.log("");
-                receiptsPromises.push(getTransactionReceiptFunAccount(e.hash, myaccount));
+              var fromA = e.from.toUpperCase();
+              myaccount = myaccount.toUpperCase();
+              if (myaccount == "*" || myaccount == e.from) {
+                receiptsPromises.push(getTransactionReceiptFun(e.hash));
               }
-            });
 
+                // printTransactionInfo(e);
+            });
             
           }
         });
 
         Promise.all(receiptsPromises).then(res => {
           getContractResults();
-          prints();
+          printsAccountsResults();
         }).catch(err => {
           console.log("ERROR receiptsPromises: " + err);
         });
@@ -265,6 +385,221 @@ module.exports = {
     }).catch(err => {
       console.log("ERROR getBlockNumber: " + err);
     });
-  }
+  },
+
+  getPeersNumber: function() {
+    return web3.eth.net.getPeerCount();
+  },
+
+  getTimeDateOfBlock: function(block) {
+    web3.eth.getBlock(block,true).then(res => {
+      var date = new Date(res.timestamp*1000);
+      // Hours part from the timestamp
+      var hours = date.getHours();
+      // Minutes part from the timestamp
+      var minutes = "0" + date.getMinutes();
+      // Seconds part from the timestamp
+      var seconds = "0" + date.getSeconds();
+      var day = date.getDate();
+
+      // Will display time in 10:30:23 format
+      var formattedTime = day + " " + hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+      console.log(formattedTime);
+    });
+  },
+
+  clearContract: function() {
+    var myContract =  new web3.eth.Contract(ABI, contract);
+
+    myContract
+
+    myContract.options.from = accountOfCentralNode;
+    myContract.options.gasPrice = '20000000000000';
+    myContract.options.gas = 5000000;
+  },
+
 
 }
+
+  var ABI = [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getGenerationsLength",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "clearing",
+      "outputs": [
+        {
+          "name": "clearingQuantity",
+          "type": "int256"
+        },
+        {
+          "name": "clearingPrice",
+          "type": "int256"
+        },
+        {
+          "name": "clearingType",
+          "type": "int256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_quantity",
+          "type": "int256"
+        },
+        {
+          "name": "_price",
+          "type": "int256"
+        }
+      ],
+      "name": "generationBid",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getClearingQuantity",
+      "outputs": [
+        {
+          "name": "",
+          "type": "int256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "marketClearing",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getConsumptionsLength",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "blockNumberNow",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_quantity",
+          "type": "int256"
+        },
+        {
+          "name": "_price",
+          "type": "int256"
+        }
+      ],
+      "name": "consumptionBid",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "market",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getClearingPrice",
+      "outputs": [
+        {
+          "name": "",
+          "type": "int256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getClearingType",
+      "outputs": [
+        {
+          "name": "",
+          "type": "int256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "deleteMapArrays",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    }
+  ];

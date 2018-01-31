@@ -3,19 +3,6 @@ var router = express.Router();
 var app = require('../server.js');
 var analytics = require('../analytics.js');
 var localforage = require('localforage');
-// var fs = require("fs");
-var Web3 = require('web3'); 
-
-var web3 = new Web3();
-web3.setProvider(new web3.providers.HttpProvider('http://localhost:8100'));
-
-var accounts = []; // Account hash - Gas spent - # Transactions
-
-var start = 8000;
-// var start = 0;
-
-// var end = 8000;
-var end = null;
 
 var contract = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
 var numberOfBlocks = 0;
@@ -26,39 +13,73 @@ router.get('/', function(req, res, next) {
   res.render('home', { title: 'Ethereum Analytics Debugger' });
 });
 
+///////////////////////////////////////////////////////////////
+/////////////////////// Get Functions /////////////////////////
+///////////////////////////////////////////////////////////////
 
 router.post('/get_transactions', function(req, res, next) {
 	var start_block = req.body.start_block;
   var end_block = req.body.end_block;
 
-  // console.log("Start block: " + start_block);
-  // console.log("End block: " + end_block);
-	
-	// val = route1();
-  val = analytics.printPaok();
-	res.render('home', { 
-    title: 'Ethereum Analytics Debugger - Get Experiment',
-    start: start_block,
-    end: end_block ,
-    data: val
+  analytics.getAccountTransactionsGasSpentClearings(start_block, end_block).then(val => {
+    
+    // console.log("RETURN VALUE: " + val);
+
+  	res.render('home', { 
+      title: 'Ethereum Analytics Debugger - Get Experiment',
+      start: start_block,
+      end: end_block,
+      data: val
+    });
+  });
+});
+
+router.post('/get_clearing', function(req, res, next) {
+
+  analytics.getContractResults().then(clearings => {
+    clearings[0] = parseInt(clearings[0]);
+    clearings[1] = parseInt(clearings[1]);
+    clearings[2] = parseInt(clearings[2]);
+    res.render('home', {
+      title: 'Ethereum Analytics Debugger - Get Clearing',
+      clearings: clearings
+    });
   });
 });
 
 router.post('/get_balance', function(req, res, next) {
-	var account = req.body.account;
+  var account = req.body.account;
 
-  console.log("Account: " + account);
-
-	res.render('home', { title: 'Ethereum Analytics Debugger - Get Balance' });
+  analytics.getBalance(account).then(val => {
+    res.render('home', {
+      title: 'Ethereum Analytics Debugger - Get Balance',
+      account: account,
+      balance: val
+    });
+    
+  });
 });
+
+router.post('/get_peers', function(req, res, next) {
+  
+  analytics.getPeersNumber().then(peers => {
+    // console.log("PEERS: " + peers);
+    res.render('home', { 
+      title: 'Ethereum Analytics Debugger - Get Peers',
+      infoP: '1',
+      peers: peers
+    });
+  });
+});
+
 
 
 router.post('/get_accounts', function(req, res, next) {
   var start_block = req.body.start_block;
   var end_block = req.body.end_block;
 
-  console.log("Start block: " + start_block);
-  console.log("End block: " + end_block);
+  // console.log("Start block: " + start_block);
+  // console.log("End block: " + end_block);
 
 	res.render('home', { title: 'Ethereum Analytics Debugger - Get Accounts' });
 });
@@ -68,26 +89,14 @@ router.post('/get_gas_spent', function(req, res, next) {
   var start_block = req.body.start_block;
   var end_block = req.body.end_block;
 
-  console.log("Account: " + account);
-  console.log("Start block: " + start_block);
-  console.log("End block: " + end_block);
+  // console.log("Account: " + account);
+  // console.log("Start block: " + start_block);
+  // console.log("End block: " + end_block);
 
   res.render('home', { title: 'Ethereum Analytics Debugger - Get Gas Spent' });
 });
 
-router.post('/get_clearing', function(req, res, next) {
 
-  res.render('home', { title: 'Ethereum Analytics Debugger - Get Clearing' });
-});
-
-router.post('/get_peers', function(req, res, next) {
-  peers = "Number of Peers: " + analytics.getPeersNumber(web3);
-
-  res.render('home', { 
-    title: 'Ethereum Analytics Debugger - Get Peers',
-    data: peers
-  });
-});
 
 router.post('/route4', function(req, res, next) {
 	var pass = req.body.password;
@@ -104,24 +113,6 @@ router.post('/route4', function(req, res, next) {
 router.get('/*', function(req, res, next) {
   res.render('home', { title: 'Ethereum Analytics Debugger (wrong url, redirected to home)' });
 });
-
-//////////////////// *** FUNCTIONS *** ////////////////////
-
-function route1() {
-	console.log("Calling function route1");
-}
-
-function route2() {
-	console.log("Calling function route2");	
-}
-
-function route3() {
-	console.log("Calling function route3");
-}
-
-function route4() {
-	console.log("Calling function route4");
-}
 
 
 module.exports = router;
