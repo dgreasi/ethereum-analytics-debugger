@@ -8,7 +8,7 @@
     <hr>
     <br>
 
-    <button class="btn btn-default blue_btn" data-toggle="modal" data-target="#get_transactions">Get Experiment</button>
+    <button class="btn btn-default blue_btn" data-toggle="modal" data-target="#get_experiment">Get Experiment</button>
     
 
 
@@ -28,16 +28,18 @@
       
       <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_balance">Get Balance of Account</button>
       
-      <!-- <button class="btn btn-default" data-toggle="modal" data-target="#get_gas_spent">Get Gas Spent of Account</button> -->
       
       <form method="post" action="/get_peers">
         <button class="btn btn-default green_btn">Get # Peers</button>
       </form>
+
+      <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_transactions_by_account">Get Transactions of Account</button>
+
     </div>
 
  
-    <form method="post" action="/get_transactions">
-      <div id="get_transactions" class="modal fade" role="dialog">
+    <form method="post" action="/get_experiment">
+      <div id="get_experiment" class="modal fade" role="dialog">
           <div class="modal-dialog">
 
               <!-- Modal content-->
@@ -196,6 +198,56 @@
       </div>
     </form>
 
+    <form method="post" action="/get_transactions_by_account">
+      <div id="get_transactions_by_account" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Get Transactions of Account</h4>
+                  </div>
+
+                 
+
+                  <div class="modal-body">
+                    <p>
+                      Specify the range of the blocks you want to check for transactions.
+                    </p>
+
+                    <p>
+                      You can leave <b>End Block</b> blank to check until the last block.
+                    </p>
+
+                    <div class="form-group">
+                        <label for="pwd">Start Block:</label>
+                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number" value="22000">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pwd">End Block:</label>
+                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number" value="22500">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pwd">Account in Hex:</label>
+                        <input type="string" class="form-control" id="account" name="account" placeholder="Enter account" value="0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768">
+                    </div>
+
+                    <p style="color: red;">
+                      If the range of the blocks is too big, there is high possibility that the ethereum Node can't answer. Just specify a smaller range of blocks.
+                    </p>
+                  </div>
+                  <div class="modal-footer">
+                      <input type="submit" value="Get" class="btn btn-default" ></input>
+                  </div>
+
+              </div>
+          </div>
+      </div>
+    </form>
+
     <form method="post" action="/route4">
       <div id="myModal" class="modal fade" role="dialog">
           <div class="modal-dialog">
@@ -268,24 +320,24 @@
     {{/if}}
     
     {{#if data}}
-    <table>
-      <thead>
-          <th>#</th> 
-          <th>Account</th> 
-          <th>Spent Gas</th> 
-          <th># Transactions</th> 
-      </thead> 
-      <tbody> 
-          {{#each data}} 
-          <tr>
-            <td>{{ @index }}</td>
-            {{#each this}}
-              <td>{{ this }}</td> 
+      <table>
+        <thead>
+            <th>#</th> 
+            <th>Account</th> 
+            <th>Spent Gas</th> 
+            <th># Transactions</th> 
+        </thead> 
+        <tbody> 
+            {{#each data}} 
+            <tr>
+              <td>{{ @index }}</td>
+              {{#each this}}
+                <td>{{ this }}</td> 
+              {{/each}}
+            </tr> 
             {{/each}}
-          </tr> 
-          {{/each}}
-      </tbody> 
-    </table>
+        </tbody> 
+      </table>
     {{/if}}
 
     {{#if clearings}}
@@ -302,7 +354,34 @@
           {{/each}}
           </tr> 
       </tbody> 
-    </table>
+      </table>
+    {{/if}}
+
+
+    {{#if transactions}}
+      <table>
+        <thead>
+            <th>#</th> 
+            <th>To</th> 
+            <th>Input</th> 
+        </thead> 
+        <tbody> 
+            {{#each transactions}} 
+            <tr>
+              <td>{{ @index }}</td>
+              {{#each this}}
+                <td>{{ this }}</td> 
+              {{/each}}
+            </tr> 
+            {{/each}}
+        </tbody> 
+      </table>
+
+<!--       <div>
+        <h2 style="color: red;">
+          <b>No transactions from this account at the specified blocks<b/>
+        </h2>
+      </div> -->
     {{/if}}
 
     <!-- {{> page/nav}} -->

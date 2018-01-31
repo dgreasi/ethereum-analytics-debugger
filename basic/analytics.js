@@ -72,12 +72,8 @@ module.exports = {
           });
 
           Promise.all(receiptsPromises).then(res => {
-            // getContractResults();
-            // printsAccountsResults();
-            // console.log("ACCOUNTS: " + accounts);
+            resolve(accounts);
 
-            resolve(accounts)
-            // return accounts;
           }).catch(err => {
             console.log("ERROR receiptsPromises: " + err);
             reject(err);
@@ -338,52 +334,51 @@ module.exports = {
   },
 
   getTransactionsByAccount: function(startBlockNumber, endBlockNumber, myaccount) {
-    var getBlockPromises = [];
-    var blockNumberPromise = web3.eth.getBlockNumber();
+    return new Promise((resolve, reject)=> {
+      var transactionsR = [];
+      var getBlockPromises = [];
+      var blockNumberPromise = web3.eth.getBlockNumber();
 
-    blockNumberPromise.then(res => {
-      checkStartEndInput(startBlockNumber, endBlockNumber, res);
-      startBlockNumber = start;
-      endBlockNumber = end;
+      blockNumberPromise.then(res => {
+        this.checkStartEndInput(startBlockNumber, endBlockNumber, res);
+        startBlockNumber = start;
+        endBlockNumber = end;
 
-      console.log("Using startBlockNumber: " + startBlockNumber);
-      console.log("Using endBlockNumber: " + endBlockNumber);
+        for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+          var getBlock = web3.eth.getBlock(i, true);
+          getBlockPromises.push(getBlock);
+        }
 
-      for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-        var getBlock = web3.eth.getBlock(i, true);
-        getBlockPromises.push(getBlock);
-      }
+        Promise.all(getBlockPromises).then(blocks => {
+          var receiptsPromises = [];
+          blocks.forEach(block => {
 
-      Promise.all(getBlockPromises).then(blocks => {
-        var receiptsPromises = [];
-        blocks.forEach(block => {
+            if (block != null && block.transactions != null) {
 
-          if (block != null && block.transactions != null) {
+              block.transactions.forEach(e => {
+                var fromA = e.from.toUpperCase();
+                myaccount = myaccount.toUpperCase();
 
-            block.transactions.forEach(e => {
-              var fromA = e.from.toUpperCase();
-              myaccount = myaccount.toUpperCase();
-              if (myaccount == "*" || myaccount == e.from) {
-                receiptsPromises.push(getTransactionReceiptFun(e.hash));
-              }
+                if (myaccount == "*" || myaccount == fromA) {
+                  transactionsR.push([e.to, e.input]);
+                }
 
-                // printTransactionInfo(e);
-            });
-            
-          }
-        });
+              });
+              
+            }
+          });
 
-        Promise.all(receiptsPromises).then(res => {
-          getContractResults();
-          printsAccountsResults();
+          // console.log("Transactions: " + JSON.stringify(transactionsR));
+          resolve(transactionsR);
+
         }).catch(err => {
-          console.log("ERROR receiptsPromises: " + err);
+          reject(err);
+          console.log("ERROR getBlockPromises: " + err);
         });
       }).catch(err => {
-        console.log("ERROR getBlockPromises: " + err);
+        reject(err);
+        console.log("ERROR getBlockNumber: " + err);
       });
-    }).catch(err => {
-      console.log("ERROR getBlockNumber: " + err);
     });
   },
 

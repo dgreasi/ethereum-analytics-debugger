@@ -17,7 +17,7 @@ router.get('/', function(req, res, next) {
 /////////////////////// Get Functions /////////////////////////
 ///////////////////////////////////////////////////////////////
 
-router.post('/get_transactions', function(req, res, next) {
+router.post('/get_experiment', function(req, res, next) {
 	var start_block = req.body.start_block;
   var end_block = req.body.end_block;
 
@@ -72,6 +72,24 @@ router.post('/get_peers', function(req, res, next) {
   });
 });
 
+router.post('/get_transactions_by_account', function(req, res, next) {
+  var start_block = req.body.start_block;
+  var end_block = req.body.end_block;
+  var account = req.body.account;
+
+  analytics.getTransactionsByAccount(start_block, end_block, account).then(val => {
+    
+    // console.log("RETURN VALUE: " + val);
+
+    res.render('home', { 
+      title: 'Ethereum Analytics Debugger - Get Transactions by Account',
+      start: start_block,
+      end: end_block,
+      account: account,
+      transactions: val
+    });
+  });
+});
 
 
 router.post('/get_accounts', function(req, res, next) {
@@ -95,7 +113,6 @@ router.post('/get_gas_spent', function(req, res, next) {
 
   res.render('home', { title: 'Ethereum Analytics Debugger - Get Gas Spent' });
 });
-
 
 
 router.post('/route4', function(req, res, next) {
