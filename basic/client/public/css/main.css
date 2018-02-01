@@ -1,5 +1,6 @@
 body {
   padding: 50px;
+  text-align: center;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -34,9 +35,12 @@ form{
     padding:0;
 }
 
+.leftP{
+  padding-right:45em;
+}
 
 table {
-    margin: 10px;
+    margin: auto;
 }
 th, td {
     padding: 5px;
@@ -52,6 +56,7 @@ td a {
     color: #000;
     text-decoration: underline;
 }
+
 /*.container {
     padding-right: 15px;
     padding-left: 15px;

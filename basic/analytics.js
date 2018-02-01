@@ -1,5 +1,6 @@
 var fs = require("fs");
 var Web3 = require('web3');
+var localforage = require('localforage');
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////// GLOBAL VARIABLES ////////////////////////////////
@@ -14,6 +15,8 @@ var accountOfCentralNode = "0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768";
 
 var start = 22000;
 var end = 22600;
+
+
 
 module.exports = {
 
@@ -34,6 +37,8 @@ module.exports = {
   ////////// Get only transactions that are calls to functions of a Contract /////
   ///////////// IE a send Gas transaction will not be shown here /////////////////
   getAccountTransactionsGasSpentClearings: function(startBlockNumber, endBlockNumber) {
+    accounts = [];
+
     return new Promise((resolve, reject)=> {
 
       var getBlockPromises = [];
@@ -57,13 +62,9 @@ module.exports = {
           blocks.forEach(block => {
             // console.log("BLOCK: " + block.number + " Number of transactions: " + block.transactions.length);
             if (block != null && block.transactions != null) {
-              // if ((block.number-start)%10 == 0) {
-              //   getContractResults(block.number);
-              // }
 
               block.transactions.forEach(e => {
                 if (e.input != "0x") {
-                  // printTransactionInfo(e);
                   receiptsPromises.push(this.getTransactionReceiptFun(e.hash));
                 }
               });
@@ -189,19 +190,31 @@ module.exports = {
   ////////////////////////// Fix START && END block /////////////////////////
 
   checkStartEndInput: function(startBlockNumber, endBlockNumber, endOfBlockEth) {
-    if (endBlockNumber == null) {
-      endBlockNumber = endOfBlockEth;
-      end = endOfBlockEth;
-      if (startBlockNumber == null) {
-        startBlockNumber = endBlockNumber - 1000;
-        start = startBlockNumber;
-      }
+    if (endBlockNumber == 1 && startBlockNumber == 1) {
+      startBlockNumber = start;
+      endBlockNumber = end;
     } else {
-      if (startBlockNumber == null || startBlockNumber > endBlockNumber) {
-        startBlockNumber = endBlockNumber - 1000;
+      if (endBlockNumber == null) {
+        endBlockNumber = endOfBlockEth;
+        end = endOfBlockEth;
+        if (startBlockNumber == null) {
+          startBlockNumber = endBlockNumber - 1000;
+          start = startBlockNumber;
+        }
+      } else {
+        end = endBlockNumber;
         start = startBlockNumber;
+        if (startBlockNumber == null || startBlockNumber > endBlockNumber) {
+          startBlockNumber = endBlockNumber - 1000;
+          start = startBlockNumber;
+        }
       }
     }
+
+
+    // console.log("START: " + start);
+    // console.log("END: " + end);
+    // this.saveStartEndLF(start, end);
   },
 
   /////////////////////////// Get Clearing Values //////////////////////////////
@@ -318,6 +331,24 @@ module.exports = {
   ////////////////////////// EXTRA HELP FUNCTIONS ///////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////
 
+  getAccountInfo: function(start_block, end_block, account) {
+    return new Promise((resolve, reject) => {
+      var promisesDif = [];
+      // console.log("BEGIN");
+      promisesDif.push(this.getBalance(account));
+      promisesDif.push(this.getTransactionsByAccount(start_block, end_block, account));
+
+      Promise.all(promisesDif).then(res => {
+        var results = [start, end];
+        results.push(res);
+        resolve(results);
+      }).catch(err => {
+        reject(err);
+        console.log("ERROR promisesDif: " + err);
+      });
+    });
+  },
+  
   printBalanceOfAccounts: function() {
     console.log("BALANCES");
     for (var i = 0; i < accounts.length; i++) {
@@ -334,7 +365,7 @@ module.exports = {
   },
 
   getTransactionsByAccount: function(startBlockNumber, endBlockNumber, myaccount) {
-    return new Promise((resolve, reject)=> {
+    return new Promise((resolve, reject) => {
       var transactionsR = [];
       var getBlockPromises = [];
       var blockNumberPromise = web3.eth.getBlockNumber();
@@ -411,6 +442,52 @@ module.exports = {
     myContract.options.from = accountOfCentralNode;
     myContract.options.gasPrice = '20000000000000';
     myContract.options.gas = 5000000;
+  },
+
+  saveStartEndLF: function(startBlock, endBlock) {
+    console.log(localforage);
+
+    localforage.setItem('start', startBlock).then(function () {
+      return localforage.getItem('start');
+    }).then(function (value) {
+      console.log("Start LF: " + value);
+      // we got our value
+    }).catch(function (err) {
+      console.log("Start LF ERROR: " + err);
+      // we got an error
+    });
+
+    localforage.setItem('start', startBlock).then(value => {
+      console.log("Start LF: " + value);
+      return value;
+      // we got our value
+    }).catch(err => {
+      console.log("Start LF ERROR: " + err);
+      return err;
+      // we got an error
+    });
+
+    localforage.setItem('end', endBlock).then(value => {
+      console.log("End LF: " + value);
+      return value;
+      // we got our value
+    }).catch(err => {
+      console.log("End LF ERROR: " + err);
+      return err;
+      // we got an error
+    });
+
+  },
+
+  getStartEndLF: function() {
+    var startEndPromises = [];
+
+    startEndPromises.push(localforage.getItem('start'));
+    startEndPromises.push(localforage.getItem('end'));
+
+    Promise.all(startEndPromises).then(startEnd => {
+      return startEnd;
+    });
   },
 
 

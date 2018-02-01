@@ -19,6 +19,8 @@
       <button class="btn btn-default blue_btn">Get Clearing</button>
     </form>
 
+    <button class="btn btn-default red_btn" data-toggle="modal" data-target="#get_account_info">Get Account Info</button>
+
 <!--     <button class="btn btn-default" data-toggle="modal" data-target="#myModal">Button Modal</button> -->
     
 
@@ -32,8 +34,8 @@
       <form method="post" action="/get_peers">
         <button class="btn btn-default green_btn">Get # Peers</button>
       </form>
-
-      <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_transactions_by_account">Get Transactions of Account</button>
+<!-- 
+      <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_transactions_by_account">Get Transactions of Account</button> -->
 
     </div>
 
@@ -232,12 +234,61 @@
 
                     <div class="form-group">
                         <label for="pwd">Account in Hex:</label>
-                        <input type="string" class="form-control" id="account" name="account" placeholder="Enter account" value="0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768">
+                        <input type="string" class="form-control" id="account" name="account" placeholder="Enter account" value="0x43eff48a19e93d7fd4d156b485b7ea79db6579e4">
                     </div>
 
                     <p style="color: red;">
                       If the range of the blocks is too big, there is high possibility that the ethereum Node can't answer. Just specify a smaller range of blocks.
                     </p>
+                  </div>
+                  <div class="modal-footer">
+                      <input type="submit" value="Get" class="btn btn-default" ></input>
+                  </div>
+
+              </div>
+          </div>
+      </div>
+    </form>
+
+    <form method="post" action="/get_account_info">
+      <div id="get_account_info" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Get Account Info</h4>
+                  </div>
+
+                  <div class="modal-body">
+                    <p>
+                      Specify the range of the blocks you want to check for transactions.
+                    </p>
+
+                    <p>
+                      You can leave <b>End Block</b> blank to check until the last block.
+                    </p>
+
+                    <div class="form-group">
+                        <label for="pwd">Start Block:</label>
+                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number" value="22000">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pwd">End Block:</label>
+                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number" value="22500">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pwd">Account in Hex:</label>
+                        <input type="string" class="form-control" id="account" name="account" placeholder="Enter account" value="0x43eff48a19e93d7fd4d156b485b7ea79db6579e4">
+                    </div>
+
+                    <p style="color: red;">
+                      If the range of the blocks is too big, there is high possibility that the ethereum Node can't answer. Just specify a smaller range of blocks.
+                    </p>
+
                   </div>
                   <div class="modal-footer">
                       <input type="submit" value="Get" class="btn btn-default" ></input>
@@ -283,27 +334,27 @@
     <hr>
     
     {{#if start}}
-    <div class="inline">
-      <h4 class="inline" style="padding-right:10em;">
-        Start Block: <b>{{start}}</b>
-      </h4>
+      <div class="inline"">
+        <h4 class="inline leftP">
+          Start Block: <b>{{start}}</b>
+        </h4>
 
-      <h4 class="inline">
-        End Block: <b>{{end}}</b>
-      </h4>
-    </div>
-    <hr>
+        <h4 class="inline">
+          End Block: <b>{{end}}</b>
+        </h4>
+      </div>
+      <hr>
     {{/if}}
 
 
     {{#if account}}
-      <h4>Selected Account: {{ account }}</h4>
+      <h4>Selected Account: <b>{{ account }}</b></h4>
       <hr>
     {{/if}}
 
     {{#if balance}}
       <div>
-        Balance: {{ balance }}
+        Balance: <b>{{ balance }}</b>
       </div>
       <hr>
     {{/if}}    
@@ -315,7 +366,7 @@
 
     {{#if infoP}}
       <div>
-        Number of peers: {{ peers }}
+        Number of peers: <b>{{ peers }}</b>
       </div>
     {{/if}}
     
@@ -332,7 +383,11 @@
             <tr>
               <td>{{ @index }}</td>
               {{#each this}}
-                <td>{{ this }}</td> 
+                {{#if @index}}
+                  <td>{{ this }}</td>
+                {{else}}
+                  <td><a href="/account/{{this}}">{{ this }}</a></td>
+                {{/if}}
               {{/each}}
             </tr> 
             {{/each}}

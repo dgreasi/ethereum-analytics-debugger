@@ -4,9 +4,6 @@ var app = require('../server.js');
 var analytics = require('../analytics.js');
 var localforage = require('localforage');
 
-var contract = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
-var numberOfBlocks = 0;
-
 
 router.get('/', function(req, res, next) {
 
@@ -72,14 +69,71 @@ router.post('/get_peers', function(req, res, next) {
   });
 });
 
+router.post('/get_account_info', function(req, res, next) {
+  var start_block = req.body.start_block;
+  var end_block = req.body.end_block;
+  var account = req.body.account;
+
+  analytics.getAccountInfo(start_block, end_block, account).then(val => {
+
+    accountMbalance = val[2][0];
+    // Delete first element from array
+    // Keep transactions
+    val[2].shift();
+    // Keep Inner array
+    transactionsT = val[2][0];
+
+    res.render('home', {
+      title: 'Ethereum Analytics Debugger - Get Account Info',
+      start: val[0],
+      end: val[1],
+      account: account,
+      balance: accountMbalance,
+      transactions: transactionsT
+    });
+    
+  });
+});
+
+router.get('/account/:acc', function(req, res, next) {
+  var account = req.params.acc;
+
+  // console.log("Account: " + JSON.stringify(account));
+
+  analytics.getAccountInfo(1, 1, account).then(val => {
+
+    accountMbalance = val[2][0];
+
+    // Delete first element from array
+    // Keep transactions
+    val[2].shift();
+
+    // Keep Inner array
+    transactionsT = val[2][0];
+
+    res.render('home', {
+      title: 'Ethereum Analytics Debugger - Get Account Info',
+      start: val[0],
+      end: val[1],
+      account: account,
+      balance: accountMbalance,
+      transactions: transactionsT
+    });
+    
+  });
+
+});
+
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+
 router.post('/get_transactions_by_account', function(req, res, next) {
   var start_block = req.body.start_block;
   var end_block = req.body.end_block;
   var account = req.body.account;
 
   analytics.getTransactionsByAccount(start_block, end_block, account).then(val => {
-    
-    // console.log("RETURN VALUE: " + val);
 
     res.render('home', { 
       title: 'Ethereum Analytics Debugger - Get Transactions by Account',
@@ -90,7 +144,6 @@ router.post('/get_transactions_by_account', function(req, res, next) {
     });
   });
 });
-
 
 router.post('/get_accounts', function(req, res, next) {
   var start_block = req.body.start_block;

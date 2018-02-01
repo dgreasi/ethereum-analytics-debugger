@@ -442,15 +442,6 @@ contract DoubleAuction {
   }
 
   function deleteMapArrays() public{
-    for (uint cleanConsumptionIndex = 0; cleanConsumptionIndex < _consumptionPrices.length; cleanConsumptionIndex++){
-      int consPrice = _consumptionPrices[cleanConsumptionIndex];
-      consumptionBids[consPrice] = 0;
-    }
-
-    for (uint cleanGenerationIndex = 0; cleanGenerationIndex < _generationPrices.length; cleanGenerationIndex++){
-      int genPrice = _generationPrices[cleanGenerationIndex];
-      generationBids[genPrice] = 0;
-    }
 
     delete _consumptionPrices;
     delete _generationPrices;

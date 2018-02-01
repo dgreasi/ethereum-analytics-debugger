@@ -12,8 +12,8 @@ var accounts = []; // Account hash - Gas spent - # Transactions
 var contract = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
 var accountOfCentralNode = "0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768";
 
-var start = 1237;
-var end = null;
+var start = 22000;
+var end = 25000;
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////// RUN PARTITION ///////////////////////////////////
