@@ -333,18 +333,25 @@
     <br>
     <hr>
     
-    {{#if start}}
-      <div class="inline"">
-        <h4 class="inline leftP">
+    {{!-- {{#if start}} --}}
+    <div class="flex-item-with-addons">
+      <div class="flex-main-item">
+      {{!-- <div class="inline""> --}}
+        <h4>
           Start Block: <b>{{start}}</b>
         </h4>
+      </div>
 
-        <h4 class="inline">
+      <div class="flex-main-item">
+        <h4>
           End Block: <b>{{end}}</b>
         </h4>
+        
       </div>
+      {{!-- </div> class="inline" --}}
+    </div>
       <hr>
-    {{/if}}
+    {{!-- {{/if}} --}}
 
 
     {{#if account}}

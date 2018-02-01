@@ -64,3 +64,85 @@ td a {
     margin-left: auto;
 }
 */
+/******************************************************************/
+/************************* FLEX  BOX ******************************/
+/******************************************************************/
+
+.flex-item-with-addons {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.flex-item-with-addons-centered {
+  align-items: center;
+}
+
+.flex-item-centered {
+  align-self: center;
+}
+
+.flex-main-item {
+  flex: 1 1 auto;
+}
+
+.flex-noshrink {
+  flex-shrink: 0;
+}
+
+.flex-nobasis {
+  flex-basis: 0;
+}
+
+.flex-item-addon {
+  flex: 0 0 auto;
+}
+
+@mixin flex-item-with-addons-padded-mixin($sizeName, $size) {
+  .flex-item-with-addons-padded#{$sizeName} {
+    margin-left: -#{$size};
+    margin-right: -#{$size};
+    justify-content: space-between;
+
+    > .flex-main-item,
+    > .flex-item-addon {
+      margin-left: #{$size};
+      margin-right: #{$size};
+    }
+  }
+}
+
+@include flex-item-with-addons-padded-mixin('', $container-spacing);
+@include flex-item-with-addons-padded-mixin(-sm, $spacing-sm);
+@include flex-item-with-addons-padded-mixin(-md, $spacing-md);
+@include flex-item-with-addons-padded-mixin(-lg, $spacing-lg);
+@include flex-item-with-addons-padded-mixin(-xl, $spacing-xl);
+
+
+
+@mixin box-property-extra-class-size($property, $side, $sizeName, $size) {
+  .#{$property}#{$side}-#{$sizeName} {
+    #{$property}#{$side}: $size;
+  }
+}
+
+@mixin box-property-extra-class-sizes($property, $side) {
+  @include box-property-extra-class-size($property, $side, none, 0);
+  @include box-property-extra-class-size($property, $side, sm, $spacing-sm);
+  @include box-property-extra-class-size($property, $side, md, $spacing-md);
+  @include box-property-extra-class-size($property, $side, lg, $spacing-lg);
+  @include box-property-extra-class-size($property, $side, xl, $spacing-xl);
+}
+
+@include box-property-extra-class-sizes('padding', '');
+@include box-property-extra-class-sizes('padding', -top);
+@include box-property-extra-class-sizes('padding', -right);
+@include box-property-extra-class-sizes('padding', -bottom);
+@include box-property-extra-class-sizes('padding', -left);
+
+@include box-property-extra-class-sizes('margin', '');
+@include box-property-extra-class-sizes('margin', -top);
+@include box-property-extra-class-sizes('margin', -right);
+@include box-property-extra-class-sizes('margin', -bottom);
+@include box-property-extra-class-sizes('margin', -left);
