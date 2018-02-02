@@ -34,8 +34,8 @@
       <form method="post" action="/get_peers">
         <button class="btn btn-default green_btn">Get # Peers</button>
       </form>
-<!-- 
-      <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_transactions_by_account">Get Transactions of Account</button> -->
+
+      <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_clearing_through_time">Get Clearing Through Blocks</button>
 
     </div>
 
@@ -64,12 +64,12 @@
 
                     <div class="form-group">
                         <label for="pwd">Start Block:</label>
-                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number" value="22000">
+                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number" value="5000">
                     </div>
 
                     <div class="form-group">
                         <label for="pwd">End Block:</label>
-                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number" value="22500">
+                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number" value="6000">
                     </div>
 
                     <p style="color: red;">
@@ -200,15 +200,15 @@
       </div>
     </form>
 
-    <form method="post" action="/get_transactions_by_account">
-      <div id="get_transactions_by_account" class="modal fade" role="dialog">
+    <form method="post" action="/get_clearing_through_time">
+      <div id="get_clearing_through_time" class="modal fade" role="dialog">
           <div class="modal-dialog">
 
               <!-- Modal content-->
               <div class="modal-content">
                   <div class="modal-header">
                       <button type="button" class="close" data-dismiss="modal">&times;</button>
-                      <h4 class="modal-title">Get Transactions of Account</h4>
+                      <h4 class="modal-title">Get Clearing Through Blocks</h4>
                   </div>
 
                  
@@ -224,18 +224,14 @@
 
                     <div class="form-group">
                         <label for="pwd">Start Block:</label>
-                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number" value="22000">
+                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number" value="4125">
                     </div>
 
                     <div class="form-group">
                         <label for="pwd">End Block:</label>
-                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number" value="22500">
+                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number" value="9562">
                     </div>
 
-                    <div class="form-group">
-                        <label for="pwd">Account in Hex:</label>
-                        <input type="string" class="form-control" id="account" name="account" placeholder="Enter account" value="0x43eff48a19e93d7fd4d156b485b7ea79db6579e4">
-                    </div>
 
                     <p style="color: red;">
                       If the range of the blocks is too big, there is high possibility that the ethereum Node can't answer. Just specify a smaller range of blocks.
@@ -272,12 +268,12 @@
 
                     <div class="form-group">
                         <label for="pwd">Start Block:</label>
-                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number" value="22000">
+                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number" value="5000">
                     </div>
 
                     <div class="form-group">
                         <label for="pwd">End Block:</label>
-                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number" value="22500">
+                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number" value="6000">
                     </div>
 
                     <div class="form-group">
@@ -333,32 +329,31 @@
     <br>
     <hr>
     
-    {{!-- {{#if start}} --}}
-    <div class="flex-item-with-addons">
-      <div class="flex-main-item">
-      {{!-- <div class="inline""> --}}
-        <h4>
-          Start Block: <b>{{start}}</b>
-        </h4>
-      </div>
 
-      <div class="flex-main-item">
-        <h4>
-          End Block: <b>{{end}}</b>
-        </h4>
+    {{!-- BLOCKS START/END --}}
+    {{#if start}}
+      <div class="flex-item-with-addons">
         
+        <div class="flex-main-item">
+          <h4>Start Block: <b>{{start}}</b></h4>
+        </div>
+
+        <div class="flex-main-item">
+          <h4>End Block: <b>{{end}}</b></h4>
+        </div>
+
       </div>
-      {{!-- </div> class="inline" --}}
-    </div>
+
       <hr>
-    {{!-- {{/if}} --}}
+    {{/if}}
 
-
+    {{!-- SELECTED ACCOUNT --}}
     {{#if account}}
       <h4>Selected Account: <b>{{ account }}</b></h4>
       <hr>
     {{/if}}
 
+    {{!-- BALANCE --}}
     {{#if balance}}
       <div>
         Balance: <b>{{ balance }}</b>
@@ -366,17 +361,14 @@
       <hr>
     {{/if}}    
 
-    
-<!--     <div>
-      {{data}}
-    </div> -->
-
+    {{!-- NUMBER OF PEERS --}}
     {{#if infoP}}
       <div>
         Number of peers: <b>{{ peers }}</b>
       </div>
     {{/if}}
     
+    {{!-- ACCOUNT - SPENT GAS - # TRANSACTIONS --}}
     {{#if data}}
       <table>
         <thead>
@@ -402,6 +394,7 @@
       </table>
     {{/if}}
 
+    {{!-- CLEARING OF LATEST BLOCK --}}
     {{#if clearings}}
       <table>
       <thead>
@@ -419,7 +412,7 @@
       </table>
     {{/if}}
 
-
+    {{!-- TRANSACTIONS OF ACCOUNT --}}
     {{#if transactions}}
       <table>
         <thead>
@@ -438,13 +431,35 @@
             {{/each}}
         </tbody> 
       </table>
-
-<!--       <div>
-        <h2 style="color: red;">
-          <b>No transactions from this account at the specified blocks<b/>
-        </h2>
-      </div> -->
     {{/if}}
+
+
+    {{!-- CLEARING THROUGH TIME --}}
+    {{#if clearingTT}}
+      <table>
+      <thead>
+          <th>Block</th> 
+          <th>Price</th> 
+          <th>Quantity</th> 
+          <th>Type</th> 
+      </thead> 
+      <tbody> 
+          {{#each clearingTT}} 
+            <tr>
+              {{#each this}}
+                <td>{{ this }}</td>
+              {{/each}}
+            </tr>
+          {{/each}}
+      </tbody> 
+      </table>
+    {{/if}}
+
+    {{!-- <div>
+      <h2 style="color: red;">
+        <b>No transactions from this account at the specified blocks<b/>
+      </h2>
+    </div> --}}
 
     <!-- {{> page/nav}} -->
 </div>

@@ -20,16 +20,6 @@ var end = 22600;
 
 module.exports = {
 
-  printPaok: function() {
-    // console.log('PAOK');
-    return 'PAOK';
-  },
-
-  printAek: function() {
-    console.log("AEK");
-    this.printPaok();
-  },
-
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////// Smart Contract - Smart Grid Functions /////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -37,9 +27,9 @@ module.exports = {
   ////////// Get only transactions that are calls to functions of a Contract /////
   ///////////// IE a send Gas transaction will not be shown here /////////////////
   getAccountTransactionsGasSpentClearings: function(startBlockNumber, endBlockNumber) {
-    accounts = [];
+    // accounts = [];
 
-    return new Promise((resolve, reject)=> {
+    return new Promise((resolve, reject) => {
 
       var getBlockPromises = [];
       var blockNumberPromise = web3.eth.getBlockNumber();
@@ -186,7 +176,7 @@ module.exports = {
     console.log("Account: " + e.from + " ,TO: " + e.to  + " , called FUNCTION: " + e.input);
     console.log("");
   },
-
+  
   ////////////////////////// Fix START && END block /////////////////////////
 
   checkStartEndInput: function(startBlockNumber, endBlockNumber, endOfBlockEth) {
@@ -261,39 +251,56 @@ module.exports = {
   // https://medium.com/aigang-network/how-to-read-ethereum-contract-storage-44252c8af925
 
   getClearingsThroughTime: function(startBlockNumber, endBlockNumber) {
-    var blockNumberPromise = web3.eth.getBlockNumber();
+    return new Promise((resolve, reject) => {
+      
+      var storagePromises = [];
+      var blockNumberPromise = web3.eth.getBlockNumber();
 
-    blockNumberPromise.then(res => {
-      checkStartEndInput(startBlockNumber, endBlockNumber, res);
-      startBlockNumber = start;
-      endBlockNumber = end;
+      blockNumberPromise.then(res => {
+        this.checkStartEndInput(startBlockNumber, endBlockNumber, res);
+        startBlockNumber = start;
+        endBlockNumber = end;
 
-      console.log("Using startBlockNumber: " + startBlockNumber);
-      console.log("Using endBlockNumber: " + endBlockNumber);
-      console.log("");
+        for (var i = startBlockNumber; i < endBlockNumber; i++) {
+          storagePromises.push(this.getStorageAtBlock(i));
+        }
 
-      for (var i = end; i > start ; i=i-40) {
-        getStorageAtBlock(i);
-      }
+        Promise.all(storagePromises).then(res => {
+          resolve(res);
+
+        }).catch(err => {
+          reject(err);
+          console.log("ERROR storagePromises: " + err);
+        });
+
+      });
 
     });
   },
 
   getStorageAtBlock: function(block) {
+    return new Promise((resolve, reject) => {
+      var promiseGetStorageAll = [];
+      promiseGetStorageAll.push(this.getStorageAtBlockPrice(block));
+      promiseGetStorageAll.push(this.getStorageAtBlockQuantity(block));
+      promiseGetStorageAll.push(this.getStorageAtBlockType(block));
 
-    var promiseGetStorageAll = [];
-    promiseGetStorageAll.push(getStorageAtBlockPrice(block));
-    promiseGetStorageAll.push(getStorageAtBlockQuantity(block));
-    promiseGetStorageAll.push(getStorageAtBlockType(block));
+      Promise.all(promiseGetStorageAll).then(clearings => {
+        var result = [];
+        result.push(block);
+        
+        clearings[0] = parseInt(clearings[0]);
+        clearings[1] = parseInt(clearings[1]);
+        clearings[2] = parseInt(clearings[2]);
 
-    Promise.all(promiseGetStorageAll).then(clearings => {
-      console.log("BLOCK: " + block);
-      console.log("Clearing Price: " + parseInt(clearings[0]));
-      console.log("Clearing Quantity: " + parseInt(clearings[1]));
-      console.log("Clearing Type: " + parseInt(clearings[2]));
-      console.log("");
-    }).catch(err => {
-      console.log("ERROR: " + err);
+        result.push(clearings);
+        result = this.flatten(result);
+
+        resolve(result);
+      }).catch(err => {
+        reject(err);
+        console.log("ERROR promiseGetStorageAll: " + err);
+      });
     });
   },
 
@@ -444,52 +451,11 @@ module.exports = {
     myContract.options.gas = 5000000;
   },
 
-  saveStartEndLF: function(startBlock, endBlock) {
-    console.log(localforage);
-
-    localforage.setItem('start', startBlock).then(function () {
-      return localforage.getItem('start');
-    }).then(function (value) {
-      console.log("Start LF: " + value);
-      // we got our value
-    }).catch(function (err) {
-      console.log("Start LF ERROR: " + err);
-      // we got an error
-    });
-
-    localforage.setItem('start', startBlock).then(value => {
-      console.log("Start LF: " + value);
-      return value;
-      // we got our value
-    }).catch(err => {
-      console.log("Start LF ERROR: " + err);
-      return err;
-      // we got an error
-    });
-
-    localforage.setItem('end', endBlock).then(value => {
-      console.log("End LF: " + value);
-      return value;
-      // we got our value
-    }).catch(err => {
-      console.log("End LF ERROR: " + err);
-      return err;
-      // we got an error
-    });
-
+  flatten: function(arr) {
+    return arr.reduce((flat, toFlatten) => {
+      return flat.concat(Array.isArray(toFlatten) ? this.flatten(toFlatten) : toFlatten);
+    }, []);
   },
-
-  getStartEndLF: function() {
-    var startEndPromises = [];
-
-    startEndPromises.push(localforage.getItem('start'));
-    startEndPromises.push(localforage.getItem('end'));
-
-    Promise.all(startEndPromises).then(startEnd => {
-      return startEnd;
-    });
-  },
-
 
 }
 

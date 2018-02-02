@@ -121,29 +121,27 @@ router.get('/account/:acc', function(req, res, next) {
     });
     
   });
-
 });
 
-///////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////
-
-router.post('/get_transactions_by_account', function(req, res, next) {
+router.post('/get_clearing_through_time', function(req, res, next) {
   var start_block = req.body.start_block;
   var end_block = req.body.end_block;
-  var account = req.body.account;
 
-  analytics.getTransactionsByAccount(start_block, end_block, account).then(val => {
+  analytics.getClearingsThroughTime(start_block, end_block).then(val => {
 
     res.render('home', { 
-      title: 'Ethereum Analytics Debugger - Get Transactions by Account',
+      title: 'Ethereum Analytics Debugger - Get Clearing Through Blocks',
       start: start_block,
       end: end_block,
-      account: account,
-      transactions: val
+      clearingTT: val
     });
   });
 });
+
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+
 
 router.post('/get_accounts', function(req, res, next) {
   var start_block = req.body.start_block;

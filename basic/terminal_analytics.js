@@ -12,19 +12,19 @@ var accounts = []; // Account hash - Gas spent - # Transactions
 var contract = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
 var accountOfCentralNode = "0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768";
 
-var start = 22000;
-var end = 25000;
+var start = 3900;
+var end = 5000;
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////// RUN PARTITION ///////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-getAccountTransactionsGasSpentClearings(start, end);
+// getAccountTransactionsGasSpentClearings(start, end);
 
 // getNumberOfTranscationsOfAccountPerBlock(start, end, accountOfCentralNode);
 // getTransactionsByAccount(start, end, accountOfCentralNode);
 // clearContract();
-// getClearingsThroughTime(start, end);
+getClearingsThroughTime(start, end);
 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////// Smart Contract - Smart Grid Functions /////////////////////
@@ -240,6 +240,7 @@ function getclearingType() {
 
 function getClearingsThroughTime(startBlockNumber, endBlockNumber) {
   var blockNumberPromise = web3.eth.getBlockNumber();
+  var storagePromises = [];
 
   blockNumberPromise.then(res => {
     checkStartEndInput(startBlockNumber, endBlockNumber, res);
@@ -248,30 +249,56 @@ function getClearingsThroughTime(startBlockNumber, endBlockNumber) {
 
     console.log("Using startBlockNumber: " + startBlockNumber);
     console.log("Using endBlockNumber: " + endBlockNumber);
-    console.log("");
+    // console.log("");
 
-    for (var i = end; i > start ; i=i-40) {
-      getStorageAtBlock(i);
+    for (var i = startBlockNumber; i < endBlockNumber ; i=i+1) {
+      storagePromises.push(getStorageAtBlock(i));
     }
+
+    Promise.all(storagePromises).then(res => {
+      res.forEach(r => {
+        console.log("");
+        // console.log("Block: " + r[0]);
+        // console.log("Clearing Price: " + parseInt(r[1]));
+        // console.log("Clearing Quantity: " + parseInt(r[2]));
+        // console.log("Clearing Type: " + parseInt(r[3]));
+        console.log(r);
+        console.log("");
+      });
+    }).catch(err => {
+      console.log("ERROR storagePromises: " + err);
+    });
 
   });
 }
 
 function getStorageAtBlock(block) {
+  return new Promise(function(resolve, reject) {
+    var promiseGetStorageAll = [];
+    promiseGetStorageAll.push(getStorageAtBlockPrice(block));
+    promiseGetStorageAll.push(getStorageAtBlockQuantity(block));
+    promiseGetStorageAll.push(getStorageAtBlockType(block));
 
-  var promiseGetStorageAll = [];
-  promiseGetStorageAll.push(getStorageAtBlockPrice(block));
-  promiseGetStorageAll.push(getStorageAtBlockQuantity(block));
-  promiseGetStorageAll.push(getStorageAtBlockType(block));
+    Promise.all(promiseGetStorageAll).then(clearings => {
+      var result = [];
+      result.push(block);
+      clearings[0] = parseInt(clearings[0]);
+      clearings[1] = parseInt(clearings[1]);
+      clearings[2] = parseInt(clearings[2]);
 
-  Promise.all(promiseGetStorageAll).then(clearings => {
-    console.log("BLOCK: " + block);
-    console.log("Clearing Price: " + parseInt(clearings[0]));
-    console.log("Clearing Quantity: " + parseInt(clearings[1]));
-    console.log("Clearing Type: " + parseInt(clearings[2]));
-    console.log("");
-  }).catch(err => {
-    console.log("ERROR: " + err);
+      result.push(clearings);
+      result = flatten(result);
+
+      resolve(result);
+      // console.log("BLOCK: " + block);
+      // console.log("Clearing Price: " + parseInt(clearings[0]));
+      // console.log("Clearing Quantity: " + parseInt(clearings[1]));
+      // console.log("Clearing Type: " + parseInt(clearings[2]));
+      // console.log("");
+    }).catch(err => {
+      reject(err);
+      console.log("ERROR: " + err);
+    });
   });
 }
 
@@ -397,6 +424,12 @@ function getTimeDateOfBlock(block) {
     var formattedTime = day + " " + hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
     console.log(formattedTime);
   });
+}
+
+function flatten(arr) {
+  return arr.reduce(function (flat, toFlatten) {
+    return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
+  }, []);
 }
 
 var ABI = [
