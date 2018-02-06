@@ -1,6 +1,5 @@
 var fs = require("fs");
 var Web3 = require('web3');
-var localforage = require('localforage');
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////// GLOBAL VARIABLES ////////////////////////////////
@@ -9,9 +8,15 @@ var localforage = require('localforage');
 var web3 = new Web3();
 web3.setProvider(new web3.providers.HttpProvider('http://localhost:8100'));
 
+var dbBlocks = [];
+// var dbTrans = [];
+var dbTransRec = [];
+
 var accounts = []; // Account hash - Gas spent - # Transactions
 var contract_first_approach = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
-var contract = "0x501897c4a684590ee69447974519e86811f0a47d";
+// var contract = "0x501897c4a684590ee69447974519e86811f0a47d";
+
+var contract = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
 var accountOfCentralNode = "0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768";
 
 var start = 22000;
@@ -40,15 +45,35 @@ module.exports = {
         startBlockNumber = start;
         endBlockNumber = end;
 
-        console.log("Using startBlockNumber: " + startBlockNumber);
-        console.log("Using endBlockNumber: " + endBlockNumber);
+        // console.log("Using startBlockNumber: " + startBlockNumber);
+        // console.log("Using endBlockNumber: " + endBlockNumber);
 
         for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-          var getBlock = web3.eth.getBlock(i, true);
-          getBlockPromises.push(getBlock);
+          check = this.searchFor(i);
+          // console.log("CHECK: " + check);
+          
+          if (check == -1) { // DOESN'T EXIST
+            var getBlock = web3.eth.getBlock(i, true);
+            getBlockPromises.push(getBlock);
+          } else { // ALREADY SAVED
+
+            var blockSaved = dbBlocks[check];
+            // console.log("Get from DB. block: " + blockSaved.number);
+            blockSaved.transactions.forEach(e => {
+              if (e.input != "0x") {
+                this.getTransactionReceiptFun(e.hash);
+              }
+            });
+
+          }
+
         }
 
         Promise.all(getBlockPromises).then(blocks => {
+          // SAVE TO DB
+          dbBlocks = dbBlocks.concat(blocks);
+          // console.log("Blocks: " + JSON.stringify(dbBlocks));
+
           var receiptsPromises = [];
           blocks.forEach(block => {
             // console.log("BLOCK: " + block.number + " Number of transactions: " + block.transactions.length);
@@ -64,7 +89,12 @@ module.exports = {
           });
 
           Promise.all(receiptsPromises).then(res => {
-            resolve(accounts);
+            // SAVE TO DB
+            // console.log("");
+            // console.log("Transactions Receipt: " + JSON.stringify(this.flatten(dbTransRec)));
+            endStartAccount = [start, end];
+            endStartAccount.push(accounts);
+            resolve(endStartAccount);
 
           }).catch(err => {
             console.log("ERROR receiptsPromises: " + err);
@@ -134,6 +164,8 @@ module.exports = {
 
   getTransactionReceiptFun: function(txHash) {
     return  web3.eth.getTransactionReceipt(txHash).then(res => {
+      // dbTransRec.push(res);
+
       if (res != null) {
         this.saveAccountTransactionsSpentGas(res.from, res.gasUsed);
       }  
@@ -266,7 +298,10 @@ module.exports = {
         }
 
         Promise.all(storagePromises).then(res => {
-          resolve(res);
+          endStartClear = [start, end];
+          endStartClear.push(res);
+
+          resolve(endStartClear);
 
         }).catch(err => {
           reject(err);
@@ -329,6 +364,12 @@ module.exports = {
         console.log("Index: " + i +" , val: " + parseInt(res));
       });
     }
+  },
+
+  searchFor: function(blockNumber) {
+    return dbBlocks.findIndex(element => {
+      return element.number == blockNumber;
+    });
   },
 
   ///////////////////////////////////////////////////////////////////////////////
