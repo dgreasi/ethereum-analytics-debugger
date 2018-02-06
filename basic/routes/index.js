@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var app = require('../server.js');
 var analytics = require('../analytics.js');
-var localforage = require('localforage');
 
 
 router.get('/', function(req, res, next) {
@@ -20,13 +19,13 @@ router.post('/get_experiment', function(req, res, next) {
 
   analytics.getAccountTransactionsGasSpentClearings(start_block, end_block).then(val => {
     
-    // console.log("RETURN VALUE: " + val);
+    // console.log("RETURN VALUE: " + JSON.stringify(val));
 
   	res.render('home', { 
       title: 'Ethereum Analytics Debugger - Get Experiment',
-      start: start_block,
-      end: end_block,
-      data: val
+      start: val[0],
+      end: val[1],
+      data: val[2]
     });
   });
 });
@@ -48,6 +47,7 @@ router.post('/get_balance', function(req, res, next) {
   var account = req.body.account;
 
   analytics.getBalance(account).then(val => {
+
     res.render('home', {
       title: 'Ethereum Analytics Debugger - Get Balance',
       account: account,
@@ -131,9 +131,9 @@ router.post('/get_clearing_through_time', function(req, res, next) {
 
     res.render('home', { 
       title: 'Ethereum Analytics Debugger - Get Clearing Through Blocks',
-      start: start_block,
-      end: end_block,
-      clearingTT: val
+      start: val[0],
+      end: val[1],
+      clearingTT: val[2]
     });
   });
 });
