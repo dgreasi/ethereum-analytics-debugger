@@ -10,7 +10,8 @@ var web3 = new Web3();
 web3.setProvider(new web3.providers.HttpProvider('http://localhost:8100'));
 
 var accounts = []; // Account hash - Gas spent - # Transactions
-var contract = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
+var contract_first_approach = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
+var contract = "0x501897c4a684590ee69447974519e86811f0a47d";
 var accountOfCentralNode = "0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768";
 
 var start = 22000;
@@ -27,7 +28,7 @@ module.exports = {
   ////////// Get only transactions that are calls to functions of a Contract /////
   ///////////// IE a send Gas transaction will not be shown here /////////////////
   getAccountTransactionsGasSpentClearings: function(startBlockNumber, endBlockNumber) {
-    // accounts = [];
+    accounts = [];
 
     return new Promise((resolve, reject) => {
 
@@ -39,8 +40,8 @@ module.exports = {
         startBlockNumber = start;
         endBlockNumber = end;
 
-        // console.log("Using startBlockNumber: " + startBlockNumber);
-        // console.log("Using endBlockNumber: " + endBlockNumber);
+        console.log("Using startBlockNumber: " + startBlockNumber);
+        console.log("Using endBlockNumber: " + endBlockNumber);
 
         for (var i = startBlockNumber; i <= endBlockNumber; i++) {
           var getBlock = web3.eth.getBlock(i, true);
@@ -184,20 +185,19 @@ module.exports = {
       startBlockNumber = start;
       endBlockNumber = end;
     } else {
-      if (endBlockNumber == null) {
+      if (!endBlockNumber) {
         endBlockNumber = endOfBlockEth;
         end = endOfBlockEth;
-        if (startBlockNumber == null) {
+        if (!startBlockNumber) {
           startBlockNumber = endBlockNumber - 1000;
-          start = startBlockNumber;
         }
+        start = startBlockNumber;
       } else {
         end = endBlockNumber;
-        start = startBlockNumber;
-        if (startBlockNumber == null || startBlockNumber > endBlockNumber) {
+        if ((!startBlockNumber) || startBlockNumber > endBlockNumber) {
           startBlockNumber = endBlockNumber - 1000;
-          start = startBlockNumber;
         }
+        start = startBlockNumber;
       }
     }
 

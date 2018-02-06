@@ -31,7 +31,6 @@ contract DoubleAuction {
     function DoubleAuction() public{
         market = msg.sender;
         blockCleared = block.number;
-        cleared.cleared = false;
         clearing.clearingPrice = 0;
         clearing.clearingQuantity = 0;
         clearing.clearingType = 0;
@@ -47,6 +46,7 @@ contract DoubleAuction {
           consumptionBids[_price] = consumptionBids[_price] + _quantity;
         }
 
+        marketClearing();
         // if ((block.number-blockCleared)>5) {
         //     blockCleared = block.number;
         //     marketClearing();
@@ -57,7 +57,6 @@ contract DoubleAuction {
         //     blockCleared = block.number;
         //     marketClearing();
         // }
-
     }
 
     function generationBid(int _quantity, int _price) public{
@@ -68,7 +67,7 @@ contract DoubleAuction {
           generationBids[_price] = generationBids[_price] + _quantity;    
         }
 
-
+        marketClearing();
         // if ((block.number-blockCleared)>5) {
         //     blockCleared = block.number;
         //     marketClearing();
@@ -409,7 +408,11 @@ contract DoubleAuction {
     }
 
     function getBlockNumberNow() constant public returns(uint){
-        return(blockNumberNow);
+        return(block.number);
+    }
+
+    function getBlockCleared() constant public returns(uint){
+        return(blockCleared);
     }
 
     function deleteMapArrays() public{
@@ -430,65 +433,3 @@ contract DoubleAuction {
         _generationPrices.length = 0;
     }
 }
-
-
-    /*function getClearingPriceType3(uint i, uint j, uint a, uint b, Bid buy, Bid sell) private returns(uint){
-    // needs to be just off such that it does not trigger any other bids
-        if(a == getPriceCap() && b != -getPriceCap()){
-            if(buy.price > b){
-                return buy.price + 1;
-            }else{
-                 return b;
-            }
-        } else if(a != getPriceCap() && b == -getPriceCap()){
-            if(sell.price < a){
-                return sell.price - 1;
-            }else{
-                 return a;
-            }
-        } else if(a == getPriceCap() && b == -getPriceCap()){
-            if(i == _consumptionPrices.length && j == _generationPrices.length){
-                return 0; // no additional bids on either side
-            } else if(i == _consumptionPrices.length){ // buyers left
-                return buy.price + 1;
-            } else if(j == _consumptionPrices.length){ // sellers left
-                return sell.price - 1;
-            } else { // additional bids on both sides, just no clearing
-                if(i==_consumptionPrices.length){
-                    if(j==_generationPrices.length){
-                        return getAvg(a,  b);
-                    }else{
-                        return getAvg(a,  sell.price);
-                    }
-                }else{
-                    if(j==_generationPrices.length){
-                        return getAvg(buy.price, b);
-                    }else{
-                        return getAvg(buy.price, sell.price);
-                    }
-                }
-            }
-        } else {
-            if(i != _consumptionPrices.length && buy.price == a){
-                return a;
-            } else if (j != _generationPrices.length && sell.price == b){
-                return b;
-            } else if(i != _consumptionPrices.length && getAvg(a,  b) < buy.price){
-                if(i==_consumptionPrices.length){
-                    return a + 1;
-                }else{
-                    return buy.price + 1;
-                }
-            } else if(j != _generationPrices.length && getAvg(a,  b) > sell.price){
-                if(j==_generationPrices.length){
-                    return b - 1;
-                }else{
-                    return sell.price - 1;
-                }
-            } else {
-                return getAvg(a,  b);
-            }
-        }
-    
-    }*/
-

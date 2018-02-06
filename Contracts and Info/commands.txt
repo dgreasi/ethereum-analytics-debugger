@@ -17,11 +17,12 @@ sudo apt-get install ethereum
         "eip158Block": 0
     },
     "difficulty": "20",
-    "gasLimit": "210000000",
+    "gasLimit": "210000000000000",
     "alloc": {
-	"0xad56cedb7d9ee48b3b93f682a9e2d87f80221768": { "balance": "20000000000000000000000" } 
+    "0xad56cedb7d9ee48b3b93f682a9e2d87f80221768": { "balance": "20000000000000000000000" } 
     }
 }
+
 ```
 
 1.2) Init central node:

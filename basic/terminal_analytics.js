@@ -9,11 +9,12 @@ var web3 = new Web3();
 web3.setProvider(new web3.providers.HttpProvider('http://localhost:8100'));
 
 var accounts = []; // Account hash - Gas spent - # Transactions
-var contract = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
+var contract_first_approach = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
+var contract = "0x501897c4a684590ee69447974519e86811f0a47d";
 var accountOfCentralNode = "0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768";
 
-var start = 3900;
-var end = 5000;
+var start = 17073;
+var end = null;
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////// RUN PARTITION ///////////////////////////////////
@@ -24,7 +25,29 @@ var end = 5000;
 // getNumberOfTranscationsOfAccountPerBlock(start, end, accountOfCentralNode);
 // getTransactionsByAccount(start, end, accountOfCentralNode);
 // clearContract();
-getClearingsThroughTime(start, end);
+// getClearingsThroughTime(start, end);
+getBlockCleared().then(res => {
+  console.log("Block Cleared: " + parseInt(res));
+  blockCleared = res;
+  getBlockNumberNow().then(res => {
+    blockNumber = res;
+    console.log("Block NumberNow: " + parseInt(res));
+    if ((blockNumber-blockCleared) > 60) {
+      console.log("TRUE");
+    } else {
+      console.log("FALSE, Distance: " + (blockNumber-blockCleared));
+    }
+    console.log("");
+    getGenerationsLength().then(res => {
+      console.log("Generation Length: " + parseInt(res));
+      getConsumptionsLength().then(res => {
+        console.log("Consumption Length: " + parseInt(res));
+      });
+    });
+
+  });
+});
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////// Smart Contract - Smart Grid Functions /////////////////////
@@ -186,13 +209,13 @@ function checkStartEndInput(startBlockNumber, endBlockNumber, endOfBlockEth) {
     end = endOfBlockEth;
     if (startBlockNumber == null) {
       startBlockNumber = endBlockNumber - 1000;
-      start = startBlockNumber;
     }
+    start = startBlockNumber;
   } else {
     if (startBlockNumber == null || startBlockNumber > endBlockNumber) {
       startBlockNumber = endBlockNumber - 1000;
-      start = startBlockNumber;
     }
+    start = startBlockNumber;
   }
 }
 
@@ -228,6 +251,21 @@ function getclearingType() {
   return web3.eth.call({to: contract, data: "0xbc3d513f"});
 }
 
+function getBlockNumberNow() {
+  return web3.eth.call({to: contract, data: "0xdd2e6ab5"});
+}
+
+function getBlockCleared() {
+  return web3.eth.call({to: contract, data: "0x16eae402"});
+}
+
+function getConsumptionsLength() {
+  return web3.eth.call({to: contract, data: "0x2a783c27"});
+}
+
+function getGenerationsLength() {
+  return web3.eth.call({to: contract, data: "0x00f35f54"});
+}
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -258,11 +296,11 @@ function getClearingsThroughTime(startBlockNumber, endBlockNumber) {
     Promise.all(storagePromises).then(res => {
       res.forEach(r => {
         console.log("");
-        // console.log("Block: " + r[0]);
-        // console.log("Clearing Price: " + parseInt(r[1]));
-        // console.log("Clearing Quantity: " + parseInt(r[2]));
-        // console.log("Clearing Type: " + parseInt(r[3]));
-        console.log(r);
+        console.log("Block: " + r[0]);
+        console.log("Clearing Price: " + parseInt(r[1]));
+        console.log("Clearing Quantity: " + parseInt(r[2]));
+        console.log("Clearing Type: " + parseInt(r[3]));
+        // console.log(r);
         console.log("");
       });
     }).catch(err => {
