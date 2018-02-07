@@ -57,6 +57,9 @@ td a {
     text-decoration: underline;
 }
 
+.center {
+    margin: auto;
+}
 /*.container {
     padding-right: 15px;
     padding-left: 15px;

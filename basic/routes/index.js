@@ -2,7 +2,9 @@ var express = require('express');
 var router = express.Router();
 var app = require('../server.js');
 var analytics = require('../analytics.js');
+var $ = require('jquery');
 
+// console.log(JSON.stringify($));
 
 router.get('/', function(req, res, next) {
 

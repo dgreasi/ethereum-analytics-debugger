@@ -212,6 +212,9 @@ function checkStartEndInput(startBlockNumber, endBlockNumber, endOfBlockEth) {
     }
     start = startBlockNumber;
   } else {
+    if (endBlockNumber > endOfBlockEth) {
+      endBlockNumber = endOfBlockEth;
+    }
     if (startBlockNumber == null || startBlockNumber > endBlockNumber) {
       startBlockNumber = endBlockNumber - 1000;
     }
