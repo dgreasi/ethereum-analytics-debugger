@@ -14,9 +14,9 @@ var dbTransRec = [];
 
 var accounts = []; // Account hash - Gas spent - # Transactions
 var contract_first_approach = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
-var contract = "0x501897c4a684590ee69447974519e86811f0a47d";
+// var contract = "0x501897c4a684590ee69447974519e86811f0a47d";
 
-// var contract = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
+var contract = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
 var accountOfCentralNode = "0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768";
 
 var start = 22000;
@@ -229,7 +229,7 @@ module.exports = {
           endBlockNumber = endOfBlockEth;
         }
         end = endBlockNumber;
-        if ((!startBlockNumber) || startBlockNumber > endBlockNumber) {
+        if ((!startBlockNumber) || (parseInt(startBlockNumber) > parseInt(endBlockNumber))) {
           startBlockNumber = endBlockNumber - 1000;
         }
         start = startBlockNumber;
@@ -295,6 +295,9 @@ module.exports = {
         this.checkStartEndInput(startBlockNumber, endBlockNumber, res);
         startBlockNumber = start;
         endBlockNumber = end;
+
+        // console.log("Using startBlockNumber: " + startBlockNumber);
+        // console.log("Using endBlockNumber: " + endBlockNumber);
 
         for (var i = startBlockNumber; i < endBlockNumber; i++) {
           storagePromises.push(this.getStorageAtBlock(i));

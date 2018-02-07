@@ -15,12 +15,12 @@
 <!--     <button class="btn btn-default red_btn" data-toggle="modal" data-target="#get_accounts">Get Accounts</button> -->
 
 
-    <form method="post" action="/get_clearing">
-      <button class="btn btn-default blue_btn">Get Clearing</button>
-    </form>
 
     <button class="btn btn-default blue_btn" data-toggle="modal" data-target="#get_clearing_through_time">Get Clearing Through Blocks</button>
 
+    <form method="post" action="/get_clearing">
+      <button class="btn btn-default blue_btn">Last Block Clearing</button>
+    </form>
     
 <!--     <button class="btn btn-default" data-toggle="modal" data-target="#myModal">Button Modal</button> -->
     
@@ -331,7 +331,11 @@
     <br>
     <hr>
 
-    <div id="tester" data-for="{{clearingTT}}" class="center" style="width:600px;height:250px;"></div>
+    {{#if clearingTT}}
+      <div id="price_chart" data-for="{{clearingTT}}" class="center"></div>
+    {{/if}}
+
+    {{!-- <div id="bids_chart" class="center"></div> --}}
     
 
     {{!-- BLOCKS START/END --}}

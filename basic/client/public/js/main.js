@@ -1,41 +1,46 @@
 // add scripts
 
 $(document).on('ready', function() {
-	console.log('sanity check!');
 
-	TESTER = document.getElementById('tester');
-	var data = TESTER.getAttribute('data-for');
+	price_chart = document.getElementById('price_chart');
+	// quantity_chart = document.getElementById('price_chart');
+
+	var data_chart = price_chart.getAttribute('data-for');
+	var dataToArray_chart = data_chart.split(",");
 	// console.log("TEST: " + JSON.stringify(data));
 
 	var blocks = [];
 	var prices = [];
 	var quantity = [];
 
-	for (var i = 0; i < data.length; i=i+4) {
-		blocks.push(data[i]);
-		prices.push(data[i+1]);
-		quantity.push(data[i+2]);
+	for (var i = 0; i < dataToArray_chart.length; i=i+4) {
+		blocks.push(dataToArray_chart[i]);
+		prices.push(dataToArray_chart[i+1]);
+		quantity.push(dataToArray_chart[i+2]);
 	}
 
-	// data.forEach(res => {
-	// 	blocks.push(res[0]);
-	// });
-
-	// data.forEach(res => {
-	// 	prices.push(res[1]);
-	// });
-
-	// data.forEach(res => {
-	// 	quantity.push(res[2]);
-	// });
-
-	console.log("Blocks: " + blocks[0]);
-	console.log("Prices: " + prices[0]);
-	console.log("Quantity: " + quantity[0]);
+	// console.log("Blocks: " + blocks[0]);
+	// console.log("Prices: " + prices[0]);
+	// console.log("Quantity: " + quantity[0]);
 	
-	Plotly.plot( TESTER, [{
-	x: [1, 2, 3, 4, 5],
-	y: [1, 2, 4, 8, 16] }], {
-	margin: { t: 0 } } );
+	// Add Clearing Prices on Chart - Blue Line
+	Plotly.plot( price_chart, [{
+		name: 'Price',
+		x: blocks,
+		y: prices }], 
+		{
+			title: 'Clearing Price && Quantity',
+			font: {
+				size: 18,
+			}
+		}
+	);
+
+	// Add Clearing Quantities on Chart - Orange Line
+	Plotly.plot( price_chart, [{
+		name: 'Quantity',
+		x: blocks,
+		y: quantity }]
+	);
 
 });

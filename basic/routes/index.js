@@ -2,9 +2,7 @@ var express = require('express');
 var router = express.Router();
 var app = require('../server.js');
 var analytics = require('../analytics.js');
-var $ = require('jquery');
 
-// console.log(JSON.stringify($));
 
 router.get('/', function(req, res, next) {
 
@@ -20,8 +18,6 @@ router.post('/get_experiment', function(req, res, next) {
   var end_block = req.body.end_block;
 
   analytics.getAccountTransactionsGasSpentClearings(start_block, end_block).then(val => {
-    
-    // console.log("RETURN VALUE: " + JSON.stringify(val));
 
   	res.render('home', { 
       title: 'Ethereum Analytics Debugger - Get Experiment',
