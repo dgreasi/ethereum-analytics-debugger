@@ -23,28 +23,50 @@ sudo apt-get install ethereum
     }
 }
 
+
+VM:
+IP: 10.96.12.69
+Username: mgdfoti
+Passwd: 1@foti1#
+
 ```
 
 1.2) Init central node:
 ```
 geth --datadir /home/ubuntu/tmp/eth/1923/00 init /home/ubuntu/tmp/eth/1923/genesis.json
+geth --datadir /home/mgdfoti/tmp/eth/1923/00 init /home/mgdfoti/tmp/eth/1923/genesis.json
 ```
 
 1.3) Start central node:
 ```
-geth --datadir /home/ubuntu/tmp/eth/1923/00 --identity mynode-00 --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr "127.0.0.1" --rpccorsdomain "*" --ipcpath /home/ubuntu/tmp/eth/1923/00/geth.ipc --networkid 1923 console
+geth --bootnodes enode://4a3e5386bbbea10696080aa6228ca94e5bcd75764c9cc1cc6413e54cb87bc678a6a58363dc25647be5480b1d8bcbb54667c2a8987e6e3d673ab982be847b431a@10.64.83.61:30299 --datadir /home/ubuntu/tmp/eth/1923/00 --identity mynode-00 --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr "127.0.0.1" --rpccorsdomain "*" --ipcpath /home/ubuntu/tmp/eth/1923/00/geth.ipc --networkid 1923 console
+
+geth --datadir /home/ubuntu/tmp/eth/1923/00 --identity mynode-00 --unlock '0' --password <(echo 0) --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr "127.0.0.1" --rpccorsdomain "*" --ipcpath /home/ubuntu/tmp/eth/1923/00/geth.ipc --networkid 1923 --syncmode full console
+
 
 geth --datadir /home/jim/tmp/eth/1923/00 --identity mynode-00 --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr "127.0.0.1" --rpccorsdomain "*" --ipcpath /home/jim/tmp/eth/1923/00/geth.ipc --networkid 1923 console
 ```
 
+
+geth --datadir /home/mgdfoti/tmp/eth/1923/00 --identity mynode-00 --unlock '0' --password <(echo 0) --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr "127.0.0.1" --rpccorsdomain "*" --ipcpath /home/mgdfoti/tmp/eth/1923/00/geth.ipc --networkid 1923 --cache 1024 --maxpeers 400 --mine --minerthreads 8 console
+
 1.4) Connect to other Central nodes
 ```
 // Magda Central Node
-admin.addPeer("enode://ad625f1c7ece8b15786d39d3116c57eb7a40922bc3e3c90b4991f2bfa56a11fb1985e6d222d2e30c051dfb700fb535c89d0492671c638b5457c5268023367cdb@10.64.83.61:30299")
+admin.addPeer("enode://enode://4a3e5386bbbea10696080aa6228ca94e5bcd75764c9cc1cc6413e54cb87bc678a6a58363dc25647be5480b1d8bcbb54667c2a8987e6e3d673ab982be847b431a@10.64.83.61:30299")
 
 // Dimitris Central Node
-admin.addPeer("enode://9222941eb46bd45d7876891f4d3eba37e3762f8abf53051d4c45cee683a4a26c967a2f15ebaeb71f54f15721bce1977154b3c8d9c8a01f614cf36f5da6e40e40@10.64.83.132:30299")
+admin.addPeer("enode://e9936640cc78452aca5c06975b7260ec8ca9c19286a3987d2c4e624a3e5c3ddd321c586e07f4bd759abca8704991a7c79dabed691804531835ce38a465e8685a@10.64.83.132:30299")
 
+
+// VM NODE
+admin.addPeer("enode://675e3ee6d0c06808f54ef4d86c52d14e87255e934fdc55ec96a21ae14591d66e4a9b51192afb4eec3cec347d83770ded5835ab324cdb4b087f15f620f2c8ad5c@10.96.12.69:30299")
+
+10.96.12.69
+
+
+// NEW PC
+admin.addPeer("enode://71f59ad5a4f4ac9a00fba82a00dc048f31cdbf34340e3717b7bce52961a4b5bbafd0435fbec30a71bd920e486eb70ce29a7117bb7a37804663f4bd7deb5bc5ab@10.64.83.169:30299")
 ```
 
 2)GridLabd:
@@ -78,11 +100,16 @@ systemString += "/geth.ipc --bootnodes enode://myNode@myExternalIP:myPort --netw
 ```
 autoreconf -isf
 ./configure --prefix=/home/ubuntu/blockchain-gridlabd/install
+
+./configure --prefix=/home/mgdfoti/blockchain-gridlabd/install
 make
 make install
 rm ./gridlabd.bin
 export PATH=$PATH:/home/ubuntu/blockchain-gridlabd/install/bin
 export GLPATH=/home/ubuntu/blockchain-gridlabd/install/lib/gridlabd:/home/ubuntu/blockchain-gridlabd/install/share/gridlabd
+
+export PATH=$PATH:/home/mgdfoti/blockchain-gridlabd/install/bin
+export GLPATH=/home/ubuntu/mgdfoti-gridlabd/install/lib/gridlabd:/home/ubuntu/blockchain-gridlabd/install/share/gridlabd
 ```
 
 2.3) Copy network.glm in /home/ubuntu/network_glm/
@@ -90,8 +117,16 @@ export GLPATH=/home/ubuntu/blockchain-gridlabd/install/lib/gridlabd:/home/ubuntu
 ### Start:
 ```
 gridlabd /home/ubuntu/network_glm/network.glm
+OR
+gridlabd -D run_realtime=1 /home/ubuntu/network_glm/network.glm
+gridlabd -D run_realtime=1 /home/ubuntu/simulation/IEEE13_houses_PV.glm
+
+
+gridlabd -D run_realtime=1 /home/mgdfoti/simulation/IEEE_13_Node_With_Houses_1.glm
 ```
 
 *************************************************************************
 *************************************************************************
 *************************************************************************
+
+eth.sendTransaction({from: eth.coinbase, to: '0x501897c4a684590ee69447974519e86811f0a47d', data: '0xecabe109' , gas: '0x1E8480', gasPrice: '0x430E23400'});
