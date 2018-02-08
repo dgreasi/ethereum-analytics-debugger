@@ -120,6 +120,7 @@ gridlabd /home/ubuntu/network_glm/network.glm
 OR
 gridlabd -D run_realtime=1 /home/ubuntu/network_glm/network.glm
 gridlabd -D run_realtime=1 /home/ubuntu/simulation/IEEE13_houses_PV.glm
+gridlabd -D run_realtime=1 /home/ubuntu/simulation/IEEE_13_Node_With_Houses.glm
 
 
 gridlabd -D run_realtime=1 /home/mgdfoti/simulation/IEEE_13_Node_With_Houses_1.glm
