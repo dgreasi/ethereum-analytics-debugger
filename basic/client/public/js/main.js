@@ -22,25 +22,38 @@ $(document).on('ready', function() {
 	// console.log("Blocks: " + blocks[0]);
 	// console.log("Prices: " + prices[0]);
 	// console.log("Quantity: " + quantity[0]);
-	
-	// Add Clearing Prices on Chart - Blue Line
-	Plotly.plot( price_chart, [{
-		name: 'Price',
-		x: blocks,
-		y: prices }], 
-		{
-			title: 'Clearing Price && Quantity',
-			font: {
-				size: 18,
-			}
-		}
-	);
 
-	// Add Clearing Quantities on Chart - Orange Line
-	Plotly.plot( price_chart, [{
-		name: 'Quantity',
+	// NEW CHART
+
+	var trace1 = {
+	  	x: blocks,
+		y: prices,
+		name: 'Price data',
+		type: 'scatter'
+	};
+
+	var trace2 = {
 		x: blocks,
-		y: quantity }]
-	);
+		y: quantity,
+		name: 'Quantity data',
+		yaxis: 'y2',
+		type: 'scatter'
+	};
+
+	var data = [trace1, trace2];
+
+	var layout = {
+	  title: 'Clearing Price && Quantity',
+	  yaxis: {title: 'Price'},
+	  yaxis2: {
+	    title: 'Quantity',
+	    titlefont: {color: 'rgb(148, 103, 189)'},
+	    tickfont: {color: 'rgb(148, 103, 189)'},
+	    overlaying: 'y',
+	    side: 'right'
+	  }
+	};
+
+	Plotly.plot('price_chart', data, layout);
 
 });
