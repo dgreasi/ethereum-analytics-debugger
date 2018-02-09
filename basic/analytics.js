@@ -186,7 +186,7 @@ module.exports = {
             var getBlock = web3.eth.getBlock(i, true);
             getBlockPromises.push(getBlock);
           } else { // ALREADY SAVED
-
+            // console.log("BLOCK FOUND: " + check);
             var blockSaved = dbBlocks[check];
             // console.log("Get from DB. block: " + blockSaved.number);
             blockSaved.transactions.forEach(e => {
@@ -612,13 +612,18 @@ module.exports = {
   },
 
   getTranscationInfo: function(hash) {
-    return  web3.eth.getTransactionReceipt(hash).then(res => {
-      if (res != null) {
-          return res;
-      }  
-    }).catch(err => {
-      console.log("ERROR getTranscationInfo: " + err);
+    return new Promise((resolve, reject) => {
+      web3.eth.getTransactionReceipt(hash).then(res => {
+        if (res != null) {
+          resolve(res);
+        }
+      }).catch(err => {
+        console.log("ERROR getTranscationInfo: " + err);
+        reject(err);
+      });
+      
     });
+
   },
   
   printBalanceOfAccounts: function() {
