@@ -3,57 +3,106 @@
 $(document).on('ready', function() {
 
 	price_chart = document.getElementById('price_chart');
-	// quantity_chart = document.getElementById('price_chart');
+	array_block_gas_spent_chart = document.getElementById('array_block_gas_spent_chart');
 
-	var data_chart = price_chart.getAttribute('data-for');
-	var dataToArray_chart = data_chart.split(",");
-	// console.log("TEST: " + JSON.stringify(data));
+	if (price_chart) {
+		var data_chart = price_chart.getAttribute('data-for');
+		var dataToArray_chart = data_chart.split(",");
+		// console.log("TEST: " + JSON.stringify(data));
 
-	var blocks = [];
-	var prices = [];
-	var quantity = [];
+		var blocks = [];
+		var prices = [];
+		var quantity = [];
 
-	for (var i = 0; i < dataToArray_chart.length; i=i+4) {
-		blocks.push(dataToArray_chart[i]);
-		prices.push(dataToArray_chart[i+1]);
-		quantity.push(dataToArray_chart[i+2]);
+		for (var i = 0; i < dataToArray_chart.length; i=i+4) {
+			blocks.push(dataToArray_chart[i]);
+			prices.push(dataToArray_chart[i+1]);
+			quantity.push(dataToArray_chart[i+2]);
+		}
+
+		// console.log("Blocks: " + blocks[0]);
+		// console.log("Prices: " + prices[0]);
+		// console.log("Quantity: " + quantity[0]);
+
+		// NEW CHART
+
+		var trace1 = {
+		  	x: blocks,
+			y: prices,
+			name: 'Price data',
+			type: 'scatter'
+		};
+
+		var trace2 = {
+			x: blocks,
+			y: quantity,
+			name: 'Quantity data',
+			yaxis: 'y2',
+			type: 'scatter'
+		};
+
+		var data = [trace1, trace2];
+
+		var layout = {
+		  title: 'Clearing Price && Quantity',
+		  yaxis: {title: 'Price'},
+		  yaxis2: {
+		    title: 'Quantity',
+		    titlefont: {color: 'rgb(148, 103, 189)'},
+		    tickfont: {color: 'rgb(148, 103, 189)'},
+		    overlaying: 'y',
+		    side: 'right'
+		  }
+		};
+
+		Plotly.plot('price_chart', data, layout);
 	}
 
-	// console.log("Blocks: " + blocks[0]);
-	// console.log("Prices: " + prices[0]);
-	// console.log("Quantity: " + quantity[0]);
+	if (array_block_gas_spent_chart) {
+		var data1_chart = array_block_gas_spent_chart.getAttribute('data-for');
+		var dataToArray1_chart = data1_chart.split(",");
+		// console.log("TEST: " + JSON.stringify(data1_chart));
 
-	// NEW CHART
+		var blocks = [];
+		var gasSpent = [];
+		var gasLimit = [];
 
-	var trace1 = {
-	  	x: blocks,
-		y: prices,
-		name: 'Price data',
-		type: 'scatter'
-	};
+		for (var i = 0; i < dataToArray1_chart.length; i=i+3) {
+			blocks.push(dataToArray1_chart[i]);
+			gasSpent.push(dataToArray1_chart[i+1]);
+			gasLimit.push(dataToArray1_chart[i+2]);
+		}
 
-	var trace2 = {
-		x: blocks,
-		y: quantity,
-		name: 'Quantity data',
-		yaxis: 'y2',
-		type: 'scatter'
-	};
+		// console.log("Blocks: " + blocks[0]);
+		// console.log("Prices: " + prices[0]);
+		// console.log("Quantity: " + quantity[0]);
 
-	var data = [trace1, trace2];
+		// NEW CHART
 
-	var layout = {
-	  title: 'Clearing Price && Quantity',
-	  yaxis: {title: 'Price'},
-	  yaxis2: {
-	    title: 'Quantity',
-	    titlefont: {color: 'rgb(148, 103, 189)'},
-	    tickfont: {color: 'rgb(148, 103, 189)'},
-	    overlaying: 'y',
-	    side: 'right'
-	  }
-	};
+		var trace1 = {
+		  	x: blocks,
+			y: gasSpent,
+			name: 'gasSpent',
+			fill: 'tozeroy',
+  			type: 'scatter'
+		};
 
-	Plotly.plot('price_chart', data, layout);
+		var trace2 = {
+			x: blocks,
+			y: gasLimit,
+			name: 'gasLimit',
+			fill: 'tozeroy',
+			type: 'scatter'
+		};
 
+		var data = [trace1, trace2];
+
+		var layout = {
+		  title: 'Gas Spent - Gas Limit - Blocks',
+		  yaxis: {title: 'Gas Spent'},
+		};
+
+		Plotly.plot('array_block_gas_spent_chart', data, layout);
+	}
 });
+

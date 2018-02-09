@@ -12,11 +12,12 @@ var dbBlocks = [];
 // var dbTrans = [];
 var dbTransRec = [];
 
-var accounts = []; // Account hash - Gas spent - # Transactions
+var accounts = []; // Account hash - Gas sent - # Transactions
 var contract_first_approach = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
 
 // var contract = "0x501897c4a684590ee69447974519e86811f0a47d"; // automated bid
-var contract = "0x668e966f3f4cf884ad6eda65784ceacf89ef084a"; // new automated fixed
+// var contract = "0x668e966f3f4cf884ad6eda65784ceacf89ef084a"; // new automated fixed
+var contract = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
 //0x1E8480
 var accountOfCentralNode = "0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768";
 
@@ -160,6 +161,131 @@ module.exports = {
       });
     }).catch(err => {
       console.log("ERROR getBlockNumber: " + err);
+    });
+  },
+
+  getSpentGasOfAccount: function(startBlockNumber, endBlockNumber, account) {
+    var transactionsReceiptsPromises = [];
+
+    return new Promise((resolve, reject) => {
+
+      var getBlockPromises = [];
+      var blockNumberPromise = web3.eth.getBlockNumber();
+
+      blockNumberPromise.then(res => {
+        this.checkStartEndInput(startBlockNumber, endBlockNumber, res);
+        startBlockNumber = start;
+        endBlockNumber = end;
+        
+        transactionsReceiptsPromises.push(this.getBalance(account));
+
+        for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+          check = this.searchFor(i);
+          
+          if (check == -1) { // DOESN'T EXIST
+            var getBlock = web3.eth.getBlock(i, true);
+            getBlockPromises.push(getBlock);
+          } else { // ALREADY SAVED
+
+            var blockSaved = dbBlocks[check];
+            // console.log("Get from DB. block: " + blockSaved.number);
+            blockSaved.transactions.forEach(e => {
+              if (e.input != "0x") {
+                transactionsReceiptsPromises.push(this.getTranscationInfo(e.hash));
+              }
+            });
+
+          }
+
+        }
+
+        Promise.all(getBlockPromises).then(blocks => {
+          // SAVE TO DB
+          dbBlocks = dbBlocks.concat(blocks);
+          // console.log("Blocks: " + JSON.stringify(dbBlocks));
+
+          blocks.forEach(block => {
+            // console.log("BLOCK: " + block.number + " Number of transactions: " + block.transactions.length);
+            if (block != null && block.transactions != null) {
+
+              block.transactions.forEach(e => {
+                if (e.input != "0x") {
+                  transactionsReceiptsPromises.push(this.getTranscationInfo(e.hash));
+                }
+              });
+              
+            }
+          });
+
+          Promise.all(transactionsReceiptsPromises).then(res => {
+
+            startEndBalanceGasSpentReceipts = [start, end];
+            // push Balance of Account
+            startEndBalanceGasSpentReceipts.push(res[0]);
+            // Delete balance from initial array,
+            // Keep only the receipts
+            res.shift();
+            
+            var gasSpentBlock = []; // Block - Gas Spent
+            var totalGasSpent = 0;
+            account = account.toUpperCase();
+            res.forEach(rs => {
+              if (rs && (account == rs.from.toUpperCase())) {
+                gasSpentBlock.push([rs.blockNumber, rs.gasUsed]);
+                totalGasSpent += rs.gasUsed;
+              }
+            });
+
+            gasSpentBlock.forEach(block => {
+              check = this.searchFor(block[0]);
+
+              if (check > -1) {
+                block.push(dbBlocks[check].gasLimit);
+              } else {
+                block.push(0);
+              }
+            });
+
+            // Push Total Gas Spent
+            startEndBalanceGasSpentReceipts.push(totalGasSpent);
+            // Push [Block - Gas Spent] Array
+            startEndBalanceGasSpentReceipts.push(gasSpentBlock);
+
+            resolve(startEndBalanceGasSpentReceipts);
+
+          }).catch(err => {
+            console.log("ERROR transactionsReceiptsPromises: " + err);
+            reject(err);
+          });
+        }).catch(err => {
+          console.log("ERROR getBlockPromises: " + err);
+          reject(err);
+        });
+      }).catch(err => {
+        console.log("ERROR getBlockNumber: " + err);
+        reject(err);
+      });
+
+    });
+  },
+
+  getBlockInfo: function(blockNumber) {
+    return new Promise((resolve, reject) => {
+
+      var getBlockPromises = [];
+      var blockNumberPromise = web3.eth.getBlockNumber();
+
+      blockNumberPromise.then(res => {
+
+        if (blockNumber <= res) {
+          var getBlock = web3.eth.getBlock(blockNumber, true);
+        } else {
+          var getBlock = web3.eth.getBlock(res, true);
+        }
+
+        resolve(getBlock);
+
+      });
     });
   },
 
@@ -403,6 +529,97 @@ module.exports = {
       });
     });
   },
+
+  getContractDetails: function(startBlockNumber, endBlockNumber) {
+    var transactionsReceiptsPromises = [];
+
+    return new Promise((resolve, reject) => {
+
+      var getBlockPromises = [];
+      var blockNumberPromise = web3.eth.getBlockNumber();
+
+      blockNumberPromise.then(res => {
+        this.checkStartEndInput(startBlockNumber, endBlockNumber, res);
+        startBlockNumber = start;
+        endBlockNumber = end;
+
+
+        for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+          check = this.searchFor(i);
+          
+          if (check == -1) { // DOESN'T EXIST
+            var getBlock = web3.eth.getBlock(i, true);
+            getBlockPromises.push(getBlock);
+          } else { // ALREADY SAVED
+
+            var blockSaved = dbBlocks[check];
+            // console.log("Get from DB. block: " + blockSaved.number);
+            blockSaved.transactions.forEach(e => {
+              if (e.input != "0x") {
+                transactionsReceiptsPromises.push(this.getTranscationInfo(e.hash));
+              }
+            });
+
+          }
+
+        }
+
+        Promise.all(getBlockPromises).then(blocks => {
+          // SAVE TO DB
+          dbBlocks = dbBlocks.concat(blocks);
+          // console.log("Blocks: " + JSON.stringify(dbBlocks));
+
+          // var receiptsPromises = [];
+          blocks.forEach(block => {
+            // console.log("BLOCK: " + block.number + " Number of transactions: " + block.transactions.length);
+            if (block != null && block.transactions != null) {
+
+              block.transactions.forEach(e => {
+                if (e.input != "0x") {
+                  transactionsReceiptsPromises.push(this.getTranscationInfo(e.hash));
+                }
+              });
+              
+            }
+          });
+
+          Promise.all(transactionsReceiptsPromises).then(receipts => {
+            var transactionsReceiptsValid = [];
+            console.log("Lenght of receipts: " + receipts.length);
+            receipts.forEach(rs => {
+              if (rs.contractAddress) {
+                console.log("Found contract");
+                transactionsReceiptsValid.push(rs);
+              }
+            });
+
+            resolve(transactionsReceiptsValid);
+
+          }).catch(err => {
+            console.log("ERROR receiptsPromises: " + err);
+            reject(err);
+          });
+        }).catch(err => {
+          console.log("ERROR getBlockPromises: " + err);
+          reject(err);
+        });
+      }).catch(err => {
+        console.log("ERROR getBlockNumber: " + err);
+        reject(err);
+      });
+
+    });
+  },
+
+  getTranscationInfo: function(hash) {
+    return  web3.eth.getTransactionReceipt(hash).then(res => {
+      if (res != null) {
+          return res;
+      }  
+    }).catch(err => {
+      console.log("ERROR getTranscationInfo: " + err);
+    });
+  },
   
   printBalanceOfAccounts: function() {
     console.log("BALANCES");
@@ -446,7 +663,7 @@ module.exports = {
                 myaccount = myaccount.toUpperCase();
 
                 if (myaccount == "*" || myaccount == fromA) {
-                  transactionsR.push([e.to, e.input]);
+                  transactionsR.push([e.hash, e.to, e.input]);
                 }
 
               });

@@ -60,6 +60,10 @@ td a {
 .center {
     margin: auto;
 }
+
+.center_text {
+  text-align: center;
+}
 /*.container {
     padding-right: 15px;
     padding-left: 15px;

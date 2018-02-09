@@ -93,6 +93,55 @@ router.post('/get_account_info', function(req, res, next) {
   });
 });
 
+router.post('/get_account_gas_spent',function(req, res, next) {
+  var start_block = req.body.start_block;
+  var end_block = req.body.end_block;
+  var account = req.body.account;
+
+  analytics.getSpentGasOfAccount(start_block, end_block, account).then(val => {
+
+    // Balance
+    accountMbalance = val[2];
+    // Total Gas Spent
+    totalGas = val[3];
+    if (totalGas == 0) {
+      totalGas = "0";
+    }
+    // Array Block - Gas Spent
+    blockGas = val[4];
+
+    // console.log("Balance " + accountMbalance);
+    // console.log("totalGas " + totalGas);
+    // console.log(" " + );
+
+    res.render('home', {
+      title: 'Ethereum Analytics Debugger - Get Gas Spent of Account',
+      start: val[0],
+      end: val[1],
+      account: account,
+      balance: accountMbalance,
+      totalGasSpent: totalGas,
+      arrayBlockGasSpent: blockGas
+    });
+    
+  });
+});
+
+
+router.post('/get_block_info',function(req, res, next) {
+  var block = req.body.block;
+
+  analytics.getBlockInfo(block).then(val => {
+
+
+    res.render('home', {
+      title: 'Ethereum Analytics Debugger - Get Block Info',
+      blockInfo: val
+    });
+    
+  });
+});
+
 router.get('/account/:acc', function(req, res, next) {
   var account = req.params.acc;
 
@@ -132,6 +181,45 @@ router.post('/get_clearing_through_time', function(req, res, next) {
       start: val[0],
       end: val[1],
       clearingTT: val[2]
+    });
+  });
+});
+
+router.post('/get_contract_details', function(req, res, next) {
+  var start_block = req.body.start_block;
+  var end_block = req.body.end_block;
+
+  analytics.getContractDetails(start_block, end_block).then(val => {
+
+    res.render('home', { 
+      title: 'Ethereum Analytics Debugger - Get Contract Details',
+      contracts: val
+    });
+  });
+});
+
+router.post('/get_transaction_info', function(req, res, next) {
+  var hash = req.body.hash;
+
+  analytics.getTranscationInfo(hash).then(val => {
+
+    res.render('home', { 
+      title: 'Ethereum Analytics Debugger - Get Transaction Info',
+      transaction_info: val
+    });
+  });
+});
+
+router.get('/get_transaction/:hash', function(req, res, next) {
+  var hash = req.params.hash;
+
+  // console.log("Account: " + JSON.stringify(account));
+
+  analytics.getTranscationInfo(hash).then(val => {
+
+    res.render('home', { 
+      title: 'Ethereum Analytics Debugger - Get Transaction Info',
+      transaction_info: val
     });
   });
 });

@@ -8,21 +8,29 @@
     <hr>
     <br>
 
-    <button class="btn btn-default blue_btn" data-toggle="modal" data-target="#get_experiment">Get Experiment</button>
-    
-
-
+      
 <!--     <button class="btn btn-default red_btn" data-toggle="modal" data-target="#get_accounts">Get Accounts</button> -->
-
-
-
-    <button class="btn btn-default blue_btn" data-toggle="modal" data-target="#get_clearing_through_time">Get Clearing Through Blocks</button>
-
-    <form method="post" action="/get_clearing">
-      <button class="btn btn-default blue_btn">Last Block Clearing</button>
-    </form>
-    
+      
 <!--     <button class="btn btn-default" data-toggle="modal" data-target="#myModal">Button Modal</button> -->
+    <div>
+
+      <button class="btn btn-default blue_btn" data-toggle="modal" data-target="#get_experiment">Get Experiment</button>
+
+      <button class="btn btn-default blue_btn" data-toggle="modal" data-target="#get_clearing_through_time">Get Clearing Through Blocks</button>
+
+      <form method="post" action="/get_clearing">
+        <button class="btn btn-default blue_btn">Last Block Clearing</button>
+      </form>
+    </div>
+
+    <div>
+      <br>
+      <button class="btn btn-default red_btn" data-toggle="modal" data-target="#get_contract_details">Get Contracts</button>
+
+      <button class="btn btn-default red_btn" data-toggle="modal" data-target="#get_transaction_info">Get Transaction Info</button>
+
+      <button class="btn btn-default red_btn" data-toggle="modal" data-target="#get_account_gas_spent">Get Gas Spent of Account</button>
+    </div>
     
 
     <div>
@@ -33,15 +41,19 @@
       
       <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_account_info">Get Account Info</button>
 
+      <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_block_info">Get Block</button>
+
       <form method="post" action="/get_peers">
         <button class="btn btn-default green_btn">Get # Peers</button>
       </form>
-
-
-
     </div>
 
- 
+    {{!-- FORMS
+    ######################################################################################
+    ######################################################################################
+    ######################################################################################
+    ###################################################################################### --}}
+
     <form method="post" action="/get_experiment">
       <div id="get_experiment" class="modal fade" role="dialog">
           <div class="modal-dialog">
@@ -155,8 +167,8 @@
       </div>
     </form>
 
-    <form method="post" action="/get_gas_spent">
-      <div id="get_gas_spent" class="modal fade" role="dialog">
+    <form method="post" action="/get_account_gas_spent">
+      <div id="get_account_gas_spent" class="modal fade" role="dialog">
           <div class="modal-dialog">
 
               <!-- Modal content-->
@@ -171,7 +183,7 @@
                   <div class="modal-body">
                     <div class="form-group">
                         <label for="pwd">Account in Hex:</label>
-                        <input type="string" class="form-control" id="account" name="account" placeholder="Enter account">
+                        <input type="string" class="form-control" id="account" name="account" placeholder="Enter account" value="0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768">
                     </div>
 
                     <p>
@@ -180,12 +192,12 @@
 
                     <div class="form-group">
                         <label for="pwd">Start Block:</label>
-                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number" value="16949">
+                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number" value="">
                     </div>
 
                     <div class="form-group">
                         <label for="pwd">End Block:</label>
-                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number">
+                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number" value="">
                     </div>
 
                     <p style="color: red;">
@@ -280,7 +292,7 @@
 
                     <div class="form-group">
                         <label for="pwd">Account in Hex:</label>
-                        <input type="string" class="form-control" id="account" name="account" placeholder="Enter account" value="0x43eff48a19e93d7fd4d156b485b7ea79db6579e4">
+                        <input type="string" class="form-control" id="account" name="account" placeholder="Enter account" value="0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768">
                     </div>
 
                     <p style="color: red;">
@@ -296,6 +308,111 @@
           </div>
       </div>
     </form>
+
+    <form method="post" action="/get_block_info">
+      <div id="get_block_info" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Get Block Info</h4>
+                  </div>
+
+                  <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="pwd">Block:</label>
+                        <input type="number" class="form-control" id="block" name="block" placeholder="Enter number" value="">
+                    </div>
+
+                  </div>
+                  <div class="modal-footer">
+                      <input type="submit" value="Get" class="btn btn-default" ></input>
+                  </div>
+
+              </div>
+          </div>
+      </div>
+    </form>
+
+    <form method="post" action="/get_contract_details">
+      <div id="get_contract_details" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Get Contracts Details Through Blocks</h4>
+                  </div>
+
+                  <div class="modal-body">
+                    <p>
+                      Specify the range of the blocks you want to check for Contracts.
+                    </p>
+
+                    <p>
+                      You can leave <b>End Block</b> blank to check until the last block.
+                    </p>
+
+                    <div class="form-group">
+                        <label for="pwd">Start Block:</label>
+                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number" value="">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pwd">End Block:</label>
+                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number" value="">
+                    </div>
+
+                    <p style="color: red;">
+                      If the range of the blocks is too big, there is high possibility that the ethereum Node can't answer. Just specify a smaller range of blocks.
+                    </p>
+                  </div>
+
+                  <div class="modal-footer">
+                      <input type="submit" value="Get" class="btn btn-default" ></input>
+                  </div>
+
+              </div>
+          </div>
+      </div>
+    </form>
+
+    <form method="post" action="/get_transaction_info">
+      <div id="get_transaction_info" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Get Transaction Info</h4>
+                  </div>
+
+                  <div class="modal-body">
+                    <div class="form-group">
+                        <label for="pwd">Hash of Transaction:</label>
+                        <input class="form-control" id="hash" name="hash" placeholder="Enter hash" value="">
+                    </div>
+                  </div>
+
+                  <div class="modal-footer">
+                      <input type="submit" value="Get" class="btn btn-default" ></input>
+                  </div>
+
+              </div>
+          </div>
+      </div>
+    </form>
+
+    {{!--  VIEWS
+    ######################################################################################
+    ######################################################################################
+    ######################################################################################
+    ###################################################################################### --}}
 
     <form method="post" action="/route4">
       <div id="myModal" class="modal fade" role="dialog">
@@ -361,13 +478,22 @@
       <hr>
     {{/if}}
 
-    {{!-- BALANCE --}}
+    {{!-- BALANCE - TOTAL GAS SPENT --}}
     {{#if balance}}
-      <div>
+      <div class="inline">
         Balance: <b>{{ balance }}</b>
       </div>
+
+      {{#if totalGasSpent}}
+        <div class="inline">
+          || Total Gas Spent: <b>{{ totalGasSpent }}</b>
+        </div>
+      {{/if}}
+      
       <hr>
-    {{/if}}    
+    {{/if}}
+
+    
 
     {{!-- NUMBER OF PEERS --}}
     {{#if infoP}}
@@ -380,10 +506,10 @@
     {{#if data}}
       <table>
         <thead>
-            <th>#</th> 
-            <th>Account</th> 
-            <th>Spent Gas</th> 
-            <th># Transactions</th> 
+            <th>#</th>
+            <th>Account</th>
+            <th>Sent Gas (Not Spent)</th>
+            <th># Transactions</th>
         </thead> 
         <tbody> 
             {{#each data}} 
@@ -425,22 +551,184 @@
       <table>
         <thead>
             <th>#</th> 
-            <th>To</th> 
+            <th>Hash</th>
+            <th>To</th>
             <th>Input</th> 
         </thead> 
         <tbody> 
             {{#each transactions}} 
-            <tr>
-              <td>{{ @index }}</td>
-              {{#each this}}
-                <td>{{ this }}</td> 
-              {{/each}}
-            </tr> 
+              <tr>
+                <td>{{ @index }}</td>
+                {{#each this}}
+                    {{#if @index}}
+                      <td>{{ this }}</td>
+                    {{else}}
+                      <td><a href="/get_transaction/{{this}}">{{ this }}</a></td>
+                    {{/if}}
+                {{/each}}
+              </tr>
             {{/each}}
         </tbody> 
       </table>
     {{/if}}
 
+    {{!-- GET CONTRACT DETAILS --}}
+    {{#if contracts}}
+
+      {{#each contracts}}
+        <h3>Contract {{ @index }}</h3>
+
+        <table>
+          <thead>
+              <th class="center_text">Attribute</th> 
+              <th class="center_text">Value</th>
+          </thead> 
+          <tbody> 
+                <tr>
+                    <td>blockHash</td>
+                    <td>{{ this.blockHash }}</td>
+                </tr>
+                <tr>
+                    <td>blockNumber</td>
+                    <td>{{ this.blockNumber }}</td>
+                </tr>
+                <tr>
+                    <td>transactionHash</td>
+                    <td>{{ this.transactionHash }}</td>
+                </tr>
+                <tr>
+                    <td>transactionIndex</td>
+                    <td>{{ this.transactionIndex }}</td>
+                </tr>
+                <tr>
+                    <td>from</td>
+                    <td>{{ this.from }}</td>
+                </tr>
+                <tr>
+                    <td>to</td>
+                    <td>{{ this.to }}</td>
+                </tr>
+                <tr>
+                    <td>contractAddress</td>
+                    <td>{{ this.contractAddress }}</td>
+                </tr>
+                <tr>
+                    <td>cumulativeGasUsed</td>
+                    <td>{{ this.cumulativeGasUsed }}</td>
+                </tr>
+                <tr>
+                    <td>gasUsed</td>
+                    <td>{{ this.gasUsed }}</td>
+                </tr>
+          </tbody>
+        </table>
+      {{/each}}
+    {{/if}}    
+
+    {{!-- GET TRANSACTION INFO --}}
+    {{#if transaction_info}}
+      <table>
+        <thead>
+            <th class="center_text">Attribute</th> 
+            <th class="center_text">Value</th>
+        </thead> 
+        <tbody> 
+              <tr>
+                  <td>blockHash</td>
+                  <td>{{ transaction_info.blockHash }}</td>
+              </tr>
+              <tr>
+                  <td>blockNumber</td>
+                  <td>{{ transaction_info.blockNumber }}</td>
+              </tr>
+              <tr>
+                  <td>transactionHash</td>
+                  <td>{{ transaction_info.transactionHash }}</td>
+              </tr>
+              <tr>
+                  <td>transactionIndex</td>
+                  <td>{{ transaction_info.transactionIndex }}</td>
+              </tr>
+              <tr>
+                  <td>from</td>
+                  <td>{{ transaction_info.from }}</td>
+              </tr>
+              <tr>
+                  <td>to</td>
+                  <td>{{ transaction_info.to }}</td>
+              </tr>
+              <tr>
+                  <td>contractAddress</td>
+                  <td>{{ transaction_info.contractAddress }}</td>
+              </tr>
+              <tr>
+                  <td>cumulativeGasUsed</td>
+                  <td>{{ transaction_info.cumulativeGasUsed }}</td>
+              </tr>
+              <tr>
+                  <td>gasUsed</td>
+                  <td>{{ transaction_info.gasUsed }}</td>
+              </tr>
+        </tbody>
+      </table>
+    {{/if}}
+  
+    {{!-- GET GAS SPENT OF ACCOUNT --}}
+    {{#if arrayBlockGasSpent}}
+      <div id="array_block_gas_spent_chart" data-for="{{arrayBlockGasSpent}}" class="center"></div>
+    {{/if}}
+
+    {{!-- GET BLOCK INFO --}}
+    {{#if blockInfo}}
+      <table>
+        <thead>
+            <th class="center_text">Attribute</th> 
+            <th class="center_text">Value</th>
+        </thead> 
+        <tbody> 
+              <tr>
+                  <td>number</td>
+                  <td>{{ blockInfo.number }}</td>
+              </tr>
+              <tr>
+                  <td>hash</td>
+                  <td>{{ blockInfo.hash }}</td>
+              </tr>
+              <tr>
+                  <td>parentHash</td>
+                  <td>{{ blockInfo.parentHash }}</td>
+              </tr>
+              <tr>
+                  <td>nonce</td>
+                  <td>{{ blockInfo.nonce }}</td>
+              </tr>
+              <tr>
+                  <td>difficulty</td>
+                  <td>{{ blockInfo.difficulty }}</td>
+              </tr>
+              <tr>
+                  <td>totalDifficulty</td>
+                  <td>{{ blockInfo.totalDifficulty }}</td>
+              </tr>
+              <tr>
+                  <td>size</td>
+                  <td>{{ blockInfo.size }}</td>
+              </tr>
+              <tr>
+                  <td>gasLimit</td>
+                  <td>{{ blockInfo.gasLimit }}</td>
+              </tr>
+              <tr>
+                  <td>gasUsed</td>
+                  <td>{{ blockInfo.gasUsed }}</td>
+              </tr>
+              <tr>
+                  <td>timestamp</td>
+                  <td>{{ blockInfo.timestamp }}</td>
+              </tr>
+        </tbody>
+      </table>
+    {{/if}}
 
     {{!-- CLEARING THROUGH TIME --}}
 {{!--     {{#if clearingTT}}
@@ -473,3 +761,19 @@
 
     <!-- {{> page/nav}} -->
 </div>
+
+{{!--         BLOCK ATTR
+
+        sha3Uncles 32 Bytes - String: SHA3 of the uncles data in the block.
+        logsBloom 256 Bytes - String: The bloom filter for the logs of the block. null when its pending block.
+        transactionsRoot 32 Bytes - String: The root of the transaction trie of the block
+        stateRoot 32 Bytes - String: The root of the final state trie of the block.
+        miner - String: The address of the beneficiary to whom the mining rewards were given.
+
+        extraData - String: The “extra data” field of this block.
+
+
+        transactions - Array: Array of transaction objects, or 32 Bytes transaction hashes depending on the returnTransactionObjects parameter.
+        uncles - Array: Array of uncle hashes.
+
+ --}}
