@@ -1,14 +1,14 @@
 // add scripts
 
 $(document).on('ready', function() {
-
+	// console.log("CHECK");
 	price_chart = document.getElementById('price_chart');
 	array_block_gas_spent_chart = document.getElementById('array_block_gas_spent_chart');
 
 	if (price_chart) {
 		var data_chart = price_chart.getAttribute('data-for');
 		var dataToArray_chart = data_chart.split(",");
-		// console.log("TEST: " + JSON.stringify(data));
+		// console.log("TEST price_chart: " + JSON.stringify(dataToArray_chart));
 
 		var blocks = [];
 		var prices = [];
@@ -61,7 +61,7 @@ $(document).on('ready', function() {
 	if (array_block_gas_spent_chart) {
 		var data1_chart = array_block_gas_spent_chart.getAttribute('data-for');
 		var dataToArray1_chart = data1_chart.split(",");
-		// console.log("TEST: " + JSON.stringify(data1_chart));
+		// console.log("TEST array_block_gas_spent_chart: " + JSON.stringify(dataToArray1_chart));
 
 		var blocks = [];
 		var gasSpent = [];

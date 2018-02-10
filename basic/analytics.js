@@ -286,6 +286,9 @@ module.exports = {
         resolve(getBlock);
 
       });
+    }).catch(err => {
+      console.log("ERROR getBlockInfo: " + err);
+      reject(err);
     });
   },
 
@@ -619,7 +622,7 @@ module.exports = {
         }
       }).catch(err => {
         console.log("ERROR getTranscationInfo: " + err);
-        reject(err);
+        resolve([]);
       });
       
     });
@@ -638,7 +641,18 @@ module.exports = {
   },
 
   getBalance: function(account) {
-    return web3.eth.getBalance(account);
+    return new Promise((resolve, reject) => {
+      web3.eth.getBalance(account).then(res => {
+        if (res != null) {
+          // console.log("PAOK");
+          resolve(res);
+        }
+      }).catch(err => {
+        console.log("ERROR getBalance: " + err);
+        reject(err);
+      });
+      
+    });
   },
 
   getTransactionsByAccount: function(startBlockNumber, endBlockNumber, myaccount) {
