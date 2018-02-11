@@ -533,6 +533,16 @@ module.exports = {
     });
   },
 
+  getPendingTransactions: function() {
+    var subscription = web3.eth.subscribe('pendingTransactions', (error, result) => {
+      if (!error)
+          console.log(result);
+    })
+    .on("data", function(transaction){
+        console.log("Pending: " + transaction);
+    });
+  },
+
   getContractDetails: function(startBlockNumber, endBlockNumber) {
     var transactionsReceiptsPromises = [];
 
@@ -626,7 +636,6 @@ module.exports = {
       });
       
     });
-
   },
   
   printBalanceOfAccounts: function() {

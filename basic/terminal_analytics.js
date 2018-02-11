@@ -27,28 +27,29 @@ var end = null;
 // getTransactionsByAccount(start, end, accountOfCentralNode);
 // clearContract();
 // getClearingsThroughTime(start, end);
-getBlockCleared().then(res => {
-  console.log("Block Cleared: " + parseInt(res));
-  blockCleared = res;
-  getBlockNumberNow().then(res => {
-    blockNumber = res;
-    console.log("Block NumberNow: " + parseInt(res));
-    if ((blockNumber-blockCleared) > 60) {
-      console.log("TRUE");
-    } else {
-      console.log("FALSE, Distance: " + (blockNumber-blockCleared));
-    }
-    console.log("");
-    getGenerationsLength().then(res => {
-      console.log("Generation Length: " + parseInt(res));
-      getConsumptionsLength().then(res => {
-        console.log("Consumption Length: " + parseInt(res));
-      });
-    });
+// getBlockCleared().then(res => {
+//   console.log("Block Cleared: " + parseInt(res));
+//   blockCleared = res;
+//   getBlockNumberNow().then(res => {
+//     blockNumber = res;
+//     console.log("Block NumberNow: " + parseInt(res));
+//     if ((blockNumber-blockCleared) > 60) {
+//       console.log("TRUE");
+//     } else {
+//       console.log("FALSE, Distance: " + (blockNumber-blockCleared));
+//     }
+//     console.log("");
+//     getGenerationsLength().then(res => {
+//       console.log("Generation Length: " + parseInt(res));
+//       getConsumptionsLength().then(res => {
+//         console.log("Consumption Length: " + parseInt(res));
+//       });
+//     });
 
-  });
-});
+//   });
+// });
 
+getPendingTransactions();
 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////// Smart Contract - Smart Grid Functions /////////////////////
@@ -394,6 +395,16 @@ function printBalance(account) {
     console.log("Account: " + account + " ,balance: " + bal);
   }).catch(err => {
     console.log("ERROR: " + err);
+  });
+}
+
+function getPendingTransactions() {
+  var subscription = web3.eth.subscribe('pendingTransactions', function(error, result){
+    if (!error)
+        console.log(result);
+  })
+  .on("data", function(transaction){
+      console.log("Pending: " + transaction);
   });
 }
 

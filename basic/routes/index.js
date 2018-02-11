@@ -17,6 +17,8 @@ router.post('/get_experiment', function(req, res, next) {
 	var start_block = req.body.start_block;
   var end_block = req.body.end_block;
 
+  analytics.getPendingTransactions();
+
   analytics.getAccountTransactionsGasSpentClearings(start_block, end_block).then(val => {
     noData = null;
 
