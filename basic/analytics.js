@@ -21,8 +21,8 @@ var contract = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
 //0x1E8480
 var accountOfCentralNode = "0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768";
 
-var start = 22000;
-var end = 22600;
+var start = 1;
+var end = 1000;
 
 
 
@@ -292,6 +292,66 @@ module.exports = {
     });
   },
 
+  getTransactionsPerBlock: function(startBlockNumber, endBlockNumber) {
+    return new Promise((resolve, reject) => {
+
+      var getBlockPromises = [];
+      var blockNumberPromise = web3.eth.getBlockNumber();
+
+      blockNumberPromise.then(res => {
+        this.checkStartEndInput(startBlockNumber, endBlockNumber, res);
+        startBlockNumber = start;
+        endBlockNumber = end;
+
+        // console.log("Using startBlockNumber: " + startBlockNumber);
+        // console.log("Using endBlockNumber: " + endBlockNumber);
+
+        for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+          check = this.searchFor(i);
+          // console.log("CHECK: " + check);
+          
+          if (check == -1) { // DOESN'T EXIST
+            var getBlock = web3.eth.getBlock(i, true);
+            getBlockPromises.push(getBlock);
+          }
+
+        }
+
+        Promise.all(getBlockPromises).then(blocks => {
+          // SAVE TO DB
+          dbBlocks = dbBlocks.concat(blocks);
+
+          dbBlocks.sort(function(a, b) {
+            return a.number - b.number;
+          });
+          // console.log("Blocks: " + JSON.stringify(dbBlocks));
+
+          var transactionsPerBlock = [];
+          transactionsPerBlock.push([startBlockNumber, endBlockNumber]);
+
+          for (var j = startBlockNumber; j <= endBlockNumber; j++) {
+            rCheck = this.searchFor(j);
+            if (rCheck != -1) {
+              transactionsPerBlock.push([j, dbBlocks[rCheck].transactions.length]);
+              // console.log("BLOCK NUMBER: " + dbBlocks[rCheck].number + " =?= " + j);
+            } else {
+              console.log("BLOCK: " + j + " , doesn't exist!");
+            }
+          }
+
+          resolve(transactionsPerBlock);
+        }).catch(err => {
+          console.log("ERROR getBlockPromises: " + err);
+          reject(err);
+        });
+      }).catch(err => {
+        console.log("ERROR getBlockNumber: " + err);
+        reject(err);
+      });
+
+    });
+  },
+
   getTransactionReceiptFun: function(txHash) {
     return  web3.eth.getTransactionReceipt(txHash).then(res => {
       // dbTransRec.push(res);
@@ -324,6 +384,10 @@ module.exports = {
       newAccount = new Object([account, gas, 1]);
       accounts.push(newAccount);
     }
+
+    accounts.sort(function(a, b) {
+      return a[2] - b[2];
+    });
   },
 
   printsAccountsResults: function() {
@@ -477,18 +541,21 @@ module.exports = {
 
   getStorageAtBlockPrice: function(block) {
     return web3.eth.getStorageAt(contract, 6, block).catch(err => {
+      console.log("ERROR getStorageAtBlockPrice: " + err);
       return -99;
     });
   },
 
   getStorageAtBlockQuantity: function(block) {
     return web3.eth.getStorageAt(contract, 5, block).catch(err => {
+      console.log("ERROR getStorageAtBlockQuantity: " + err);
       return -99;
     });
   },
 
   getStorageAtBlockType: function(block) {
     return web3.eth.getStorageAt(contract, 7,block).catch(err => {
+      console.log("ERROR getStorageAtBlockType: " + err);
       return -99;
     });
   },
@@ -687,11 +754,44 @@ module.exports = {
             if (block != null && block.transactions != null) {
 
               block.transactions.forEach(e => {
-                var fromA = e.from.toUpperCase();
+                fromA = e.from.toUpperCase();
                 myaccount = myaccount.toUpperCase();
+                
 
+                // help = web3.eth.abi.decodeParameters([{
+                //     type: 'int256',
+                //     name: '_quantity'
+                // },{
+                //     type: 'int256',
+                //     name: '_price'
+                // }], input);
+
+
+                // console.log("myaccount: " + myaccount);
+                // console.log("fromA: " + fromA);
+
+                // input = help;
+                // console.log("Transactions: " + JSON.stringify(input));
+                
                 if (myaccount == "*" || myaccount == fromA) {
-                  transactionsR.push([e.hash, e.to, e.input]);
+                  input = e.input.toString();
+                  fun = input.slice(0,10);
+                  if (input.length > 10) {
+                    input = input.slice(10);
+                    input = "0x".concat(input);
+                    help = web3.eth.abi.decodeParameters(['int256', 'int256'], input);
+                    input = "";
+                    input = input.concat(help[0]);
+                    input = input.concat(", ");
+                    input = input.concat(help[1]);
+                    input = fun.concat(", ".concat(input));
+                  }
+
+                  // console.log("help0: " + help[0]);
+                  // console.log("help1: " + help[1]);
+                  // console.log("Input: " + input);
+                  // console.log("Push");
+                  transactionsR.push([e.hash, e.blockNumber, e.to, input]);
                 }
 
               });
@@ -699,16 +799,19 @@ module.exports = {
             }
           });
 
-          // console.log("Transactions: " + JSON.stringify(transactionsR));
           resolve(transactionsR);
 
         }).catch(err => {
-          reject(err);
-          console.log("ERROR getBlockPromises: " + err);
+          if(err != "ReferenceError: name is not define") {
+            reject(err);
+            console.log("ERROR getBlockPromises: " + err);
+          }
         });
       }).catch(err => {
-        reject(err);
-        console.log("ERROR getBlockNumber: " + err);
+        if(err != "ReferenceError: name is not define") {
+          reject(err);
+          console.log("ERROR getBlockNumber: " + err);
+        }
       });
     });
   },
@@ -735,13 +838,13 @@ module.exports = {
   },
 
   clearContract: function() {
-    var myContract =  new web3.eth.Contract(ABI, contract);
+    // var myContract =  new web3.eth.Contract(ABI, contract);
 
-    myContract
+    // myContract
 
-    myContract.options.from = accountOfCentralNode;
-    myContract.options.gasPrice = '20000000000000';
-    myContract.options.gas = 5000000;
+    // myContract.options.from = accountOfCentralNode;
+    // myContract.options.gasPrice = '20000000000000';
+    // myContract.options.gas = 5000000;
   },
 
   flatten: function(arr) {
@@ -752,185 +855,3 @@ module.exports = {
 
 }
 
-  var ABI = [
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getGenerationsLength",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "clearing",
-      "outputs": [
-        {
-          "name": "clearingQuantity",
-          "type": "int256"
-        },
-        {
-          "name": "clearingPrice",
-          "type": "int256"
-        },
-        {
-          "name": "clearingType",
-          "type": "int256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_quantity",
-          "type": "int256"
-        },
-        {
-          "name": "_price",
-          "type": "int256"
-        }
-      ],
-      "name": "generationBid",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getClearingQuantity",
-      "outputs": [
-        {
-          "name": "",
-          "type": "int256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [],
-      "name": "marketClearing",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getConsumptionsLength",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "blockNumberNow",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_quantity",
-          "type": "int256"
-        },
-        {
-          "name": "_price",
-          "type": "int256"
-        }
-      ],
-      "name": "consumptionBid",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "market",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getClearingPrice",
-      "outputs": [
-        {
-          "name": "",
-          "type": "int256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getClearingType",
-      "outputs": [
-        {
-          "name": "",
-          "type": "int256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [],
-      "name": "deleteMapArrays",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "constructor"
-    }
-  ];

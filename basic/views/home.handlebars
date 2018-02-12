@@ -50,6 +50,11 @@
         Get Gas Spent of Account
         <span class="glyphicon glyphicon-stats"></span>
       </button>
+
+      <button class="btn btn-default red_btn" data-toggle="modal" data-target="#get_transactions_per_block">
+        Get Transactions Per Block
+        <span class="glyphicon glyphicon-stats"></span>
+      </button>
     </div>
     
 
@@ -206,6 +211,46 @@
                         <input type="string" class="form-control" id="account" name="account" placeholder="Enter account" value="0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768">
                     </div>
 
+                    <p>
+                      Specify the range of the blocks you want to check for accounts.
+                    </p>
+
+                    <div class="form-group">
+                        <label for="pwd">Start Block:</label>
+                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number" value="{{start}}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pwd">End Block:</label>
+                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number" value="{{end}}">
+                    </div>
+
+                    <p style="color: red;">
+                      If the range of the blocks is too big, there is high possibility that the ethereum Node can't answer. Just specify a smaller range of blocks.
+                    </p>
+                  </div>
+
+                  <div class="modal-footer">
+                      <input type="submit" value="Get" class="btn btn-default" ></input>
+                  </div>
+
+              </div>
+          </div>
+      </div>
+    </form>
+
+    <form method="post" action="/get_transactions_per_block">
+      <div id="get_transactions_per_block" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Get Transactions Per Block</h4>
+                  </div>
+
+                  <div class="modal-body">
                     <p>
                       Specify the range of the blocks you want to check for accounts.
                     </p>
@@ -468,6 +513,7 @@
     <br>
     <hr>
 
+    {{!-- GET CLEARINGS --}}
     {{#if clearingTT}}
       <div id="price_chart" data-for="{{clearingTT}}" class="center"></div>
     {{/if}}
@@ -475,6 +521,11 @@
     {{!-- GET GAS SPENT OF ACCOUNT --}}
     {{#if arrayBlockGasSpent}}
       <div id="array_block_gas_spent_chart" data-for="{{arrayBlockGasSpent}}" class="center"></div>
+    {{/if}}
+
+    {{!-- GET TRANSACTIONS PER BLOCK --}}
+    {{#if transactionsPerBlock}}
+      <div id="transactions_per_block_chart" data-for="{{transactionsPerBlock}}" class="center"></div>
     {{/if}}
 
     {{!-- <div id="bids_chart" class="center"></div> --}}
@@ -580,8 +631,9 @@
     {{#if transactions}}
       <table>
         <thead>
-            <th>#</th> 
+            <th>#</th>
             <th>Hash of Transaction</th>
+            <th>Block</th>
             <th>To</th>
             <th>Input (Function + Args)</th> 
         </thead> 
@@ -669,7 +721,7 @@
               </tr>
               <tr>
                   <td>blockNumber</td>
-                  <td>{{ transaction_info.blockNumber }}</td>
+                  <td><a href="/get_block/{{transaction_info.blockNumber}}">{{ transaction_info.blockNumber }}</a></td>
               </tr>
               <tr>
                   <td>transactionHash</td>
@@ -724,6 +776,10 @@
                   <td>{{ blockInfo.parentHash }}</td>
               </tr>
               <tr>
+                  <td>transactions</td>
+                  <td>{{ blockInfo.transactions.length }}</td>
+              </tr>
+              <tr>
                   <td>nonce</td>
                   <td>{{ blockInfo.nonce }}</td>
               </tr>
@@ -751,31 +807,37 @@
                   <td>timestamp</td>
                   <td>{{ blockInfo.timestamp }}</td>
               </tr>
+              <tr>
+                  <td>sha3Uncles</td>
+                  <td>{{ blockInfo.sha3Uncles }}</td>
+              </tr>
+              {{!-- <tr>
+                  <td>logsBloom</td>
+                  <td>{{ blockInfo.logsBloom }}</td>
+              </tr> --}}
+              <tr>
+                  <td>transactionsRoot</td>
+                  <td>{{ blockInfo.transactionsRoot }}</td>
+              </tr>
+              <tr>
+                  <td>stateRoot</td>
+                  <td>{{ blockInfo.stateRoot }}</td>
+              </tr>
+              <tr>
+                  <td>miner</td>
+                  <td>{{ blockInfo.miner }}</td>
+              </tr>
+              <tr>
+                  <td>extraData</td>
+                  <td>{{ blockInfo.extraData }}</td>
+              </tr>
+              <tr>
+                  <td>uncles</td>
+                  <td>{{ blockInfo.uncles }}</td>
+              </tr>
         </tbody>
       </table>
     {{/if}}
-
-    {{!-- CLEARING THROUGH TIME --}}
-{{!--     {{#if clearingTT}}
-      <table>
-      <thead>
-          <th>Block</th> 
-          <th>Price</th> 
-          <th>Quantity</th> 
-          <th>Type</th> 
-      </thead> 
-      <tbody> 
-          {{#each clearingTT}} 
-            <tr>
-              {{#each this}}
-                <td>{{ this }}</td>
-              {{/each}}
-            </tr>
-          {{/each}}
-      </tbody> 
-      </table>
-    {{/if}}
- --}}
 
  
     {{!-- <div>
@@ -786,19 +848,3 @@
 
     <!-- {{> page/nav}} -->
 </div>
-
-{{!--         BLOCK ATTR
-
-        sha3Uncles 32 Bytes - String: SHA3 of the uncles data in the block.
-        logsBloom 256 Bytes - String: The bloom filter for the logs of the block. null when its pending block.
-        transactionsRoot 32 Bytes - String: The root of the transaction trie of the block
-        stateRoot 32 Bytes - String: The root of the final state trie of the block.
-        miner - String: The address of the beneficiary to whom the mining rewards were given.
-
-        extraData - String: The “extra data” field of this block.
-
-
-        transactions - Array: Array of transaction objects, or 32 Bytes transaction hashes depending on the returnTransactionObjects parameter.
-        uncles - Array: Array of uncle hashes.
-
- --}}

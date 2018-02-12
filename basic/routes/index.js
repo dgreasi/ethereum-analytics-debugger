@@ -17,13 +17,13 @@ router.post('/get_experiment', function(req, res, next) {
 	var start_block = req.body.start_block;
   var end_block = req.body.end_block;
 
-  analytics.getPendingTransactions();
+  // analytics.getPendingTransactions();
 
   analytics.getAccountTransactionsGasSpentClearings(start_block, end_block).then(val => {
     noData = null;
 
     if (val[2].length < 1) {
-      // console.log("ASSING NoDATA");
+      console.log("ASSING NoDATA");
       noData = "No available Info! Probably there are no transactions for the specified scenario.";
     }
 
@@ -152,9 +152,21 @@ router.post('/get_account_gas_spent',function(req, res, next) {
   });
 });
 
-
 router.post('/get_block_info',function(req, res, next) {
   var block = req.body.block;
+
+  analytics.getBlockInfo(block).then(val => {
+    // console.log("INDEX");
+    res.render('home', {
+      title: 'Ethereum Analytics Debugger - Get Block Info',
+      blockInfo: val
+    });
+    
+  });
+});
+
+router.get('/get_block/:block',function(req, res, next) {
+  var block = req.params.block;
 
   analytics.getBlockInfo(block).then(val => {
     // console.log("INDEX");
@@ -218,6 +230,32 @@ router.post('/get_clearing_through_time', function(req, res, next) {
       start: val[0],
       end: val[1],
       clearingTT: val[2],
+      noData: noData
+    });
+  });
+});
+
+router.post('/get_transactions_per_block', function(req, res, next) {
+  var start_block = req.body.start_block;
+  var end_block = req.body.end_block;
+
+  analytics.getTransactionsPerBlock(start_block, end_block).then(val => {
+    noData = null;
+
+    if (val[1].length < 1) {
+      // console.log("ASSING NoDATA get_clearing_through_time");
+      noData = "No available Info! Probably there are no blocks for the specified scenario.";
+    }
+
+    var start = val[0][0];
+    var end = val[0][1];
+    val.shift();
+
+    res.render('home', { 
+      title: 'Ethereum Analytics Debugger - Get Transactions Per Block',
+      start: start,
+      end: end,
+      transactionsPerBlock: val,
       noData: noData
     });
   });
