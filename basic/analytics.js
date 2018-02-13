@@ -240,6 +240,7 @@ module.exports = {
             var totalGasSpent = 0;
             account = account.toUpperCase();
 
+            // GET POS of start Block in the saved Blocks
             check = this.searchFor(start);
             var j = 0;
             var gasUsedInBlockOfAccount = 0;
@@ -250,6 +251,10 @@ module.exports = {
             // console.log("CHECK: " + check);
             // console.log("i: " + (end-start))
 
+            // FOR THE SPECIFIED BLOCKS
+            // FOR EACH BLOCK, CHECK TRANSACTIONS THAT ARE FROM THE SPECIFIED ACCOUNT
+            // SUMUP SPENT GAS OF TRANSACATIONS IN THE SAME BLOCK
+            // PUSH ARRAY [BLOCK NUMBER, GAS SPENT OF ACCOUNT, GAS LIMIT OF BLOCK]
             for (var i = 0; i <= end-start; i++) {
 
               while( (j < res.length) && (res[j].blockNumber <= dbBlocks[check+i].number)) {
