@@ -202,6 +202,9 @@ module.exports = {
         Promise.all(getBlockPromises).then(blocks => {
           // SAVE TO DB
           dbBlocks = dbBlocks.concat(blocks);
+          dbBlocks.sort(function(a, b) {
+            return a.number - b.number;
+          });
           // console.log("Blocks: " + JSON.stringify(dbBlocks));
 
           blocks.forEach(block => {
@@ -225,26 +228,42 @@ module.exports = {
             // Delete balance from initial array,
             // Keep only the receipts
             res.shift();
+            res.sort(function(a, b) {
+              return a.blockNumber - b.blockNumber;
+            });
+
+            // res.forEach(rs => {
+            //   console.log("BL: " + rs.blockNumber);
+            // });
             
             var gasSpentBlock = []; // Block - Gas Spent
             var totalGasSpent = 0;
             account = account.toUpperCase();
-            res.forEach(rs => {
-              if (rs && (account == rs.from.toUpperCase())) {
-                gasSpentBlock.push([rs.blockNumber, rs.gasUsed]);
-                totalGasSpent += rs.gasUsed;
-              }
-            });
 
-            gasSpentBlock.forEach(block => {
-              check = this.searchFor(block[0]);
+            check = this.searchFor(start);
+            var j = 0;
+            var gasUsedInBlockOfAccount = 0;
 
-              if (check > -1) {
-                block.push(dbBlocks[check].gasLimit);
-              } else {
-                block.push(0);
+            // dbBlocks.forEach((res, index) => {
+            //   console.log(index + " : " + res.number);
+            // });
+            // console.log("CHECK: " + check);
+            // console.log("i: " + (end-start))
+
+            for (var i = 0; i <= end-start; i++) {
+
+              while( (j < res.length) && (res[j].blockNumber <= dbBlocks[check+i].number)) {
+
+                if ((res[j].blockNumber == dbBlocks[check+i].number) && (account == res[j].from.toUpperCase())) {
+                  gasUsedInBlockOfAccount += res[j].gasUsed;
+                }
+                j++;
               }
-            });
+
+              gasSpentBlock.push([dbBlocks[check+i].number, gasUsedInBlockOfAccount, dbBlocks[check+i].gasLimit]);
+              gasUsedInBlockOfAccount = 0;
+              j = 0;
+            }
 
             // Push Total Gas Spent
             startEndBalanceGasSpentReceipts.push(totalGasSpent);
@@ -572,6 +591,12 @@ module.exports = {
   searchFor: function(blockNumber) {
     return dbBlocks.findIndex(element => {
       return element.number == blockNumber;
+    });
+  },
+
+  searchForInArray: function(gasSpentBlock, blockNumber) {
+    return gasSpentBlock.findIndex(element => {
+      return element[0] == blockNumber;
     });
   },
 

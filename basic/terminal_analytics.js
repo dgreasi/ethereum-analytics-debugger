@@ -11,7 +11,8 @@ web3.setProvider(new web3.providers.HttpProvider('http://localhost:8100'));
 var accounts = []; // Account hash - Gas spent - # Transactions
 var contract_first_approach = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3"; // 1st approach
 // var contract = "0x501897c4a684590ee69447974519e86811f0a47d"; // automated bid
-var contract = "0x668e966f3f4cf884ad6eda65784ceacf89ef084a"; // new automated fixed
+// var contract = "0x668e966f3f4cf884ad6eda65784ceacf89ef084a"; // new automated fixed
+var contract = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3"; // new automated fixed
 var accountOfCentralNode = "0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768";
 
 var start = 17073;
@@ -49,7 +50,9 @@ var end = null;
 //   });
 // });
 
-getPendingTransactions();
+// getPendingTransactions();
+
+getCode();
 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////// Smart Contract - Smart Grid Functions /////////////////////
@@ -405,6 +408,12 @@ function getPendingTransactions() {
   })
   .on("data", function(transaction){
       console.log("Pending: " + transaction);
+  });
+}
+
+function getCode() {
+  web3.eth.getCode(contract).then(res => {
+    console.log(web3.utils.hexToUtf8(res));
   });
 }
 
