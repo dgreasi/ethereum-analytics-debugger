@@ -5,6 +5,9 @@
         Uth
       </button>
     </form>
+    <button class="btn btn-default round" data-toggle="modal" data-target="#tips_modal">
+      <span class="glyphicon glyphicon-info-sign"></span>
+    </button>
     <hr>
     <br>
 
@@ -62,26 +65,21 @@
 
       <br>
       
-      <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_balance">Get Balance of Account</button>
+{{!--       <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_balance">Get Balance of Account</button> --}}
+      <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_block_info">Get Block</button>
       
       <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_account_info">Get Account Info</button>
-
-      <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_block_info">Get Block</button>
 
       <form method="post" action="/get_peers">
         <button class="btn btn-default green_btn">Get # Peers</button>
       </form>
     </div>
 
-    <div>
+{{!--     <div>
       <br>
 
-      <button class="btn btn-default" data-toggle="modal" data-target="#tips_modal">
-        <span class="glyphicon glyphicon-info-sign"></span>
-        Tips
-        <span class="glyphicon glyphicon-info-sign"></span>
-      </button>
-    </div>
+
+    </div> --}}
 
     {{!-- FORMS
     ######################################################################################
@@ -640,14 +638,53 @@
           || Total Gas Spent: <b>{{ totalGasSpent }}</b>
         </div>
       {{/if}}
-      
+
+
+      {{#if totalTransactions}}
+        <div class="inline">
+          || Total # of Transactions: <b>{{ totalTransactions }}</b>
+        </div>
+      {{/if}}      
       <hr>
+    {{/if}}
+
+
+    {{!-- SILENT BUGS --}}
+    {{#if silentBugs}}
+      <h2 class="red_btn">
+        Found Bug
+      </h2>
+      <table>
+        <thead>
+            <th>#</th>
+            <th>hash</th>
+            <th>Gas Sent</th>
+            <th>Gas Used</th>
+        </thead> 
+        <tbody> 
+            {{#each silentBugs}} 
+            <tr>
+              <td>{{ @index }}</td>
+              {{#each this}}
+                {{#if @index}}
+                  <td>{{ this }}</td>
+                {{else}}
+                  <td><a href="/get_transaction/{{this}}">{{ this }}</a></td>
+                {{/if}}
+              {{/each}}
+            </tr> 
+            {{/each}}
+        </tbody> 
+      </table>
+      <hr>
+      {{!-- <br> --}}
     {{/if}}
 
 
     {{#if noData}}
       <h4 class="red_btn">{{ noData }}</h4>
     {{/if}}
+
 
     
 

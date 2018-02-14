@@ -22,8 +22,9 @@ router.post('/get_experiment', function(req, res, next) {
   analytics.getAccountTransactionsGasSpentClearings(start_block, end_block).then(val => {
     noData = null;
 
-    if (val[2].length < 1) {
+    if (val[3].length < 1) {
       console.log("ASSING NoDATA");
+      console.log(JSON.stringify(val));
       noData = "No available Info! Probably there are no transactions for the specified scenario.";
     }
 
@@ -31,7 +32,8 @@ router.post('/get_experiment', function(req, res, next) {
       title: 'Ethereum Analytics Debugger - Get Experiment',
       start: val[0],
       end: val[1],
-      data: val[2],
+      silentBugs: val[2],
+      data: val[3],
       noData: noData
     });
   });
@@ -78,6 +80,18 @@ router.post('/get_peers', function(req, res, next) {
   });
 });
 
+router.post('/get_number_of_transactions', function(req, res, next) {
+  
+  analytics.getNumberOfTransactions().then(res => {
+    // console.log("PEERS: " + peers);
+    res.render('home', { 
+      title: 'Ethereum Analytics Debugger - Total Number of Transactions',
+      infoP: '1',
+      totalTransactions: res
+    });
+  });
+});
+
 router.post('/get_account_info', function(req, res, next) {
   var start_block = req.body.start_block;
   var end_block = req.body.end_block;
@@ -88,9 +102,12 @@ router.post('/get_account_info', function(req, res, next) {
 
 
     accountMbalance = val[2][0];
+    totalTransactions = val[2][1];
     // Delete first element from array
     // Keep transactions
     val[2].shift();
+    val[2].shift();
+
     // Keep Inner array
     transactionsT = val[2][0];
 
@@ -105,6 +122,7 @@ router.post('/get_account_info', function(req, res, next) {
       end: val[1],
       account: account,
       balance: accountMbalance,
+      totalTransactions: totalTransactions,
       transactions: transactionsT,
       noData: noData
     });
@@ -187,9 +205,10 @@ router.get('/account/:acc', function(req, res, next) {
     noData = null;
 
     accountMbalance = val[2][0];
-
+    totalTransactions = val[2][1];
     // Delete first element from array
     // Keep transactions
+    val[2].shift();
     val[2].shift();
 
     // Keep Inner array
@@ -206,6 +225,7 @@ router.get('/account/:acc', function(req, res, next) {
       end: val[1],
       account: account,
       balance: accountMbalance,
+      totalTransactions: totalTransactions,
       transactions: transactionsT,
       noData: noData
     });
@@ -221,7 +241,7 @@ router.post('/get_clearing_through_time', function(req, res, next) {
     noData = null;
 
     if (val[2].length < 1) {
-      // console.log("ASSING NoDATA get_clearing_through_time");
+      console.log("ASSING NoDATA get_clearing_through_time");
       noData = "No available Info! Probably there are no transactions for the specified scenario.";
     }
 

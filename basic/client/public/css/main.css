@@ -64,6 +64,10 @@ td a {
 .center_text {
   text-align: center;
 }
+
+.round {
+  border-radius: 50%;
+}
 /*.container {
     padding-right: 15px;
     padding-left: 15px;
