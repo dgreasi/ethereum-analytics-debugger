@@ -8,13 +8,14 @@ var Web3 = require('web3');
 var web3 = new Web3();
 web3.setProvider(new web3.providers.HttpProvider('http://localhost:8100'));
 
-var dbBlocks = [];
+// DATABASE TO BE
+var dbBlocks = []; // ARRAY OF BLOCKS
 // var dbTrans = [];
-var dbTransRec = [];
-
-var silentBugs = [];
-
+var dbTransRec = []; // ARRAY OF TRANSACTION RECEIPTS
+var dbClearings = []; // BLOCK - PRICE - QUANTITY - TYPE
+var silentBugs = []; // TRANSACTION - GAS SENT - GAS SPENT
 var accounts = []; // Account hash - Gas sent - # Transactions
+
 var contract_first_approach = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
 
 // var contract = "0x501897c4a684590ee69447974519e86811f0a47d"; // automated bid
@@ -560,11 +561,33 @@ module.exports = {
         // console.log("Using startBlockNumber: " + startBlockNumber);
         // console.log("Using endBlockNumber: " + endBlockNumber);
 
-        for (var i = startBlockNumber; i < endBlockNumber; i++) {
-          storagePromises.push(this.getStorageAtBlock(i));
+        for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+          check = this.searchForInArray(dbClearings, i);
+          if (check == -1) {
+            storagePromises.push(this.getStorageAtBlock(i));
+          }
         }
 
         Promise.all(storagePromises).then(res => {
+          dbClearings = dbClearings.concat(res);
+
+          dbClearings.sort(function(a, b) {
+            return a[0] - b[0];
+          });
+
+          res = [];
+
+          check = this.searchForInArray(dbClearings, startBlockNumber);
+          console.log("DBClearings");
+          for (i = 0; i <= (endBlockNumber - startBlockNumber); i++) {
+            if (check == -1) {
+              console.log("Didnt found in dbClearings");
+            } else {
+              res.push(dbClearings[check+i]);
+              console.log("Push clearing of block: " + dbClearings[check+i]);
+            }
+          }
+
           endStartClear = [start, end];
           // console.log(JSON.stringify(res));
           endStartClear.push(res);
