@@ -145,3 +145,39 @@ $(document).on('ready', function() {
 	}
 });
 
+
+$( "#get_exp" ).click(function() {
+  // alert( "Handler for .click() called." );
+  $( "#id_function" ).val("1");
+  $( "#submit_global" ).click();
+});
+
+$( "#get_clr" ).click(function() {
+  // alert( "Handler for .click() called." );
+  $( "#id_function" ).val("2");
+  $( "#submit_global" ).click();
+});
+
+$( "#get_con_details" ).click(function() {
+  // alert( "Handler for .click() called." );
+  $( "#id_function" ).val("3");
+  $( "#submit_global" ).click();
+});
+
+$( "#get_transactions_per_block" ).click(function() {
+  // alert( "Handler for .click() called." );
+  $( "#id_function" ).val("4");
+  $( "#submit_global" ).click();
+});
+
+$( "#get_account_gas_spent" ).click(function() {
+  // alert( "Handler for .click() called." );
+  $( "#id_function" ).val("5");
+  $( "#submit_global" ).click();
+});
+
+$( "#get_account_info" ).click(function() {
+  // alert( "Handler for .click() called." );
+  $( "#id_function" ).val("6");
+  $( "#submit_global" ).click();
+});

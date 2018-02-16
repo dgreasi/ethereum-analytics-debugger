@@ -38,12 +38,12 @@ module.exports = {
 
   ////////// Get only transactions that are calls to functions of a Contract /////
   ///////////// IE a send Gas transaction will not be shown here /////////////////
-  getAccountTransactionsGasSpentClearings: function(startBlockNumber, endBlockNumber) {
-    this.accounts = [];
+  getAccountTransactionsGasSpentClearings: function(startBlockNumber, endBlockNumber, contract_arg) {
 
     return new Promise((resolve, reject) => {
 
       var getBlockPromises = [];
+      var receiptsPromises = [];
       var blockNumberPromise = web3.eth.getBlockNumber();
 
       blockNumberPromise.then(res => {
@@ -66,11 +66,19 @@ module.exports = {
             // console.log(JSON.stringify(dbBlocks));
             var blockSaved = dbBlocks[check];
             // console.log("Get from DB. block: " + blockSaved.number);
-            blockSaved.transactions.forEach(e => {
-              if (e.input != "0x") {
-                this.getTransactionReceiptFun(e);
-              }
-            });
+            if (contract_arg != "") {
+              blockSaved.transactions.forEach(e => {
+                if ((e.input != "0x") && (e.to == contract_arg)) {
+                  receiptsPromises.push(this.getTransactionReceiptFun(e));
+                }
+              });
+            } else {
+              blockSaved.transactions.forEach(e => {
+                if (e.input != "0x") {
+                  receiptsPromises.push(this.getTransactionReceiptFun(e));
+                }
+              });
+            }
 
           }
 
@@ -84,27 +92,42 @@ module.exports = {
           });
           // console.log("Blocks: " + JSON.stringify(dbBlocks));
 
-          var receiptsPromises = [];
+          
+          // console.log("");
+          // console.log("length before: " + accounts.length);
+          accounts = [];
+          // console.log("length after: " + accounts.length);
           blocks.forEach(block => {
             // console.log("BLOCK: " + block.number + " Number of transactions: " + block.transactions.length);
             if (block != null && block.transactions != null) {
+              // console.log("Block with transactions");
 
-              block.transactions.forEach(e => {
-                if (e.input != "0x") {
-                  receiptsPromises.push(this.getTransactionReceiptFun(e));
-                }
-              });
-              
+              if (contract_arg != "") {
+                block.transactions.forEach(e => {
+                  if ((e.input != "0x") && (e.to == contract_arg)) {
+                    // console.log("Call with contract_arg");
+                    receiptsPromises.push(this.getTransactionReceiptFun(e));
+                  }
+                });
+              } else {
+                block.transactions.forEach(e => {
+                  if (e.input != "0x") {
+                    // console.log("Call WITHOUT contract_arg");
+                    receiptsPromises.push(this.getTransactionReceiptFun(e));
+                  }
+                });
+              }
             }
           });
 
           Promise.all(receiptsPromises).then(res => {
             // SAVE TO DB
-            // console.log("");
             // console.log("Transactions Receipt: " + JSON.stringify(this.flatten(dbTransRec)));
             endStartAccount = [start, end];
             endStartAccount.push(silentBugs);
             endStartAccount.push(accounts);
+            // setTimeout
+            // console.log("RESOLVING");
             resolve(endStartAccount);
 
           }).catch(err => {
@@ -289,12 +312,15 @@ module.exports = {
               while( (j < res.length) && (res[j].blockNumber <= dbBlocks[check+i].number)) {
 
                 if ((res[j].blockNumber == dbBlocks[check+i].number) && (account == res[j].from.toUpperCase())) {
+                  // console.log("Account1: " + account)
+                  // console.log("Account2: " + res[j].from.toUpperCase())
                   gasUsedInBlockOfAccount += res[j].gasUsed;
                 }
                 j++;
               }
 
               gasSpentBlock.push([dbBlocks[check+i].number, gasUsedInBlockOfAccount, dbBlocks[check+i].gasLimit]);
+              totalGasSpent += gasUsedInBlockOfAccount;
               gasUsedInBlockOfAccount = 0;
               j = 0;
             }
@@ -406,50 +432,60 @@ module.exports = {
   },
 
   getTransactionReceiptFun: function(tx) {
-    return  web3.eth.getTransactionReceipt(tx.hash).then(res => {
-      // dbTransRec.push(res);
+    return new Promise((resolve, reject) => {
+      web3.eth.getTransactionReceipt(tx.hash).then(res => {
+        // dbTransRec.push(res);
 
-      if (res != null) {
-        // console.log("EXECUTING");
-        check = this.searchForSilentBugs(tx.hash);
-        if (check == -1) {
-          if (tx.gas == res.gasUsed) {
-            // console.log("FOUND NEW SILENT BUG");
-            silentBugs.push([tx.hash, tx.gas, res.gasUsed]);
+        if (res != null) {
+          // console.log("EXECUTING");
+          check = this.searchForSilentBugs(tx.hash);
+          if (check == -1) {
+            if (tx.gas == res.gasUsed) {
+              // console.log("FOUND NEW SILENT BUG");
+              silentBugs.push([tx.hash, tx.gas, res.gasUsed]);
+            }
           }
-        }
 
-        this.saveAccountTransactionsSpentGas(res.from, res.gasUsed);
-      }  
-    }).catch(err => {
-      console.log("ERROR getTransactionReceipt: " + err);
+          this.saveAccountTransactionsSpentGas(res.from, res.gasUsed).then(res => {
+            resolve(res);
+          });
+        }  
+      }).catch(err => {
+        console.log("ERROR getTransactionReceipt: " + err);
+        reject(err);
+      });
     });
   },
 
   saveAccountTransactionsSpentGas: function(account, gas) {
-    var found = false;
+    return new Promise((resolve, reject) => {
+      var found = false;
 
-    for (var i = 0; i < accounts.length; i++) {
+      for (var i = 0; i < accounts.length; i++) {
 
-      var str1 = parseInt(accounts[i][0]);
-      var str2 = parseInt(account);
+        var str1 = parseInt(accounts[i][0]);
+        var str2 = parseInt(account);
 
-      if (str1 == str2) {
-        accounts[i][1] += gas;
-        accounts[i][2] += 1;
-        found = true;
-        break;
+        if (str1 == str2) {
+          // console.log("+1");
+          accounts[i][1] += gas;
+          accounts[i][2] += 1;
+          found = true;
+          break;
+        }
       }
-    }
 
-    if (!found) {
-      // console.log("PUSH NEW ACCOUNT");
-      newAccount = new Object([account, gas, 1]);
-      accounts.push(newAccount);
-    }
+      if (!found) {
+        // console.log("PUSH NEW ACCOUNT");
+        newAccount = new Object([account, gas, 1]);
+        accounts.push(newAccount);
+      }
 
-    accounts.sort(function(a, b) {
-      return a[2] - b[2];
+      accounts.sort(function(a, b) {
+        return a[2] - b[2];
+      });
+
+      resolve(true);
     });
   },
 
@@ -472,29 +508,44 @@ module.exports = {
   checkStartEndInput: function(startBlockNumber, endBlockNumber, endOfBlockEth) {
     // console.log("TYPE of start: " + typeof startBlockNumber);
     // console.log("TYPE of end: " + typeof endBlockNumber);
+    startBlockNumber = parseInt(startBlockNumber);
+    endBlockNumber = parseInt(endBlockNumber);
+    // console.log("startBlockNumber: " + startBlockNumber);
+    // console.log("endBlockNumber: " + endBlockNumber);
 
     if (endBlockNumber == 1 && startBlockNumber == 1) {
       startBlockNumber = start;
       endBlockNumber = end;
     } else {
       if (!endBlockNumber) {
+        // console.log("CHANGES 0");
         endBlockNumber = endOfBlockEth;
         end = endOfBlockEth;
         if (!startBlockNumber) {
+          // console.log("CHANGES 0.1");
           startBlockNumber = endBlockNumber - 1000;
         }
-        start = startBlockNumber;
+        if (startBlockNumber <= 0) {
+          // console.log("CHANGES");
+          startBlockNumber = 1;
+        }
+        start = startBlockNumber;  
       } else {
-        startBlockNumber = parseInt(startBlockNumber);
-        endBlockNumber = parseInt(endBlockNumber);
+        // console.log("CHANGES 1");
         if (endBlockNumber > endOfBlockEth) {
+          // console.log("CHANGES 1.1");
           endBlockNumber = endOfBlockEth;
         }
         end = endBlockNumber;
         if ((!startBlockNumber) || (parseInt(startBlockNumber) > parseInt(endBlockNumber))) {
+          // console.log("CHANGES 1.2");
           startBlockNumber = endBlockNumber - 1000;
         }
-        start = startBlockNumber;
+        if (startBlockNumber <= 0) {
+          // console.log("CHANGES 1.3");
+          startBlockNumber = 1;
+        }
+        start = startBlockNumber;  
       }
     }
 
@@ -547,9 +598,10 @@ module.exports = {
   // More info about storage at specified block here:
   // https://medium.com/aigang-network/how-to-read-ethereum-contract-storage-44252c8af925
 
-  getClearingsThroughTime: function(startBlockNumber, endBlockNumber) {
+  getClearingsThroughTime: function(startBlockNumber, endBlockNumber, contract_arg) {
     return new Promise((resolve, reject) => {
-      
+      console.log("Contract: " + contract_arg)
+      contract_arg = contract_arg.toLowerCase();
       var storagePromises = [];
       var blockNumberPromise = web3.eth.getBlockNumber();
 
@@ -564,7 +616,7 @@ module.exports = {
         for (var i = startBlockNumber; i <= endBlockNumber; i++) {
           check = this.searchForInArray(dbClearings, i);
           if (check == -1) {
-            storagePromises.push(this.getStorageAtBlock(i));
+            storagePromises.push(this.getStorageAtBlock(i, contract_arg));
           }
         }
 
@@ -584,7 +636,7 @@ module.exports = {
               console.log("Didnt found in dbClearings");
             } else {
               res.push(dbClearings[check+i]);
-              console.log("Push clearing of block: " + dbClearings[check+i]);
+              // console.log("Push clearing of block: " + dbClearings[check+i]);
             }
           }
 
@@ -604,12 +656,12 @@ module.exports = {
     });
   },
 
-  getStorageAtBlock: function(block) {
+  getStorageAtBlock: function(block, contract_arg) {
     return new Promise((resolve, reject) => {
       var promiseGetStorageAll = [];
-      promiseGetStorageAll.push(this.getStorageAtBlockPrice(block));
-      promiseGetStorageAll.push(this.getStorageAtBlockQuantity(block));
-      promiseGetStorageAll.push(this.getStorageAtBlockType(block));
+      promiseGetStorageAll.push(this.getStorageAtBlockPrice(block, contract_arg));
+      promiseGetStorageAll.push(this.getStorageAtBlockQuantity(block, contract_arg));
+      promiseGetStorageAll.push(this.getStorageAtBlockType(block, contract_arg));
 
       Promise.all(promiseGetStorageAll).then(clearings => {
         var result = [];
@@ -630,22 +682,22 @@ module.exports = {
     });
   },
 
-  getStorageAtBlockPrice: function(block) {
-    return web3.eth.getStorageAt(contract, 6, block).catch(err => {
+  getStorageAtBlockPrice: function(block, contract_arg) {
+    return web3.eth.getStorageAt(contract_arg, 6, block).catch(err => {
       console.log("ERROR getStorageAtBlockPrice: " + err);
       return -99;
     });
   },
 
-  getStorageAtBlockQuantity: function(block) {
-    return web3.eth.getStorageAt(contract, 5, block).catch(err => {
+  getStorageAtBlockQuantity: function(block, contract_arg) {
+    return web3.eth.getStorageAt(contract_arg, 5, block).catch(err => {
       console.log("ERROR getStorageAtBlockQuantity: " + err);
       return -99;
     });
   },
 
-  getStorageAtBlockType: function(block) {
-    return web3.eth.getStorageAt(contract, 7,block).catch(err => {
+  getStorageAtBlockType: function(block, contract_arg) {
+    return web3.eth.getStorageAt(contract_arg, 7,block).catch(err => {
       console.log("ERROR getStorageAtBlockType: " + err);
       return -99;
     });
@@ -788,6 +840,7 @@ module.exports = {
           });
 
           Promise.all(transactionsReceiptsPromises).then(receipts => {
+            endStartContracts = [start, end]
             var transactionsReceiptsValid = [];
             console.log("Lenght of receipts: " + receipts.length);
             receipts.forEach(rs => {
@@ -797,7 +850,8 @@ module.exports = {
               }
             });
 
-            resolve(transactionsReceiptsValid);
+            endStartContracts.push(transactionsReceiptsValid);
+            resolve(endStartContracts);
 
           }).catch(err => {
             console.log("ERROR receiptsPromises: " + err);

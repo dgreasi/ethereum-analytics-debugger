@@ -39,6 +39,10 @@ form{
   padding-right:45em;
 }
 
+.hide {
+   visibility: hidden;
+}
+
 table {
     margin: auto;
 }
