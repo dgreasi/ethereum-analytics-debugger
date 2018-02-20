@@ -16,6 +16,8 @@ var dbClearings = []; // BLOCK - PRICE - QUANTITY - TYPE
 var silentBugs = []; // TRANSACTION - GAS SENT - GAS SPENT
 var accounts = []; // Account hash - Gas sent - # Transactions
 
+var previous_contracts_accounts = [];
+
 var contract_first_approach = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
 
 // var contract = "0x501897c4a684590ee69447974519e86811f0a47d"; // automated bid
@@ -27,6 +29,7 @@ var accountOfCentralNode = "0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768";
 
 var start = 1;
 var end = 1000;
+var lastBlock = 0;
 
 
 
@@ -39,6 +42,10 @@ module.exports = {
   ////////// Get only transactions that are calls to functions of a Contract /////
   ///////////// IE a send Gas transaction will not be shown here /////////////////
   getAccountTransactionsGasSpentClearings: function(startBlockNumber, endBlockNumber, contract_arg) {
+    // if (contract_arg != "") {
+    //   previous_contracts_accounts.push(contract_arg);
+    //   console.log("Pushed contract_arg: " + JSON.stringify(previous_contracts_accounts));
+    // }
 
     return new Promise((resolve, reject) => {
 
@@ -67,6 +74,7 @@ module.exports = {
             var blockSaved = dbBlocks[check];
             // console.log("Get from DB. block: " + blockSaved.number);
             if (contract_arg != "") {
+              this.addToHistory(contract_arg);
               blockSaved.transactions.forEach(e => {
                 if ((e.input != "0x") && (e.to == contract_arg)) {
                   receiptsPromises.push(this.getTransactionReceiptFun(e));
@@ -147,6 +155,10 @@ module.exports = {
   },
 
   getNumberOfTranscationsOfAccountPerBlock: function(startBlockNumber, endBlockNumber, account) {
+    if (account != "") {
+      this.addToHistory(account);
+    }
+
     var getBlockPromises = [];
     var blockNumberPromise = web3.eth.getBlockNumber();
 
@@ -155,8 +167,8 @@ module.exports = {
       startBlockNumber = start;
       endBlockNumber = end;
 
-      console.log("Using startBlockNumber: " + startBlockNumber);
-      console.log("Using endBlockNumber: " + endBlockNumber);
+      // console.log("Using startBlockNumber: " + startBlockNumber);
+      // console.log("Using endBlockNumber: " + endBlockNumber);
 
       for (var i = startBlockNumber; i <= endBlockNumber; i++) {
         check = this.searchFor(i);
@@ -218,6 +230,9 @@ module.exports = {
 
   getSpentGasOfAccount: function(startBlockNumber, endBlockNumber, account) {
     var transactionsReceiptsPromises = [];
+    if (account != "") {
+      this.addToHistory(account);
+    }
 
     return new Promise((resolve, reject) => {
 
@@ -510,6 +525,8 @@ module.exports = {
     // console.log("TYPE of end: " + typeof endBlockNumber);
     startBlockNumber = parseInt(startBlockNumber);
     endBlockNumber = parseInt(endBlockNumber);
+    lastBlock = endOfBlockEth;
+    // console.log("Last block: " + lastBlock);
     // console.log("startBlockNumber: " + startBlockNumber);
     // console.log("endBlockNumber: " + endBlockNumber);
 
@@ -599,8 +616,12 @@ module.exports = {
   // https://medium.com/aigang-network/how-to-read-ethereum-contract-storage-44252c8af925
 
   getClearingsThroughTime: function(startBlockNumber, endBlockNumber, contract_arg) {
+    if (contract_arg != "") {
+      this.addToHistory(contract_arg);
+    }
+
     return new Promise((resolve, reject) => {
-      console.log("Contract: " + contract_arg)
+      // console.log("Contract: " + contract_arg);
       contract_arg = contract_arg.toLowerCase();
       var storagePromises = [];
       var blockNumberPromise = web3.eth.getBlockNumber();
@@ -630,7 +651,7 @@ module.exports = {
           res = [];
 
           check = this.searchForInArray(dbClearings, startBlockNumber);
-          console.log("DBClearings");
+          // console.log("DBClearings");
           for (i = 0; i <= (endBlockNumber - startBlockNumber); i++) {
             if (check == -1) {
               console.log("Didnt found in dbClearings");
@@ -743,6 +764,10 @@ module.exports = {
   ///////////////////////////////////////////////////////////////////////////////
 
   getAccountInfo: function(start_block, end_block, account) {
+    if (account != "") {
+      this.addToHistory(account);
+    }
+
     return new Promise((resolve, reject) => {
       var promisesDif = [];
       // console.log("BEGIN");
@@ -772,6 +797,10 @@ module.exports = {
   },
 
   getNumberOfTransactions: function(account) {
+    if (account != "") {
+      this.addToHistory(account);
+    }
+
     return new Promise((resolve, reject) => {
       web3.eth.getTransactionCount(account).then(res => {
         if (res != null) {
@@ -909,7 +938,40 @@ module.exports = {
     });
   },
 
+  getLastBlockLocally: function() {
+    if (lastBlock != 0) {
+      // console.log('Local');
+      return new Promise((resolve, reject) => {
+        resolve(lastBlock);
+      });
+    } else {
+      // console.log('Ger Promise');
+      return web3.eth.getBlockNumber();
+    }
+  },
+
+  getPreviousAccounts: function() {
+    // console.log("ACCOUNTS: " + JSON.stringify(previous_contracts_accounts));
+    return previous_contracts_accounts;
+  },
+
+  addToHistory: function(arg) {
+    acc = arg.toLowerCase();
+    var found = previous_contracts_accounts.find(function(element) {
+      return element == acc;
+    });
+
+    if (!found) {
+      previous_contracts_accounts.push(acc);
+      // console.log("Pushed arg: " + arg);
+    }
+  },
+
   getTransactionsByAccount: function(startBlockNumber, endBlockNumber, myaccount) {
+    if (myaccount != "") {
+      this.addToHistory(myaccount);
+    }
+
     return new Promise((resolve, reject) => {
       var transactionsR = [];
       var getBlockPromises = [];

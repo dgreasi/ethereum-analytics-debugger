@@ -29,6 +29,9 @@ IP: 10.96.12.69
 Username: mgdfoti
 Passwd: 1@foti1#
 
+ssh mgdfoti@10.96.12.69
+ssh mgdfoti@10.96.12.79
+ssh mgdfoti@10.96.12.80
 ```
 
 1.2) Init central node:
@@ -112,6 +115,8 @@ export PATH=$PATH:/home/mgdfoti/blockchain-gridlabd/install/bin
 export GLPATH=/home/ubuntu/mgdfoti-gridlabd/install/lib/gridlabd:/home/ubuntu/blockchain-gridlabd/install/share/gridlabd
 ```
 
+IEEE_13_Node_With_Houses
+
 2.3) Copy network.glm in /home/ubuntu/network_glm/
 
 ### Start:
@@ -145,14 +150,14 @@ geth --datadir /home2/mgdfoti/tmp/eth/1923/00 --identity mynode-00 --unlock '0' 
 
 ######################################################################################################
 
-geth --bootnodes enode://9674443c55f2570e0cb3c7c966437a42709f3f37336e063c9783c2eddcb06477d9bad6a00686d27a948df8965ec1c75227d5c75e4811493ff5ab4ab249e2cba1@10.96.12.79:30299,enode://32c227973c00ee178699fee4cba77b8c9e612fee99680b24ef7d652f35e6082c6f625d6c4350a36b6a8b5abb8bd87bead7b25f08cca339b9f487b9b7bc7f4265@10.96.12.80:30299 --datadir /home2/mgdfoti/tmp/eth/1923/00 --identity mynode-00-69 --unlock '0' --password <(echo 0) --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr=10.96.12.69 --rpccorsdomain "*" --ipcpath /home2/mgdfoti/tmp/eth/1923/00/geth.ipc --networkid 1923 --minerthreads 4 --cache 1024 --maxpeers 400 --targetgaslimit 9000000000000 console
+geth --bootnodes enode://9674443c55f2570e0cb3c7c966437a42709f3f37336e063c9783c2eddcb06477d9bad6a00686d27a948df8965ec1c75227d5c75e4811493ff5ab4ab249e2cba1@11.10.1.3:30299,enode://32c227973c00ee178699fee4cba77b8c9e612fee99680b24ef7d652f35e6082c6f625d6c4350a36b6a8b5abb8bd87bead7b25f08cca339b9f487b9b7bc7f4265@11.10.1.2:30299 --datadir /home2/mgdfoti/tmp/eth/1923/00 --identity mynode-00-69 --unlock '0' --password <(echo 0) --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr=11.10.1.1 --rpccorsdomain "*" --ipcpath /home2/mgdfoti/tmp/eth/1923/00/geth.ipc --networkid 1923 --minerthreads 4 --cache 1024 --maxpeers 400 --targetgaslimit 9000000000000 console
 
-geth --bootnodes enode://339d93ffe8e3100b49a7392de71388196156d611ff2e5de7b37c16658781a2c023336d7766a1919a508dcbe9a69d16ef6f469ed82f093b1ba04183a524b87770@10.96.12.69:30299,enode://32c227973c00ee178699fee4cba77b8c9e612fee99680b24ef7d652f35e6082c6f625d6c4350a36b6a8b5abb8bd87bead7b25f08cca339b9f487b9b7bc7f4265@10.96.12.80:30299 --datadir /home2/mgdfoti/tmp/eth/1923/00 --identity mynode-00-79 --unlock '0' --password <(echo 0) --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr=10.96.12.79 --rpccorsdomain "*" --ipcpath /home2/mgdfoti/tmp/eth/1923/00/geth.ipc --networkid 1923 --minerthreads 4 --cache 1024 --maxpeers 400 --targetgaslimit 9000000000000 console
+geth --bootnodes enode://339d93ffe8e3100b49a7392de71388196156d611ff2e5de7b37c16658781a2c023336d7766a1919a508dcbe9a69d16ef6f469ed82f093b1ba04183a524b87770@11.10.1.1:30299,enode://32c227973c00ee178699fee4cba77b8c9e612fee99680b24ef7d652f35e6082c6f625d6c4350a36b6a8b5abb8bd87bead7b25f08cca339b9f487b9b7bc7f4265@11.10.1.2:30299 --datadir /home2/mgdfoti/tmp/eth/1923/00 --identity mynode-00-79 --unlock '0' --password <(echo 0) --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr=11.10.1.3 --rpccorsdomain "*" --ipcpath /home2/mgdfoti/tmp/eth/1923/00/geth.ipc --networkid 1923 --minerthreads 4 --cache 1024 --maxpeers 400 --targetgaslimit 9000000000000 console
 
-geth --datadir /home2/mgdfoti/tmp/eth/1923/00 --identity mynode-00-80 --unlock '0' --password <(echo 0) --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr=10.96.12.80 --rpccorsdomain "*" --ipcpath /home2/mgdfoti/tmp/eth/1923/00/geth.ipc --networkid 1923 --minerthreads 4 --cache 1024 --maxpeers 400 --targetgaslimit 9000000000000 console
+geth --datadir /home2/mgdfoti/tmp/eth/1923/00 --identity mynode-00-80 --unlock '0' --password <(echo 0) --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr=11.10.1.2 --rpccorsdomain "*" --ipcpath /home2/mgdfoti/tmp/eth/1923/00/geth.ipc --networkid 1923 --minerthreads 4 --cache 1024 --maxpeers 400 --targetgaslimit 9000000000000 console
 
 VM 69:
-enode://339d93ffe8e3100b49a7392de71388196156d611ff2e5de7b37c16658781a2c023336d7766a1919a508dcbe9a69d16ef6f469ed82f093b1ba04183a524b87770@10.96.12.69:30299
+enode://339d93ffe8e3100b49a7392de71388196156d611ff2e5de7b37c16658781a2c023336d7766a1919a508dcbe9a69d16ef6f469ed82f093b1ba04183a524b87770@11.10.1.1:30299
 
 VM 79:
 enode://9674443c55f2570e0cb3c7c966437a42709f3f37336e063c9783c2eddcb06477d9bad6a00686d27a948df8965ec1c75227d5c75e4811493ff5ab4ab249e2cba1@10.96.12.79:30299

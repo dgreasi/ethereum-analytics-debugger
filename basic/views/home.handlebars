@@ -10,6 +10,8 @@
     </button>
     <hr>
 
+    <p>Last Block: <b>{{ lastBlock }}</b></p>
+
     <form method="post" action="/get">
       <div class="form-inline">
         <input type="number" class="form-control" id="start_block1" name="start_block" placeholder="From block:(to-1000)" value="{{start}}">
@@ -21,6 +23,21 @@
         <input type="submit" value="Get" id="submit_global" class="btn btn-default hide" ></input>
       </div>
     </form>
+
+    {{#if previous_contracts_accounts}}
+      <div class="dropdown inline">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">History
+        <span class="caret"></span></button>
+        <ul class="dropdown-menu" data-for="{{previous_contracts_accounts}}">
+          {{#each previous_contracts_accounts}}
+            <li><a href="#" class="clickclass" id="{{@index}}">{{this}}</a></li>
+          {{!-- <li><a href="#">CSS</a></li>
+          <li><a href="#">JavaScript</a></li> --}}
+          {{/each}}
+        </ul>
+      </div>
+    {{/if}}
+
 
     <hr>
 <!--     <button class="btn btn-default red_btn" data-toggle="modal" data-target="#get_accounts">Get Accounts</button> -->

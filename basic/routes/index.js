@@ -6,13 +6,24 @@ var analytics = require('../analytics.js');
 
 router.get('/', function(req, res, next) {
 
-  res.render('home', { title: 'Ethereum Analytics Debugger' });
+  analytics.getLastBlockLocally().then(block => {
+    // console.log('PAOK: ' + block);
+    prvAC = analytics.getPreviousAccounts();
+    // console.log("ACCOUNTS: " + JSON.stringify(prvAC));
+    res.render('home', { 
+      title: 'Ethereum Analytics Debugger',
+      lastBlock: block,
+      previous_contracts_accounts: prvAC
+    });
+  });
 });
 
 ///////////////////////////////////////////////////////////////
 /////////////////////// Get Functions /////////////////////////
 ///////////////////////////////////////////////////////////////
+analytics.getLastBlockLocally().then(block => {
 
+});
 router.post('/get', function(req, res, next) {
   var start_block = req.body.start_block;
   var end_block = req.body.end_block;
@@ -30,22 +41,32 @@ router.post('/get', function(req, res, next) {
         noData = "No available Info! Probably there are no transactions for the specified scenario.";
       }
 
-      res.render('home', { 
-        title: 'Ethereum Analytics Debugger - Get Experiment',
-        start: val[0],
-        end: val[1],
-        silentBugs: val[2],
-        data: val[3],
-        noData: noData
+      prvAC = analytics.getPreviousAccounts();
+      analytics.getLastBlockLocally().then(block => {
+        res.render('home', { 
+          title: 'Ethereum Analytics Debugger - Get Experiment',
+          start: val[0],
+          end: val[1],
+          silentBugs: val[2],
+          data: val[3],
+          noData: noData,
+          lastBlock: block,
+          previous_contracts_accounts: prvAC
+        });
       });
     });
   } else if (id_function == "2") { // GET CLEARINGS THROUGH TIME
 
     if (contract == "") {
       noData = "Contract doesn't exist.";
-      res.render('home', { 
-        title: 'Ethereum Analytics Debugger - Get Clearing Through Blocks',
-        noData: noData
+      prvAC = analytics.getPreviousAccounts();
+      analytics.getLastBlockLocally().then(block => {
+        res.render('home', { 
+          title: 'Ethereum Analytics Debugger - Get Clearing Through Blocks',
+          noData: noData,
+          lastBlock: block,
+          previous_contracts_accounts: prvAC
+        });
       });
     } else {
       analytics.getClearingsThroughTime(start_block, end_block, contract).then(val => {
@@ -55,13 +76,17 @@ router.post('/get', function(req, res, next) {
           console.log("ASSING NoDATA get_clearing_through_time");
           noData = "No available Info! Probably there are no transactions for the specified scenario, or the contract you specified doesn't exist.";
         }
-
-        res.render('home', { 
-          title: 'Ethereum Analytics Debugger - Get Clearing Through Blocks',
-          start: val[0],
-          end: val[1],
-          clearingTT: val[2],
-          noData: noData
+        prvAC = analytics.getPreviousAccounts();
+        analytics.getLastBlockLocally().then(block => {
+          res.render('home', { 
+            title: 'Ethereum Analytics Debugger - Get Clearing Through Blocks',
+            start: val[0],
+            end: val[1],
+            clearingTT: val[2],
+            noData: noData,
+            lastBlock: block,
+            previous_contracts_accounts: prvAC
+          });
         });
       });      
     }
@@ -73,13 +98,17 @@ router.post('/get', function(req, res, next) {
         // console.log("ASSING NoDATA");
         noData = "No available Info! Probably there are no transactions for the specified scenario.";
       }
-
-      res.render('home', { 
-        title: 'Ethereum Analytics Debugger - Get Contract Details',
-        start: val[0],
-        end: val[1],
-        contracts: val[2],
-        noData: noData
+      prvAC = analytics.getPreviousAccounts();
+      analytics.getLastBlockLocally().then(block => {
+        res.render('home', { 
+          title: 'Ethereum Analytics Debugger - Get Contract Details',
+          start: val[0],
+          end: val[1],
+          contracts: val[2],
+          noData: noData,
+          lastBlock: block,
+          previous_contracts_accounts: prvAC
+        });
       });
     });
   } else if (id_function == "4") { // GET TRANSACTIONS PER BLOCK
@@ -94,21 +123,30 @@ router.post('/get', function(req, res, next) {
       var start = val[0][0];
       var end = val[0][1];
       val.shift();
-
-      res.render('home', { 
-        title: 'Ethereum Analytics Debugger - Get Transactions Per Block',
-        start: start,
-        end: end,
-        transactionsPerBlock: val,
-        noData: noData
+      prvAC = analytics.getPreviousAccounts();
+      analytics.getLastBlockLocally().then(block => {
+        res.render('home', { 
+          title: 'Ethereum Analytics Debugger - Get Transactions Per Block',
+          start: start,
+          end: end,
+          transactionsPerBlock: val,
+          noData: noData,
+          lastBlock: block,
+          previous_contracts_accounts: prvAC
+        });
       });
     });
   } else if (id_function == "5") { // GET GAS SPENT OF ACCOUNT
     if (contract == "") {
       noData = "Account not specified.";
-      res.render('home', { 
-        title: 'Ethereum Analytics Debugger - Get Gas Spent of Account',
-        noData: noData
+      prvAC = analytics.getPreviousAccounts();
+      analytics.getLastBlockLocally().then(block => {
+        res.render('home', { 
+          title: 'Ethereum Analytics Debugger - Get Gas Spent of Account',
+          noData: noData,
+          lastBlock: block,
+          previous_contracts_accounts: prvAC
+        });
       });
     } else {
       analytics.getSpentGasOfAccount(start_block, end_block, contract).then(val => {
@@ -132,16 +170,20 @@ router.post('/get', function(req, res, next) {
         // console.log("Balance " + accountMbalance);
         // console.log("totalGas " + totalGas);
         // console.log(" " + );
-
-        res.render('home', {
-          title: 'Ethereum Analytics Debugger - Get Gas Spent of Account',
-          start: val[0],
-          end: val[1],
-          account: contract,
-          balance: accountMbalance,
-          totalGasSpent: totalGas,
-          arrayBlockGasSpent: blockGas,
-          noData: noData
+        prvAC = analytics.getPreviousAccounts();
+        analytics.getLastBlockLocally().then(block => {
+          res.render('home', {
+            title: 'Ethereum Analytics Debugger - Get Gas Spent of Account',
+            start: val[0],
+            end: val[1],
+            account: contract,
+            balance: accountMbalance,
+            totalGasSpent: totalGas,
+            arrayBlockGasSpent: blockGas,
+            noData: noData,
+            lastBlock: block,
+            previous_contracts_accounts: prvAC
+          });
         });
         
       });
@@ -149,9 +191,14 @@ router.post('/get', function(req, res, next) {
   } else if (id_function == "6") { // GET ACCOUNT INFO
     if (contract == "") {
       noData = "Account not specified.";
-      res.render('home', { 
-        title: 'Ethereum Analytics Debugger - Get Account Info',
-        noData: noData
+      prvAC = analytics.getPreviousAccounts();
+      analytics.getLastBlockLocally().then(block => {
+        res.render('home', { 
+          title: 'Ethereum Analytics Debugger - Get Account Info',
+          noData: noData,
+          lastBlock: block,
+          previous_contracts_accounts: prvAC
+        });
       });
     } else {
       analytics.getAccountInfo(start_block, end_block, contract).then(val => {
@@ -172,16 +219,20 @@ router.post('/get', function(req, res, next) {
           // console.log("ASSING NoDATA");
           noData = "No available Info! Probably there are no transactions for the specified scenario.";
         }
-
-        res.render('home', {
-          title: 'Ethereum Analytics Debugger - Get Account Info',
-          start: val[0],
-          end: val[1],
-          account: contract,
-          balance: accountMbalance,
-          totalTransactions: totalTransactions,
-          transactions: transactionsT,
-          noData: noData
+        prvAC = analytics.getPreviousAccounts();
+        analytics.getLastBlockLocally().then(block => {
+          res.render('home', {
+            title: 'Ethereum Analytics Debugger - Get Account Info',
+            start: val[0],
+            end: val[1],
+            account: contract,
+            balance: accountMbalance,
+            totalTransactions: totalTransactions,
+            transactions: transactionsT,
+            noData: noData,
+            lastBlock: block,
+            previous_contracts_accounts: prvAC
+          });
         });
         
       });
@@ -195,14 +246,18 @@ router.post('/get', function(req, res, next) {
         console.log(JSON.stringify(val));
         noData = "No available Info! Probably there are no transactions for the specified scenario.";
       }
-
-      res.render('home', { 
-        title: 'Ethereum Analytics Debugger - Get Experiment',
-        start: val[0],
-        end: val[1],
-        silentBugs: val[2],
-        data: val[3],
-        noData: noData
+      prvAC = analytics.getPreviousAccounts();
+      analytics.getLastBlockLocally().then(block => {
+        res.render('home', { 
+          title: 'Ethereum Analytics Debugger - Get Experiment',
+          start: val[0],
+          end: val[1],
+          silentBugs: val[2],
+          data: val[3],
+          noData: noData,
+          lastBlock: block,
+          previous_contracts_accounts: prvAC
+        });
       });
     });
   }
@@ -216,9 +271,14 @@ router.post('/get_clearing', function(req, res, next) {
     clearings[0] = parseInt(clearings[0]);
     clearings[1] = parseInt(clearings[1]);
     clearings[2] = parseInt(clearings[2]);
-    res.render('home', {
-      title: 'Ethereum Analytics Debugger - Get Clearing',
-      clearings: clearings
+    prvAC = analytics.getPreviousAccounts();
+    analytics.getLastBlockLocally().then(block => {
+      res.render('home', {
+        title: 'Ethereum Analytics Debugger - Get Clearing',
+        clearings: clearings,
+        lastBlock: block,
+        previous_contracts_accounts: prvAC
+      });
     });
   });
 });
@@ -230,35 +290,51 @@ router.post('/get_balance', function(req, res, next) {
     if (val.length < 1) {
       val = "Non-existed Account";
     }
-    res.render('home', {
-      title: 'Ethereum Analytics Debugger - Get Balance',
-      account: account,
-      balance: val
+    
+    prvAC = analytics.getPreviousAccounts();
+    analytics.getLastBlockLocally().then(block => {
+      res.render('home', {
+        title: 'Ethereum Analytics Debugger - Get Balance',
+        account: account,
+        balance: val,
+        lastBlock: block,
+        previous_contracts_accounts: prvAC
+      });
     });
     
   });
 });
 
 router.post('/get_peers', function(req, res, next) {
-  
+
   analytics.getPeersNumber().then(peers => {
     // console.log("PEERS: " + peers);
-    res.render('home', { 
-      title: 'Ethereum Analytics Debugger - Get Peers',
-      infoP: '1',
-      peers: peers
+    prvAC = analytics.getPreviousAccounts();
+    analytics.getLastBlockLocally().then(block => {
+      res.render('home', { 
+        title: 'Ethereum Analytics Debugger - Get Peers',
+        infoP: '1',
+        peers: peers,
+        lastBlock: block,
+        previous_contracts_accounts: prvAC
+      });
     });
   });
 });
 
 router.post('/get_number_of_transactions', function(req, res, next) {
-  
+
   analytics.getNumberOfTransactions().then(res => {
     // console.log("PEERS: " + peers);
-    res.render('home', { 
-      title: 'Ethereum Analytics Debugger - Total Number of Transactions',
-      infoP: '1',
-      totalTransactions: res
+    prvAC = analytics.getPreviousAccounts();
+    analytics.getLastBlockLocally().then(block => {
+      res.render('home', { 
+        title: 'Ethereum Analytics Debugger - Total Number of Transactions',
+        infoP: '1',
+        totalTransactions: res,
+        lastBlock: block,
+        previous_contracts_accounts: prvAC
+      });
     });
   });
 });
@@ -287,15 +363,20 @@ router.post('/get_account_info', function(req, res, next) {
       noData = "No available Info! Probably there are no transactions for the specified scenario.";
     }
 
-    res.render('home', {
-      title: 'Ethereum Analytics Debugger - Get Account Info',
-      start: val[0],
-      end: val[1],
-      account: account,
-      balance: accountMbalance,
-      totalTransactions: totalTransactions,
-      transactions: transactionsT,
-      noData: noData
+    prvAC = analytics.getPreviousAccounts();
+    analytics.getLastBlockLocally().then(block => {
+      res.render('home', {
+        title: 'Ethereum Analytics Debugger - Get Account Info',
+        start: val[0],
+        end: val[1],
+        account: account,
+        balance: accountMbalance,
+        totalTransactions: totalTransactions,
+        transactions: transactionsT,
+        noData: noData,
+        lastBlock: block,
+        previous_contracts_accounts: prvAC
+      });
     });
     
   });
@@ -305,7 +386,6 @@ router.post('/get_account_gas_spent',function(req, res, next) {
   var start_block = req.body.start_block;
   var end_block = req.body.end_block;
   var account = req.body.account;
-
 
   analytics.getSpentGasOfAccount(start_block, end_block, account).then(val => {
     noData = null;
@@ -327,15 +407,20 @@ router.post('/get_account_gas_spent',function(req, res, next) {
     // console.log("totalGas " + totalGas);
     // console.log(" " + );
 
-    res.render('home', {
-      title: 'Ethereum Analytics Debugger - Get Gas Spent of Account',
-      start: val[0],
-      end: val[1],
-      account: account,
-      balance: accountMbalance,
-      totalGasSpent: totalGas,
-      arrayBlockGasSpent: blockGas,
-      noData: noData
+    prvAC = analytics.getPreviousAccounts();
+    analytics.getLastBlockLocally().then(block => {
+      res.render('home', {
+        title: 'Ethereum Analytics Debugger - Get Gas Spent of Account',
+        start: val[0],
+        end: val[1],
+        account: account,
+        balance: accountMbalance,
+        totalGasSpent: totalGas,
+        arrayBlockGasSpent: blockGas,
+        noData: noData,
+        lastBlock: block,
+        previous_contracts_accounts: prvAC
+      });
     });
     
   });
@@ -346,9 +431,14 @@ router.post('/get_block_info',function(req, res, next) {
 
   analytics.getBlockInfo(block).then(val => {
     // console.log("INDEX");
-    res.render('home', {
-      title: 'Ethereum Analytics Debugger - Get Block Info',
-      blockInfo: val
+    prvAC = analytics.getPreviousAccounts();
+    analytics.getLastBlockLocally().then(block => {
+      res.render('home', {
+        title: 'Ethereum Analytics Debugger - Get Block Info',
+        blockInfo: val,
+        lastBlock: block,
+        previous_contracts_accounts: prvAC
+      });
     });
     
   });
@@ -359,9 +449,14 @@ router.get('/get_block/:block',function(req, res, next) {
 
   analytics.getBlockInfo(block).then(val => {
     // console.log("INDEX");
-    res.render('home', {
-      title: 'Ethereum Analytics Debugger - Get Block Info',
-      blockInfo: val
+    prvAC = analytics.getPreviousAccounts();
+    analytics.getLastBlockLocally().then(block => {
+      res.render('home', {
+        title: 'Ethereum Analytics Debugger - Get Block Info',
+        blockInfo: val,
+        lastBlock: block,
+        previous_contracts_accounts: prvAC
+      });
     });
     
   });
@@ -369,7 +464,6 @@ router.get('/get_block/:block',function(req, res, next) {
 
 router.get('/account/:acc', function(req, res, next) {
   var account = req.params.acc;
-
   // console.log("Account: " + JSON.stringify(account));
 
   analytics.getAccountInfo(1, 1, account).then(val => {
@@ -390,15 +484,20 @@ router.get('/account/:acc', function(req, res, next) {
       noData = "No available Info! Probably there are no transactions for the specified scenario.";
     }
 
-    res.render('home', {
-      title: 'Ethereum Analytics Debugger - Get Account Info',
-      start: val[0],
-      end: val[1],
-      account: account,
-      balance: accountMbalance,
-      totalTransactions: totalTransactions,
-      transactions: transactionsT,
-      noData: noData
+    prvAC = analytics.getPreviousAccounts();
+    analytics.getLastBlockLocally().then(block => {
+      res.render('home', {
+        title: 'Ethereum Analytics Debugger - Get Account Info',
+        start: val[0],
+        end: val[1],
+        account: account,
+        balance: accountMbalance,
+        totalTransactions: totalTransactions,
+        transactions: transactionsT,
+        noData: noData,
+        lastBlock: block,
+        previous_contracts_accounts: prvAC
+      });
     });
     
   });
@@ -421,12 +520,17 @@ router.post('/get_transactions_per_block', function(req, res, next) {
     var end = val[0][1];
     val.shift();
 
-    res.render('home', { 
-      title: 'Ethereum Analytics Debugger - Get Transactions Per Block',
-      start: start,
-      end: end,
-      transactionsPerBlock: val,
-      noData: noData
+    prvAC = analytics.getPreviousAccounts();
+    analytics.getLastBlockLocally().then(block => {
+      res.render('home', { 
+        title: 'Ethereum Analytics Debugger - Get Transactions Per Block',
+        start: start,
+        end: end,
+        transactionsPerBlock: val,
+        noData: noData,
+        lastBlock: block,
+        previous_contracts_accounts: prvAC
+      });
     });
   });
 });
@@ -462,24 +566,33 @@ router.post('/get_transaction_info', function(req, res, next) {
       noData = "No available Info! There is no transaction with that hash.";
     }
 
-    res.render('home', { 
-      title: 'Ethereum Analytics Debugger - Get Transaction Info',
-      transaction_info: val,
-      noData: noData
+    prvAC = analytics.getPreviousAccounts();
+    analytics.getLastBlockLocally().then(block => {
+      res.render('home', { 
+        title: 'Ethereum Analytics Debugger - Get Transaction Info',
+        transaction_info: val,
+        noData: noData,
+        lastBlock: block,
+        previous_contracts_accounts: prvAC
+      });
     });
   });
 });
 
 router.get('/get_transaction/:hash', function(req, res, next) {
   var hash = req.params.hash;
-
   // console.log("Account: " + JSON.stringify(account));
 
   analytics.getTranscationInfo(hash).then(val => {
 
-    res.render('home', { 
-      title: 'Ethereum Analytics Debugger - Get Transaction Info',
-      transaction_info: val
+    prvAC = analytics.getPreviousAccounts();
+    analytics.getLastBlockLocally().then(block => {
+      res.render('home', { 
+        title: 'Ethereum Analytics Debugger - Get Transaction Info',
+        transaction_info: val,
+        lastBlock: block,
+        previous_contracts_accounts: prvAC
+      });
     });
   });
 });

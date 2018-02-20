@@ -146,6 +146,20 @@ $(document).on('ready', function() {
 });
 
 
+$('.clickclass').click(function (event) {
+  // If the input button is clicked, get the parent with class 'clickclass' and replace with other HTML.
+  console.log("Target id: " + event.target.id);
+  console.log("Target val: " + event.target);
+  val = $(event.target).text();
+  console.log("VAL: " + JSON.stringify(val));
+  $( "#contract" ).val(val);
+  // if (event.target.id == 'save_button') {
+  //    myparent = event.target.parent();
+  //    myparent.html('some html code');
+  // }
+
+});
+
 $( "#get_exp" ).click(function() {
   // alert( "Handler for .click() called." );
   $( "#id_function" ).val("1");
