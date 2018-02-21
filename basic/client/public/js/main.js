@@ -15,7 +15,7 @@ $(document).on('ready', function() {
 		var prices = [];
 		var quantity = [];
 
-		for (var i = 0; i < dataToArray_chart.length; i=i+4) {
+		for (var i = 0; i < dataToArray_chart.length; i=i+5) {
 			blocks.push(dataToArray_chart[i]);
 			prices.push(dataToArray_chart[i+1]);
 			quantity.push(dataToArray_chart[i+2]);
@@ -193,5 +193,11 @@ $( "#get_account_gas_spent" ).click(function() {
 $( "#get_account_info" ).click(function() {
   // alert( "Handler for .click() called." );
   $( "#id_function" ).val("6");
+  $( "#submit_global" ).click();
+});
+
+$( "#get_clr_last_block" ).click(function() {
+  // alert( "Handler for .click() called." );
+  $( "#id_function" ).val("7");
   $( "#submit_global" ).click();
 });

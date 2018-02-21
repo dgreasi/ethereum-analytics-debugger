@@ -574,13 +574,13 @@ module.exports = {
 
   /////////////////////////// Get Clearing Values //////////////////////////////
 
-  getContractResults: function() {
+  getContractResults: function(contract_arg) {
     return new Promise((resolve, reject) => {
       var promisesAllgetClearing = [];
 
-      promisesAllgetClearing.push(this.getClearingPrice());
-      promisesAllgetClearing.push(this.getclearingQuantity());
-      promisesAllgetClearing.push(this.getclearingType());
+      promisesAllgetClearing.push(this.getClearingPrice(contract_arg));
+      promisesAllgetClearing.push(this.getclearingQuantity(contract_arg));
+      promisesAllgetClearing.push(this.getclearingType(contract_arg));
 
       Promise.all(promisesAllgetClearing).then(clearings => {
         resolve(clearings);
@@ -593,16 +593,16 @@ module.exports = {
     });
   },
 
-  getClearingPrice: function() {
-    return web3.eth.call({to: contract, data: "0x901a40a7"});
+  getClearingPrice: function(contract_arg) {
+    return web3.eth.call({to: contract_arg, data: "0x901a40a7"});
   },
 
-  getclearingQuantity: function() {
-    return web3.eth.call({to: contract, data: "0x14fffa15"});
+  getclearingQuantity: function(contract_arg) {
+    return web3.eth.call({to: contract_arg, data: "0x14fffa15"});
   },
 
-  getclearingType: function() {
-    return web3.eth.call({to: contract, data: "0xbc3d513f"});
+  getclearingType: function(contract_arg) {
+    return web3.eth.call({to: contract_arg, data: "0xbc3d513f"});
   },
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -656,7 +656,12 @@ module.exports = {
             if (check == -1) {
               console.log("Didnt found in dbClearings");
             } else {
-              res.push(dbClearings[check+i]);
+              if (contract_arg == dbClearings[check+i][4]) {
+                console.log("FOUND CONTRACT IN DB");
+                res.push(dbClearings[check+i]);
+              } else {
+                console.log("DIFERRENT CONTRACTS: " + contract_arg + " - " + dbClearings[check+i][4]);
+              }
               // console.log("Push clearing of block: " + dbClearings[check+i]);
             }
           }
@@ -694,6 +699,7 @@ module.exports = {
 
         result.push(clearings);
         result = this.flatten(result);
+        result.push(contract_arg);
 
         resolve(result);
       }).catch(err => {

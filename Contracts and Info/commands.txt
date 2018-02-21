@@ -112,7 +112,7 @@ export PATH=$PATH:/home/ubuntu/blockchain-gridlabd/install/bin
 export GLPATH=/home/ubuntu/blockchain-gridlabd/install/lib/gridlabd:/home/ubuntu/blockchain-gridlabd/install/share/gridlabd
 
 export PATH=$PATH:/home/mgdfoti/blockchain-gridlabd/install/bin
-export GLPATH=/home/ubuntu/mgdfoti-gridlabd/install/lib/gridlabd:/home/ubuntu/blockchain-gridlabd/install/share/gridlabd
+export GLPATH=/home/mgdfoti/mgdfoti-gridlabd/install/lib/gridlabd:/home/ubuntu/blockchain-gridlabd/install/share/gridlabd
 ```
 
 IEEE_13_Node_With_Houses

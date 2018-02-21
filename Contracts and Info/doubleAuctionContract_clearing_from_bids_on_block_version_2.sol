@@ -111,7 +111,7 @@ contract DoubleAuction {
     function marketClearing() public{
         if ((block.number-blockCleared) > 60) {
 		    blockCleared = block.number;
-    		if(_consumptionPrices.length > 300 || _generationPrices.length > 100){
+    		if(_consumptionPrices.length > 600 || _generationPrices.length > 300){
     			deleteMapArrays();
     		}
     		else{

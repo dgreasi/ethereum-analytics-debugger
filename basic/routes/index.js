@@ -237,6 +237,37 @@ router.post('/get', function(req, res, next) {
         
       });
     }
+  } else if (id_function == "7") { // GET LAST BLOCK CLEARING
+    if (contract == "") {
+      noData = "Contract not specified.";
+      prvAC = analytics.getPreviousAccounts();
+      analytics.getLastBlockLocally().then(block => {
+        res.render('home', { 
+          title: 'Ethereum Analytics Debugger - Get Account Info',
+          noData: noData,
+          lastBlock: block,
+          previous_contracts_accounts: prvAC
+        });
+      });
+    } else {
+
+      analytics.getContractResults(contract).then(clearings => {
+        clearings[0] = parseInt(clearings[0]);
+        clearings[1] = parseInt(clearings[1]);
+        clearings[2] = parseInt(clearings[2]);
+
+        prvAC = analytics.getPreviousAccounts();
+        analytics.getLastBlockLocally().then(block => {
+          res.render('home', {
+            title: 'Ethereum Analytics Debugger - Get Clearing',
+            clearings: clearings,
+            lastBlock: block,
+            previous_contracts_accounts: prvAC
+          });
+        });
+      });
+    }
+
   } else {
     analytics.getAccountTransactionsGasSpentClearings(start_block, end_block).then(val => {
       noData = null;
@@ -265,23 +296,24 @@ router.post('/get', function(req, res, next) {
 });
 
 
-router.post('/get_clearing', function(req, res, next) {
+// router.post('/get_clearing', function(req, res, next) {
+//   var contract = req.body.contract;
 
-  analytics.getContractResults().then(clearings => {
-    clearings[0] = parseInt(clearings[0]);
-    clearings[1] = parseInt(clearings[1]);
-    clearings[2] = parseInt(clearings[2]);
-    prvAC = analytics.getPreviousAccounts();
-    analytics.getLastBlockLocally().then(block => {
-      res.render('home', {
-        title: 'Ethereum Analytics Debugger - Get Clearing',
-        clearings: clearings,
-        lastBlock: block,
-        previous_contracts_accounts: prvAC
-      });
-    });
-  });
-});
+//   analytics.getContractResults().then(clearings => {
+//     clearings[0] = parseInt(clearings[0]);
+//     clearings[1] = parseInt(clearings[1]);
+//     clearings[2] = parseInt(clearings[2]);
+//     prvAC = analytics.getPreviousAccounts();
+//     analytics.getLastBlockLocally().then(block => {
+//       res.render('home', {
+//         title: 'Ethereum Analytics Debugger - Get Clearing',
+//         clearings: clearings,
+//         lastBlock: block,
+//         previous_contracts_accounts: prvAC
+//       });
+//     });
+//   });
+// });
 
 router.post('/get_balance', function(req, res, next) {
   var account = req.body.account;
