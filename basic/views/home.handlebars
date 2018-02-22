@@ -464,6 +464,7 @@
             <th>#</th>
             <th>Hash of Transaction</th>
             <th>Block</th>
+            <th>Gas Used</th>
             <th>To</th>
             <th>Input (Function + Args)</th> 
         </thead> 
@@ -568,6 +569,10 @@
               <tr>
                   <td>to</td>
                   <td>{{ transaction_info.to }}</td>
+              </tr>
+              <tr>
+                  <td>input</td>
+                  <td>{{ transaction_info.input }}</td>
               </tr>
               <tr>
                   <td>contractAddress</td>

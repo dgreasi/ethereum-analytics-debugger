@@ -214,7 +214,7 @@ router.post('/get', function(req, res, next) {
 
         // Keep Inner array
         transactionsT = val[2][0];
-
+        // console.log(JSON.stringify(transactionsT));
         if (transactionsT.length < 1) {
           // console.log("ASSING NoDATA");
           noData = "No available Info! Probably there are no transactions for the specified scenario.";
@@ -389,6 +389,7 @@ router.post('/get_account_info', function(req, res, next) {
 
     // Keep Inner array
     transactionsT = val[2][0];
+    // console.log(JSON.stringify(transactionsT));
 
     if (transactionsT.length < 1) {
       // console.log("ASSING NoDATA");
@@ -510,7 +511,7 @@ router.get('/account/:acc', function(req, res, next) {
 
     // Keep Inner array
     transactionsT = val[2][0];
-
+    // console.log(JSON.stringify(transactionsT));
     if (transactionsT.length < 1) {
       // console.log("ASSING NoDATA");
       noData = "No available Info! Probably there are no transactions for the specified scenario.";

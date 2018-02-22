@@ -657,7 +657,7 @@ module.exports = {
               console.log("Didnt found in dbClearings");
             } else {
               if (contract_arg == dbClearings[check+i][4]) {
-                console.log("FOUND CONTRACT IN DB");
+                // console.log("FOUND CONTRACT IN DB");
                 res.push(dbClearings[check+i]);
               } else {
                 console.log("DIFERRENT CONTRACTS: " + contract_arg + " - " + dbClearings[check+i][4]);
@@ -906,14 +906,27 @@ module.exports = {
 
   getTranscationInfo: function(hash) {
     return new Promise((resolve, reject) => {
-      web3.eth.getTransactionReceipt(hash).then(res => {
-        if (res != null) {
-          resolve(res);
+      web3.eth.getTransaction(hash).then(rs => {
+
+        if (rs != null) {
+          web3.eth.getTransactionReceipt(hash).then(res => {
+            if (res != null) {
+              // console.log("Input: " + rs.input);
+              res.input = rs.input;
+              resolve(res);
+            }
+          }).catch(err => {
+            console.log("ERROR getTransactionReceipt getTranscationInfo: " + err);
+            resolve([]);
+          });
+
         }
       }).catch(err => {
-        console.log("ERROR getTranscationInfo: " + err);
+        console.log("ERROR getTransaction => getTranscationInfo: " + err);
         resolve([]);
       });
+
+      
       
     });
   },
@@ -982,6 +995,7 @@ module.exports = {
       var transactionsR = [];
       var getBlockPromises = [];
       var blockNumberPromise = web3.eth.getBlockNumber();
+      var promiseRec = [];
 
       blockNumberPromise.then(res => {
         this.checkStartEndInput(startBlockNumber, endBlockNumber, res);
@@ -1008,64 +1022,59 @@ module.exports = {
           check = this.searchFor(startBlockNumber);
           for (var j = 0; j <= (endBlockNumber - startBlockNumber); j++) {
             blocks.push(dbBlocks[check+j]);
+            dbBlocks[check+j].transactions.forEach(e => {
+              fromA = e.from.toUpperCase();
+              myaccount = myaccount.toUpperCase();
+              if (myaccount == "*" || myaccount == fromA) {
+                promiseRec.push(web3.eth.getTransactionReceipt(e.hash));
+              }
+            });
           }
-          // console.log("ACCOUNT INFO PRINT BLOCKS");
-          // blocks.forEach(rs => {
-          //   console.log("Block: " + rs.number);
-          // });
 
-          var receiptsPromises = [];
-          blocks.forEach(block => {
+          Promise.all(promiseRec).then(trans => {
+            blocks.forEach(block => {
 
-            if (block != null && block.transactions != null) {
+              if (block != null && block.transactions != null) {
 
-              block.transactions.forEach(e => {
-                fromA = e.from.toUpperCase();
-                myaccount = myaccount.toUpperCase();
-                
+                block.transactions.forEach(e => {
+                  fromA = e.from.toUpperCase();
+                  myaccount = myaccount.toUpperCase();
 
-                // help = web3.eth.abi.decodeParameters([{
-                //     type: 'int256',
-                //     name: '_quantity'
-                // },{
-                //     type: 'int256',
-                //     name: '_price'
-                // }], input);
+                  if (myaccount == "*" || myaccount == fromA) {
+                    input = e.input.toString();
+                    fun = input.slice(0,10);
+                    if (input.length > 10) {
+                      input = input.slice(10);
+                      input = "0x".concat(input);
+                      help = web3.eth.abi.decodeParameters(['int256', 'int256'], input);
+                      input = "";
+                      input = input.concat(help[0]);
+                      input = input.concat(", ");
+                      input = input.concat(help[1]);
+                      input = fun.concat(", ".concat(input));
+                    }
 
-
-                // console.log("myaccount: " + myaccount);
-                // console.log("fromA: " + fromA);
-
-                // input = help;
-                // console.log("Transactions: " + JSON.stringify(input));
-                
-                if (myaccount == "*" || myaccount == fromA) {
-                  input = e.input.toString();
-                  fun = input.slice(0,10);
-                  if (input.length > 10) {
-                    input = input.slice(10);
-                    input = "0x".concat(input);
-                    help = web3.eth.abi.decodeParameters(['int256', 'int256'], input);
-                    input = "";
-                    input = input.concat(help[0]);
-                    input = input.concat(", ");
-                    input = input.concat(help[1]);
-                    input = fun.concat(", ".concat(input));
+                    trans.some((el) => {
+                      if (el.transactionHash == e.hash) {
+                        transactionsR.push([e.hash, e.blockNumber, el.gasUsed, e.to, input]);
+                        return true;
+                      }
+                    });
                   }
 
-                  // console.log("help0: " + help[0]);
-                  // console.log("help1: " + help[1]);
-                  // console.log("Input: " + input);
-                  // console.log("Push");
-                  transactionsR.push([e.hash, e.blockNumber, e.to, input]);
-                }
+                });
+              }
 
-              });
-              
+            });
+
+            resolve(transactionsR);
+
+          }).catch(err => {
+            if(err != "ReferenceError: name is not define") {
+              reject(err);
+              console.log("ERROR promiseRec: " + err);
             }
           });
-
-          resolve(transactionsR);
 
         }).catch(err => {
           if(err != "ReferenceError: name is not define") {
