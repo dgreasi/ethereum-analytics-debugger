@@ -45,19 +45,27 @@
     <div>
 
       {{!-- data-toggle="modal" data-target="#get_experiment" --}}
-      <button class="btn btn-default blue_btn" id="get_exp">
+      <button class="btn btn-default blue_btn" id="get_exp" title="Blocks => Results">
         Get Experiment
+        <span class="glyphicon glyphicon-exclamation-sign"></span>
+        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
         <span class="glyphicon glyphicon-th-list"></span>
       </button>
       {{!-- data-toggle="modal" data-target="#get_clearing_through_time" --}}
-      <button class="btn btn-default blue_btn" id="get_clr">
+      <button class="btn btn-default blue_btn" id="get_clr" title="Address + Blocks => Chart">
         Get Clearing Through Blocks
+        <span class="glyphicon glyphicon-exclamation-sign"></span>
+        <span class="glyphicon glyphicon glyphicon-plus-sign green_btn"></span>
+        <span class="glyphicon glyphicon-hdd"></span>
+        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
         <span class="glyphicon glyphicon-stats"></span>
       </button>
       
       {{!-- <form method="post" action="/get_clearing"> --}}
-      <button class="btn btn-default blue_btn" id="get_clr_last_block">
+      <button class="btn btn-default blue_btn" id="get_clr_last_block" title="Address => Results">
         Last Block Clearing
+        <span class="glyphicon glyphicon-exclamation-sign"></span>
+        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
         <span class="glyphicon glyphicon-th-list"></span>
       </button>
       {{!-- </form> --}}
@@ -66,23 +74,33 @@
     <div>
       <br>
 
-      <button class="btn btn-default red_btn" id="get_con_details">
+      <button class="btn btn-default red_btn" id="get_con_details" title="Blocks => Results">
         Get Contracts
+        <span class="glyphicon glyphicon-hdd"></span>
+        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
         <span class="glyphicon glyphicon-th-list"></span>
       </button>
 
-      <button class="btn btn-default red_btn" data-toggle="modal" data-target="#get_transaction_info">
+      <button class="btn btn-default red_btn" data-toggle="modal" data-target="#get_transaction_info" title="Address => Results">
         Get Transaction Info
+        <span class="glyphicon glyphicon-exclamation-sign"></span>
+        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
         <span class="glyphicon glyphicon-th-list"></span>
       </button>
 
-      <button class="btn btn-default red_btn" id="get_account_gas_spent">
+      <button class="btn btn-default red_btn" id="get_account_gas_spent" title="Address + Blocks => Chart">
         Get Gas Spent of Account
+        <span class="glyphicon glyphicon-exclamation-sign"></span>
+        <span class="glyphicon glyphicon glyphicon-plus-sign green_btn"></span>
+        <span class="glyphicon glyphicon-hdd"></span>
+        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
         <span class="glyphicon glyphicon-stats"></span>
       </button>
        {{!-- data-toggle="modal" data-target="#get_transactions_per_block" --}}
-      <button class="btn btn-default red_btn" id="get_transactions_per_block">
+      <button class="btn btn-default red_btn" id="get_transactions_per_block" title="Address + Blocks => Chart">
         Get Transactions Per Block
+        <span class="glyphicon glyphicon-hdd"></span>
+        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
         <span class="glyphicon glyphicon-stats"></span>
       </button>
     </div>
@@ -468,18 +486,27 @@
             <th>To</th>
             <th>Input (Function + Args)</th> 
         </thead> 
-        <tbody> 
-            {{#each transactions}} 
+        <tbody>
+            {{#each transactions}}
+            {{#if this.bug}}
+              <tr class="red_btn">
+                <td>{{ @index }}</td>
+                <td><a href="/get_transaction/{{this.hash}}">{{ this.hash }}</a></td>
+                <td>{{ this.blockNumber }}</td>
+                <td>{{ this.gasUsed }}</td>
+                <td>{{ this.to }}</td>
+                <td>{{ this.input }}</td>
+              </tr>
+            {{else}}
               <tr>
                 <td>{{ @index }}</td>
-                {{#each this}}
-                    {{#if @index}}
-                      <td>{{ this }}</td>
-                    {{else}}
-                      <td><a href="/get_transaction/{{this}}">{{ this }}</a></td>
-                    {{/if}}
-                {{/each}}
+                <td><a href="/get_transaction/{{this.hash}}">{{ this.hash }}</a></td>
+                <td>{{ this.blockNumber }}</td>
+                <td>{{ this.gasUsed }}</td>
+                <td>{{ this.to }}</td>
+                <td>{{ this.input }}</td>
               </tr>
+            {{/if}}
             {{/each}}
         </tbody> 
       </table>
@@ -564,7 +591,7 @@
               </tr>
               <tr>
                   <td>from</td>
-                  <td>{{ transaction_info.from }}</td>
+                  <td><a href="/account/{{ transaction_info.from }}">{{ transaction_info.from }}</a></td>
               </tr>
               <tr>
                   <td>to</td>

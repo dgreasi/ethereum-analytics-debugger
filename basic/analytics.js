@@ -363,21 +363,52 @@ module.exports = {
     });
   },
 
-  getBlockInfo: function(blockNumber) {
+  getBlockInfoMinimal: function(blockNumber) {
     return new Promise((resolve, reject) => {
 
       var getBlockPromises = [];
       var blockNumberPromise = web3.eth.getBlockNumber();
 
       blockNumberPromise.then(res => {
-
+        
         if (blockNumber <= res) {
-          var getBlock = web3.eth.getBlock(blockNumber, true);
+          check = this.searchFor(blockNumber);
+
+          if (check == -1) {
+            web3.eth.getBlock(blockNumber, true).then(bl => {
+              // console.log("GET BLOCK: " + blockNumber);
+              // SAVE TO DB
+              dbBlocks.push(bl);
+              dbBlocks.sort(function(a, b) {
+                return a.number - b.number;
+              });
+              // console.log(JSON.stringify(dbBlocks));
+
+              resolve(bl);
+
+            });
+            
+
+          } else {
+            // console.log("AAAAAAAAAAAAAAAAA");
+            var getBlock = dbBlocks[check];
+            resolve(getBlock);
+          }
         } else {
-          var getBlock = web3.eth.getBlock(res, true);
+          // console.log("VVVVVVVVVVVVV"); 
+          web3.eth.getBlock(res, true).then(bl => {
+            // console.log("IN IFFFF GET BLOCK: " + res);
+            // SAVE TO DB
+            dbBlocks.push(bl);
+            dbBlocks.sort(function(a, b) {
+              return a.number - b.number;
+            });
+            // console.log(JSON.stringify(dbBlocks));
+
+            resolve(bl);
+          });
         }
 
-        resolve(getBlock);
 
       });
     }).catch(err => {
@@ -575,6 +606,10 @@ module.exports = {
   /////////////////////////// Get Clearing Values //////////////////////////////
 
   getContractResults: function(contract_arg) {
+    if (contract_arg != "") {
+      this.addToHistory(contract_arg);
+    }
+
     return new Promise((resolve, reject) => {
       var promisesAllgetClearing = [];
 
@@ -624,6 +659,7 @@ module.exports = {
       // console.log("Contract: " + contract_arg);
       contract_arg = contract_arg.toLowerCase();
       var storagePromises = [];
+      var getBlocksPromises = [];
       var blockNumberPromise = web3.eth.getBlockNumber();
 
       blockNumberPromise.then(res => {
@@ -631,60 +667,76 @@ module.exports = {
         startBlockNumber = start;
         endBlockNumber = end;
 
-        // console.log("Using startBlockNumber: " + startBlockNumber);
-        // console.log("Using endBlockNumber: " + endBlockNumber);
-
         for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-          check = this.searchForInArray(dbClearings, i);
-          if (check == -1) {
-            storagePromises.push(this.getStorageAtBlock(i, contract_arg));
-          }
+          getBlocksPromises.push(this.getBlockInfoMinimal(i));
         }
 
-        Promise.all(storagePromises).then(res => {
-          dbClearings = dbClearings.concat(res);
+        Promise.all(getBlocksPromises).then(rs => {
+          // console.log("length: " + dbBlocks.length);
 
-          dbClearings.sort(function(a, b) {
-            return a[0] - b[0];
-          });
-
-          res = [];
-
-          check = this.searchForInArray(dbClearings, startBlockNumber);
-          // console.log("DBClearings");
-          for (i = 0; i <= (endBlockNumber - startBlockNumber); i++) {
-            if (check == -1) {
-              console.log("Didnt found in dbClearings");
-            } else {
-              if (contract_arg == dbClearings[check+i][4]) {
-                // console.log("FOUND CONTRACT IN DB");
-                res.push(dbClearings[check+i]);
-              } else {
-                console.log("DIFERRENT CONTRACTS: " + contract_arg + " - " + dbClearings[check+i][4]);
+          for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+            checkCl = this.searchForInArray(dbClearings, i);
+            if (checkCl == -1) {
+              checkBL = this.searchFor(startBlockNumber);
+              if (checkBL == -1) {
+                console.log("BLOCK DINDNT FOUND");
               }
-              // console.log("Push clearing of block: " + dbClearings[check+i]);
+              timestamp = this.decodeTime(dbBlocks[checkBL].timestamp);
+              // console.log("Push promise, timestamp: " + timestamp);
+              storagePromises.push(this.getStorageAtBlock(i, contract_arg, timestamp));
             }
           }
 
-          endStartClear = [start, end];
-          // console.log(JSON.stringify(res));
-          endStartClear.push(res);
+          Promise.all(storagePromises).then(res => {
+            // console.log("LENGTH: " + res.length);
+            dbClearings = dbClearings.concat(res);
 
-          resolve(endStartClear);
+            dbClearings.sort(function(a, b) {
+              return a[0] - b[0];
+            });
+
+            res = [];
+
+            check = this.searchForInArray(dbClearings, startBlockNumber);
+            // console.log("DBClearings");
+            for (i = 0; i <= (endBlockNumber - startBlockNumber); i++) {
+              if (check == -1) {
+                console.log("Didnt found in dbClearings");
+              } else {
+                if (contract_arg == dbClearings[check+i][5]) {
+                  // console.log("FOUND CONTRACT IN DB");
+                  res.push(dbClearings[check+i]);
+                } else {
+                  console.log("DIFERRENT CONTRACTS: " + contract_arg + " - " + dbClearings[check+i][5]);
+                }
+                // console.log("Push clearing of block: " + dbClearings[check+i]);
+              }
+            }
+
+            endStartClear = [start, end];
+            // console.log(JSON.stringify(res));
+            endStartClear.push(res);
+
+            resolve(endStartClear);
+
+          }).catch(err => {
+            reject(err);
+            console.log("ERROR storagePromises: " + err);
+          });
 
         }).catch(err => {
           reject(err);
-          console.log("ERROR storagePromises: " + err);
+          console.log("ERROR getBlocksPromises: " + err);
         });
-
       });
 
     });
   },
 
-  getStorageAtBlock: function(block, contract_arg) {
+  getStorageAtBlock: function(block, contract_arg, timestamp) {
     return new Promise((resolve, reject) => {
       var promiseGetStorageAll = [];
+
       promiseGetStorageAll.push(this.getStorageAtBlockPrice(block, contract_arg));
       promiseGetStorageAll.push(this.getStorageAtBlockQuantity(block, contract_arg));
       promiseGetStorageAll.push(this.getStorageAtBlockType(block, contract_arg));
@@ -692,6 +744,7 @@ module.exports = {
       Promise.all(promiseGetStorageAll).then(clearings => {
         var result = [];
         result.push(block);
+        result.push(timestamp);
         
         clearings[0] = parseInt(clearings[0]);
         clearings[1] = parseInt(clearings[1]);
@@ -1056,7 +1109,16 @@ module.exports = {
 
                     trans.some((el) => {
                       if (el.transactionHash == e.hash) {
-                        transactionsR.push([e.hash, e.blockNumber, el.gasUsed, e.to, input]);
+                        bug = ((e.gas == el.gasUsed) ? 1 : 0);
+                        obj = new Object({
+                          hash: e.hash, 
+                          blockNumber: e.blockNumber, 
+                          bug: bug, 
+                          gasUsed: el.gasUsed, 
+                          to: e.to, 
+                          input: input
+                        });
+                        transactionsR.push(obj);
                         return true;
                       }
                     });
@@ -1120,6 +1182,22 @@ module.exports = {
     // myContract.options.from = accountOfCentralNode;
     // myContract.options.gasPrice = '20000000000000';
     // myContract.options.gas = 5000000;
+  },
+
+
+  decodeTime: function(timestamp) {
+    var date = new Date(timestamp*1000);
+    // Hours part from the timestamp
+    var hours = date.getHours();
+    // Minutes part from the timestamp
+    var minutes = "0" + date.getMinutes();
+    // Seconds part from the timestamp
+    // var seconds = "0" + date.getSeconds();
+    // + ':' + seconds.substr(-2)
+
+    // Will display time in 10:30:23 format
+    var formattedTime = hours + ':' + minutes.substr(-2);
+    return formattedTime;
   },
 
   flatten: function(arr) {

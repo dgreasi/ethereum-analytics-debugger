@@ -135,7 +135,9 @@ gridlabd -D run_realtime=1 /home/mgdfoti/simulation/IEEE_13_Node_With_Houses_1.g
 *************************************************************************
 *************************************************************************
 
-eth.sendTransaction({from: eth.coinbase, to: '0x501897c4a684590ee69447974519e86811f0a47d', data: '0xecabe109' , gas: '0x1E8480', gasPrice: '0x430E23400'});
+eth.sendTransaction({from: eth.coinbase, to: '0xd628298b7f4b4c0cbf46d97d6d255fc20f2baaae', data: '0xecabe109' , gas: '0x430E23400'});
+
+eth.call({from: eth.coinbase, to: '0xd628298b7f4b4c0cbf46d97d6d255fc20f2baaae', data: '0x027cb7c6' , gas: '0x430E23400'}, 15000);
 
 
 INIT 3 VMs:

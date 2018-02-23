@@ -12,19 +12,25 @@ $(document).on('ready', function() {
 		// console.log("TEST price_chart: " + JSON.stringify(dataToArray_chart));
 
 		var blocks = [];
+		var time = [];
 		var prices = [];
 		var quantity = [];
 
-		for (var i = 0; i < dataToArray_chart.length; i=i+5) {
+		for (var i = 0; i < dataToArray_chart.length; i=i+6) {
 			blocks.push(dataToArray_chart[i]);
-			prices.push(dataToArray_chart[i+1]);
-			quantity.push(dataToArray_chart[i+2]);
+			time.push(dataToArray_chart[i+1]);
+			// console.log("TIME: " + dataToArray_chart[i+1]);
+			prices.push(dataToArray_chart[i+2]);
+			quantity.push(dataToArray_chart[i+3]);
 		}
 
 		// console.log("Blocks: " + blocks[0]);
 		// console.log("Prices: " + prices[0]);
 		// console.log("Quantity: " + quantity[0]);
 
+
+		// console.log("blocks: " + blocks.length);
+		// console.log("time: " + time.length);
 		// NEW CHART
 
 		var trace1 = {
@@ -42,18 +48,38 @@ $(document).on('ready', function() {
 			type: 'scatter'
 		};
 
-		var data = [trace1, trace2];
+		var trace3 = {
+			x: time,
+			name: 'Time',
+			xaxis: 'x2',
+			type: 'scatter'
+		};
+
+		var data = [trace1, trace2, trace3];
 
 		var layout = {
 		  title: 'Clearing Price && Quantity',
-		  yaxis: {title: 'Price'},
+		  xaxis: {
+		  	title: 'Blocks',
+		  },
+		  yaxis: {
+		  	title: 'Price',
+		  	range: [0, 40]
+		  },
 		  yaxis2: {
 		    title: 'Quantity',
 		    titlefont: {color: 'rgb(148, 103, 189)'},
 		    tickfont: {color: 'rgb(148, 103, 189)'},
 		    overlaying: 'y',
 		    side: 'right'
-		  }
+		  },
+		  xaxis2: {
+            title: 'Timestamp', 
+            titlefont: {color: 'rgb(148, 103, 189)'}, 
+            tickfont: {color: 'rgb(148, 103, 189)'}, 
+            overlaying: 'x', 
+            side: 'top'
+      	  }
 		};
 
 		Plotly.plot('price_chart', data, layout);

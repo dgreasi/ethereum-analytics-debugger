@@ -52,7 +52,34 @@ var end = null;
 
 // getPendingTransactions();
 
-getCode();
+web3.eth.getBlock(15000, true).then(res => {
+  var date = new Date(res.timestamp*1000);
+  // Hours part from the timestamp
+  var hours = date.getHours();
+  // Minutes part from the timestamp
+  var minutes = "0" + date.getMinutes();
+  // Seconds part from the timestamp
+  // var seconds = "0" + date.getSeconds();
+  // + ':' + seconds.substr(-2)
+
+  // Will display time in 10:30:23 format
+  var formattedTime = hours + ':' + minutes.substr(-2);
+  console.log("timestamp: " + formattedTime);
+});
+
+// res = "0000000000000000000000000000000000000000000000000000000000076ae2000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000001";
+// res1 = res.substr(0, 64);
+// res1 = "0x".concat(res1);
+// res2 = res.substr(64, 64);
+// res2 = "0x".concat(res2);
+// res3 = res.substr(128, 64);
+// res3 = "0x".concat(res3);
+
+// console.log("Res1: " + parseInt(res1));
+// console.log("Res2: " + parseInt(res2));
+// console.log("Res3: " + parseInt(res3));
+
+// getCode();
 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////// Smart Contract - Smart Grid Functions /////////////////////
