@@ -24,6 +24,7 @@ router.get('/', function(req, res, next) {
 analytics.getLastBlockLocally().then(block => {
 
 });
+
 router.post('/get', function(req, res, next) {
   var start_block = req.body.start_block;
   var end_block = req.body.end_block;
@@ -43,12 +44,21 @@ router.post('/get', function(req, res, next) {
 
       prvAC = analytics.getPreviousAccounts();
       analytics.getLastBlockLocally().then(block => {
+        var dbData = val[3];
+        var totalTransactions = 0;
+        if (dbData) {
+          dbData.forEach(d => {
+            totalTransactions += d[2];
+          });
+        }
+
         res.render('home', { 
           title: 'Ethereum Analytics Debugger - Get Experiment',
           start: val[0],
           end: val[1],
           silentBugs: val[2],
           data: val[3],
+          totalTrans: totalTransactions,
           noData: noData,
           lastBlock: block,
           previous_contracts_accounts: prvAC
@@ -292,7 +302,6 @@ router.post('/get', function(req, res, next) {
       });
     });
   }
-
 });
 
 
@@ -462,7 +471,7 @@ router.post('/get_account_gas_spent',function(req, res, next) {
 router.post('/get_block_info',function(req, res, next) {
   var block = req.body.block;
 
-  analytics.getBlockInfo(block).then(val => {
+  analytics.getBlockInfoMinimal(block).then(val => {
     // console.log("INDEX");
     prvAC = analytics.getPreviousAccounts();
     analytics.getLastBlockLocally().then(block => {
@@ -480,7 +489,7 @@ router.post('/get_block_info',function(req, res, next) {
 router.get('/get_block/:block',function(req, res, next) {
   var block = req.params.block;
 
-  analytics.getBlockInfo(block).then(val => {
+  analytics.getBlockInfoMinimal(block).then(val => {
     // console.log("INDEX");
     prvAC = analytics.getPreviousAccounts();
     analytics.getLastBlockLocally().then(block => {
@@ -567,26 +576,6 @@ router.post('/get_transactions_per_block', function(req, res, next) {
     });
   });
 });
-
-// router.post('/get_contract_details', function(req, res, next) {
-//   var start_block = req.body.start_block;
-//   var end_block = req.body.end_block;
-
-//   analytics.getContractDetails(start_block, end_block).then(val => {
-//     noData = null;
-
-//     if (val.length < 1) {
-//       // console.log("ASSING NoDATA");
-//       noData = "No available Info! Probably there are no transactions for the specified scenario.";
-//     }
-
-//     res.render('home', { 
-//       title: 'Ethereum Analytics Debugger - Get Contract Details',
-//       contracts: val,
-//       noData: noData
-//     });
-//   });
-// });
 
 router.post('/get_transaction_info', function(req, res, next) {
   var hash = req.body.hash;

@@ -68,26 +68,6 @@ module.exports = {
           if (check == -1) { // DOESN'T EXIST
             var getBlock = web3.eth.getBlock(i, true);
             getBlockPromises.push(getBlock);
-          } else { // ALREADY SAVED
-
-            // console.log(JSON.stringify(dbBlocks));
-            var blockSaved = dbBlocks[check];
-            // console.log("Get from DB. block: " + blockSaved.number);
-            if (contract_arg != "") {
-              this.addToHistory(contract_arg);
-              blockSaved.transactions.forEach(e => {
-                if ((e.input != "0x") && (e.to == contract_arg)) {
-                  receiptsPromises.push(this.getTransactionReceiptFun(e));
-                }
-              });
-            } else {
-              blockSaved.transactions.forEach(e => {
-                if (e.input != "0x") {
-                  receiptsPromises.push(this.getTransactionReceiptFun(e));
-                }
-              });
-            }
-
           }
 
         }
@@ -98,15 +78,13 @@ module.exports = {
           dbBlocks.sort(function(a, b) {
             return a.number - b.number;
           });
-          // console.log("Blocks: " + JSON.stringify(dbBlocks));
-
-          
-          // console.log("");
-          // console.log("length before: " + accounts.length);
+ 
           accounts = [];
-          // console.log("length after: " + accounts.length);
-          blocks.forEach(block => {
-            // console.log("BLOCK: " + block.number + " Number of transactions: " + block.transactions.length);
+          check = this.searchFor(startBlockNumber);
+          var block;
+          for (var i = 0; i <= endBlockNumber - startBlockNumber; i++) {
+            block = dbBlocks[check+i]
+
             if (block != null && block.transactions != null) {
               // console.log("Block with transactions");
 
@@ -126,7 +104,7 @@ module.exports = {
                 });
               }
             }
-          });
+          }
 
           Promise.all(receiptsPromises).then(res => {
             // SAVE TO DB
@@ -384,6 +362,7 @@ module.exports = {
               });
               // console.log(JSON.stringify(dbBlocks));
 
+              bl.timestamp = this.decodeTime(bl.timestamp);
               resolve(bl);
 
             });
@@ -392,6 +371,7 @@ module.exports = {
           } else {
             // console.log("AAAAAAAAAAAAAAAAA");
             var getBlock = dbBlocks[check];
+            // getBlock.timestamp = this.decodeTime(getBlock.timestamp);
             resolve(getBlock);
           }
         } else {
@@ -404,7 +384,7 @@ module.exports = {
               return a.number - b.number;
             });
             // console.log(JSON.stringify(dbBlocks));
-
+            bl.timestamp = this.decodeTime(bl.timestamp);
             resolve(bl);
           });
         }
@@ -677,13 +657,14 @@ module.exports = {
           for (var i = startBlockNumber; i <= endBlockNumber; i++) {
             checkCl = this.searchForInArray(dbClearings, i);
             if (checkCl == -1) {
-              checkBL = this.searchFor(startBlockNumber);
+              checkBL = this.searchFor(i);
               if (checkBL == -1) {
                 console.log("BLOCK DINDNT FOUND");
               }
-              timestamp = this.decodeTime(dbBlocks[checkBL].timestamp);
-              // console.log("Push promise, timestamp: " + timestamp);
-              storagePromises.push(this.getStorageAtBlock(i, contract_arg, timestamp));
+              // console.log("Push promise, timestamp: " + dbBlocks[checkBL].number + " & " + dbBlocks[checkBL].timestamp);
+              // var timestamp = this.decodeTime(dbBlocks[checkBL].timestamp);
+              // console.log("AFTER, timestamp: " + timestamp);
+              storagePromises.push(this.getStorageAtBlock(i, contract_arg, dbBlocks[checkBL].timestamp));
             }
           }
 
@@ -745,6 +726,7 @@ module.exports = {
         var result = [];
         result.push(block);
         result.push(timestamp);
+        // console.log("Push: " + timestamp);
         
         clearings[0] = parseInt(clearings[0]);
         clearings[1] = parseInt(clearings[1]);

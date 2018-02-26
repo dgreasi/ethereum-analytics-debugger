@@ -15,10 +15,12 @@ $(document).on('ready', function() {
 		var time = [];
 		var prices = [];
 		var quantity = [];
+		var zeros = [];
 
 		for (var i = 0; i < dataToArray_chart.length; i=i+6) {
 			blocks.push(dataToArray_chart[i]);
 			time.push(dataToArray_chart[i+1]);
+			zeros.push(0);
 			// console.log("TIME: " + dataToArray_chart[i+1]);
 			prices.push(dataToArray_chart[i+2]);
 			quantity.push(dataToArray_chart[i+3]);
@@ -31,6 +33,7 @@ $(document).on('ready', function() {
 
 		// console.log("blocks: " + blocks.length);
 		// console.log("time: " + time.length);
+		// console.log("A: " + JSON.stringify(time));
 		// NEW CHART
 
 		var trace1 = {
@@ -50,12 +53,15 @@ $(document).on('ready', function() {
 
 		var trace3 = {
 			x: time,
+			y: zeros,
 			name: 'Time',
 			xaxis: 'x2',
 			type: 'scatter'
 		};
 
 		var data = [trace1, trace2, trace3];
+		// var data = [trace1, trace2];
+
 
 		var layout = {
 		  title: 'Clearing Price && Quantity',

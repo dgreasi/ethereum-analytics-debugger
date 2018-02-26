@@ -96,8 +96,8 @@
         <span class="glyphicon glyphicon-arrow-right green_btn"></span>
         <span class="glyphicon glyphicon-stats"></span>
       </button>
-       {{!-- data-toggle="modal" data-target="#get_transactions_per_block" --}}
-      <button class="btn btn-default red_btn" id="get_transactions_per_block" title="Address + Blocks => Chart">
+
+      <button class="btn btn-default red_btn" id="get_transactions_per_block" title="Blocks => Chart">
         Get Transactions Per Block
         <span class="glyphicon glyphicon-hdd"></span>
         <span class="glyphicon glyphicon-arrow-right green_btn"></span>
@@ -414,8 +414,13 @@
       </table>
       <hr>
       {{!-- <br> --}}
+    {{/if }}
+    
+    {{#if totalTrans}}
+      <div>
+        Total # of Transactions: <b>{{ totalTrans }}</b>
+      </div>
     {{/if}}
-
 
     {{#if noData}}
       <h4 class="red_btn">{{ noData }}</h4>
