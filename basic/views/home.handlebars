@@ -18,6 +18,8 @@
         <input type="number" class="form-control" id="end_block1" name="end_block" placeholder="To block:(blank=last)" value="{{end}}">
         <input type="string" class="form-control" id="contract" name="contract" placeholder="Contract | Account (optional)" value="">
 
+        <input type="string" class="form-control" id="nickname" name="nickname" placeholder="Nickname of hex(optional)" value="">
+
         <input type="string" class="hide" id="id_function" name="id_function">
 
         <input type="submit" value="Get" id="submit_global" class="btn btn-default hide" ></input>
@@ -30,7 +32,11 @@
         <span class="caret"></span></button>
         <ul class="dropdown-menu" data-for="{{previous_contracts_accounts}}">
           {{#each previous_contracts_accounts}}
-            <li><a href="#" class="clickclass" id="{{@index}}">{{this}}</a></li>
+            {{#if this.name}}
+              <li><a href="#" class="clickclass" id="{{@index}}">{{this.name}}</a></li>
+            {{else}}
+              <li><a href="#" class="clickclass" id="{{@index}}">{{this.hex}}</a></li>
+            {{/if}}
           {{!-- <li><a href="#">CSS</a></li>
           <li><a href="#">JavaScript</a></li> --}}
           {{/each}}
@@ -124,7 +130,7 @@
     ######################################################################################
     ######################################################################################
     ###################################################################################### --}}
-
+    {{!-- UNUSED - UNCOMMENT ROUTER TO USE --}}
     <form method="post" action="/get_balance">
       <div id="get_balance" class="modal fade" role="dialog">
           <div class="modal-dialog">
@@ -142,47 +148,6 @@
                         <input type="string" class="form-control" id="account" name="account" placeholder="Enter account" value="0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768">
                     </div>
 
-                  </div>
-                  <div class="modal-footer">
-                      <input type="submit" value="Get" class="btn btn-default" ></input>
-                  </div>
-
-              </div>
-          </div>
-      </div>
-    </form>
-
-    <form method="post" action="/get_accounts">
-      <div id="get_accounts" class="modal fade" role="dialog">
-          <div class="modal-dialog">
-
-              <!-- Modal content-->
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal">&times;</button>
-                      <h4 class="modal-title">Get Accounts through Specified Blocks</h4>
-                  </div>
-
-                 
-
-                  <div class="modal-body">
-                    <p>
-                      Specify the range of the blocks you want to check for accounts.
-                    </p>
-
-                    <div class="form-group">
-                        <label for="pwd">Start Block:</label>
-                        <input type="number" class="form-control" id="start_block" name="start_block" placeholder="Enter number" value="{{start}}">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="pwd">End Block:</label>
-                        <input type="number" class="form-control" id="end_block" name="end_block" placeholder="Enter number" value="{{end}}">
-                    </div>
-
-                    <p style="color: red;">
-                      If the range of the blocks is too big, there is high possibility that the ethereum Node can't answer. Just specify a smaller range of blocks.
-                    </p>
                   </div>
                   <div class="modal-footer">
                       <input type="submit" value="Get" class="btn btn-default" ></input>

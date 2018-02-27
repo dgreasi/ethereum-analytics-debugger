@@ -41,10 +41,10 @@ module.exports = {
 
   ////////// Get only transactions that are calls to functions of a Contract /////
   ///////////// IE a send Gas transaction will not be shown here /////////////////
-  getAccountTransactionsGasSpentClearings: function(startBlockNumber, endBlockNumber, contract_arg) {
+  getAccountTransactionsGasSpentClearings: function(startBlockNumber, endBlockNumber, contract_arg, nickname) {
     // if (contract_arg != "") {
     //   previous_contracts_accounts.push(contract_arg);
-    //   console.log("Pushed contract_arg: " + JSON.stringify(previous_contracts_accounts));
+      console.log("Contract_arg: " + JSON.stringify(contract_arg));
     // }
 
     return new Promise((resolve, reject) => {
@@ -89,9 +89,12 @@ module.exports = {
               // console.log("Block with transactions");
 
               if (contract_arg != "") {
+                var onj = new Object({hex: contract_arg, name: (nickname ? nickname : contract_arg)});
+                this.addToHistory(onj);
+                    console.log("Call with contract_arg");
+                
                 block.transactions.forEach(e => {
                   if ((e.input != "0x") && (e.to == contract_arg)) {
-                    // console.log("Call with contract_arg");
                     receiptsPromises.push(this.getTransactionReceiptFun(e));
                   }
                 });
@@ -206,11 +209,11 @@ module.exports = {
     });
   },
 
-  getSpentGasOfAccount: function(startBlockNumber, endBlockNumber, account) {
+  getSpentGasOfAccount: function(startBlockNumber, endBlockNumber, account, nickname) {
     var transactionsReceiptsPromises = [];
-    if (account != "") {
-      this.addToHistory(account);
-    }
+
+    var onj = new Object({hex: account, name: (nickname ? nickname : account)});
+    this.addToHistory(onj);
 
     return new Promise((resolve, reject) => {
 
@@ -585,10 +588,9 @@ module.exports = {
 
   /////////////////////////// Get Clearing Values //////////////////////////////
 
-  getContractResults: function(contract_arg) {
-    if (contract_arg != "") {
-      this.addToHistory(contract_arg);
-    }
+  getContractResults: function(contract_arg, nickname) {
+    var onj = new Object({hex: contract_arg, name: (nickname ? nickname : contract_arg)});
+    this.addToHistory(onj);
 
     return new Promise((resolve, reject) => {
       var promisesAllgetClearing = [];
@@ -630,10 +632,9 @@ module.exports = {
   // More info about storage at specified block here:
   // https://medium.com/aigang-network/how-to-read-ethereum-contract-storage-44252c8af925
 
-  getClearingsThroughTime: function(startBlockNumber, endBlockNumber, contract_arg) {
-    if (contract_arg != "") {
-      this.addToHistory(contract_arg);
-    }
+  getClearingsThroughTime: function(startBlockNumber, endBlockNumber, contract_arg, nickname) { 
+    var onj = new Object({hex: contract_arg, name: (nickname ? nickname : contract_arg)});
+    this.addToHistory(onj);
 
     return new Promise((resolve, reject) => {
       // console.log("Contract: " + contract_arg);
@@ -688,7 +689,7 @@ module.exports = {
                   // console.log("FOUND CONTRACT IN DB");
                   res.push(dbClearings[check+i]);
                 } else {
-                  console.log("DIFERRENT CONTRACTS: " + contract_arg + " - " + dbClearings[check+i][5]);
+                  // console.log("DIFERRENT CONTRACTS: " + contract_arg + " - " + dbClearings[check+i][5]);
                 }
                 // console.log("Push clearing of block: " + dbClearings[check+i]);
               }
@@ -804,10 +805,10 @@ module.exports = {
   ////////////////////////// EXTRA HELP FUNCTIONS ///////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////
 
-  getAccountInfo: function(start_block, end_block, account) {
-    if (account != "") {
-      this.addToHistory(account);
-    }
+  getAccountInfo: function(start_block, end_block, account, nickname) {
+
+    var onj = new Object({hex: account, name: (nickname ? nickname : account)});
+    this.addToHistory(onj);
 
     return new Promise((resolve, reject) => {
       var promisesDif = [];
@@ -838,10 +839,6 @@ module.exports = {
   },
 
   getNumberOfTransactions: function(account) {
-    if (account != "") {
-      this.addToHistory(account);
-    }
-
     return new Promise((resolve, reject) => {
       web3.eth.getTransactionCount(account).then(res => {
         if (res != null) {
@@ -912,10 +909,10 @@ module.exports = {
           Promise.all(transactionsReceiptsPromises).then(receipts => {
             endStartContracts = [start, end]
             var transactionsReceiptsValid = [];
-            console.log("Lenght of receipts: " + receipts.length);
+            // console.log("Lenght of receipts: " + receipts.length);
             receipts.forEach(rs => {
               if (rs.contractAddress) {
-                console.log("Found contract");
+                // console.log("Found contract");
                 transactionsReceiptsValid.push(rs);
               }
             });
@@ -1010,22 +1007,55 @@ module.exports = {
   },
 
   addToHistory: function(arg) {
-    acc = arg.toLowerCase();
+    acc = arg.hex.toLowerCase();
+    arg.hex = acc;
     var found = previous_contracts_accounts.find(function(element) {
-      return element == acc;
+      return element.hex == acc;
     });
 
     if (!found) {
-      previous_contracts_accounts.push(acc);
-      // console.log("Pushed arg: " + arg);
+      previous_contracts_accounts.push(arg);
+      // console.log("Pushed arg: " + JSON.stringify(arg));
+    } else {
+      previous_contracts_accounts.some(r => {
+        if (r.hex == acc) {
+          r.name = ((arg.name != arg.hex) ? arg.name : r.name);
+          // console.log("CHANGED TO: " + r.name);
+          return true;
+        }
+      });
     }
   },
 
-  getTransactionsByAccount: function(startBlockNumber, endBlockNumber, myaccount) {
-    if (myaccount != "") {
-      this.addToHistory(myaccount);
+  searchPrevAccounts: function(arg) {
+    var found = previous_contracts_accounts.find(function(element) {
+      return element.name == arg;
+    });
+
+    return found;
+  },
+
+  is_hexadecimal: function(str){
+    if (str[0] == 0 && str[1].toLowerCase() == 'x') {
+      return true;
+    } else {
+      return false
     }
 
+    // var a = parseInt(str,16);
+    // return (a.toString(16) ===str.toLowerCase())
+    // regexp = /^[0-9a-fA-F]+$/;
+    // // regexp.test(str)
+    // if (parseInt(str, 16)) {
+    //   console.log("ARG is hex");
+    //   return true;
+    // } else {
+    //   console.log("ARG is NOT hex");  
+    //   return false;
+    // }
+  },
+
+  getTransactionsByAccount: function(startBlockNumber, endBlockNumber, myaccount) {
     return new Promise((resolve, reject) => {
       var transactionsR = [];
       var getBlockPromises = [];
