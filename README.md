@@ -29,3 +29,18 @@ $ node server.js
 ```
 
 5) Use the web interface at [http://localhost:3000](http://localhost:3000)
+
+## Basic Functions
+
+1) Get Experiment - ARGS: (Start block, End block, (?)Contract)
+
+>This function will generate a table which contains the addresses of the accounts that made transactions through the specified range of blocks.
+
+Each line contains: 
+- (address of account)
+- (Spent Gas of the transactions)
+- (number of transactions through specified range of blocks)
+
+2) Get state of Contract - ARGS: (Start block, End block, Contract)
+
+>This function will generate a chart that contains the values of the variables of the specified contract, at each block and time of day. The chart represents the values through the specified range of blocks.
