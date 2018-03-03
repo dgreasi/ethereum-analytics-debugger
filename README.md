@@ -97,4 +97,4 @@ $ node server.js
 
 ### Home Interface
 
-![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/get_account_info.png?raw=true "Home")
+![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/basic_UI.png?raw=true "Home")
