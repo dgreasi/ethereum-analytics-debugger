@@ -94,6 +94,12 @@ $ node server.js
 
 6) Use the web interface at [http://localhost:3000](http://localhost:3000)
 
+>The code of the functions is located at: analytics.js which is imported and used at /routes/index.js
+
+>Pure javascript and a bit of JQuery in the front are used. Handlebars and bootstrap are also being used. 
+
+>There is a version of the implementation that can be used for faster testing in terminal. Just run the terminal_analytics.js with node after choosing which functions you want to call.
+
 
 ### Home Interface
 
