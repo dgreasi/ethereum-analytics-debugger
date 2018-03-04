@@ -2,7 +2,7 @@
 A NodeJs project to get various analytics and debug a private ethereum network.
 
 ## Requirements
-1) A private ethereum network (Instructions to initiate one can be found [here](https://github.com/Temeteron/my_private_blockchain_network]))
+1) A private ethereum network (Instructions to initiate one can be found [here](https://github.com/Temeteron/my_private_blockchain_network))
 2) A node of this network locally running on your pc
 
 ## Basic Functions
