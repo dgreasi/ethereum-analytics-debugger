@@ -16,12 +16,8 @@ var dbClearings = []; // BLOCK - PRICE - QUANTITY - TYPE
 var silentBugs = []; // TRANSACTION - GAS SENT - GAS SPENT
 var accounts = []; // Account hash - Gas sent - # Transactions
 
-var previous_contracts_accounts = [];
+var previous_contracts_accounts = []; //history of contracts-accounts searched
 
-var contract_first_approach = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
-
-// var contract = "0x501897c4a684590ee69447974519e86811f0a47d"; // automated bid
-// var contract = "0x668e966f3f4cf884ad6eda65784ceacf89ef084a"; // new automated fixed
 var contract = "0x368cbd3514a671e3a6c7d5ca865576a6face12fc";
 // var contract = "0xf176c2f03773b63A6e3659423D7380bFA276Dcb3";
 
