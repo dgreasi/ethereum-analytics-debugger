@@ -11,7 +11,7 @@ web3.setProvider(new web3.providers.HttpProvider('http://localhost:8100'));
 // DATABASE TO BE
 var dbBlocks = []; // ARRAY OF BLOCKS
 // var dbTrans = [];
-var dbTransRec = []; // ARRAY OF TRANSACTION RECEIPTS
+var dbTransInfo = []; // ARRAY OF TRANSACTION RECEIPTS
 var dbClearings = []; // BLOCK - PRICE - QUANTITY - TYPE
 var silentBugs = []; // TRANSACTION - GAS SENT - GAS SPENT
 var accounts = []; // Account hash - Gas sent - # Transactions
@@ -234,8 +234,10 @@ module.exports = {
             var blockSaved = dbBlocks[check];
             // console.log("Get from DB. block: " + blockSaved.number);
             blockSaved.transactions.forEach(e => {
-              if (e.input != "0x") {
+              if (e.input != "0x" && (this.searchTsInfoDB(e) == -1)) {
                 transactionsReceiptsPromises.push(this.getTranscationInfo(e.hash));
+              } else {
+                console.log("Found on db");
               }
             });
 
@@ -254,10 +256,12 @@ module.exports = {
           blocks.forEach(block => {
             // console.log("BLOCK: " + block.number + " Number of transactions: " + block.transactions.length);
             if (block != null && block.transactions != null) {
-
+              // console.log("Block: " + block.number + ", length ts: " + block.transactions.length);
               block.transactions.forEach(e => {
-                if (e.input != "0x") {
+                if (e.input != "0x" && (this.searchTsInfoDB(e) == -1)) {
                   transactionsReceiptsPromises.push(this.getTranscationInfo(e.hash));
+                } else {
+                  console.log("Found on db");                  
                 }
               });
               
@@ -271,10 +275,16 @@ module.exports = {
             startEndBalanceGasSpentReceipts.push(res[0]);
             // Delete balance from initial array,
             // Keep only the receipts
-            res.shift();
-            res.sort(function(a, b) {
+            // res.shift();
+            dbTransInfo.sort(function(a, b) {
               return a.blockNumber - b.blockNumber;
             });
+            console.log("LENGTH dbTransInfo: " + dbTransInfo.length);
+            // console.log("First block dbTransInfo: " + JSON.stringify(dbTransInfo[0]));
+            // console.log("Last block dbTransInfo: " + JSON.stringify(dbTransInfo[dbTransInfo.length-1]));
+            // res.sort(function(a, b) {
+            //   return a.blockNumber - b.blockNumber;
+            // });
 
             // res.forEach(rs => {
             //   console.log("BL: " + rs.blockNumber);
@@ -286,6 +296,44 @@ module.exports = {
 
             // GET POS of start Block in the saved Blocks
             check = this.searchFor(start);
+
+            // checkTsInfoIndexStart = -1;
+            // while (checkTsInfoIndexStart == -1) {
+
+            checkTsInfoIndexStart = dbTransInfo.findIndex(element => {
+              return element.blockNumber >= start;
+            });
+              
+            // }
+
+            console.log("START INDEX: " + checkTsInfoIndexStart);
+
+            // checkTsInfoIndexEnd = -1;
+            // while (checkTsInfoIndexEnd == -1) {
+            checkTsInfoIndexEnd = -1;
+
+            for (var k = dbTransInfo.length-1; k > checkTsInfoIndexStart; k++) {
+              if (dbTransInfo[k].blockNumber <= end) {
+                checkTsInfoIndexEnd = k;
+                break;
+              }
+            }
+
+            console.log("END INDEX: " + checkTsInfoIndexEnd);
+
+            // if (checkTsInfoIndexEnd == -1) {
+            //   console.log("START == END");
+            //   checkTsInfoIndexEnd = checkTsInfoIndexStart;
+            // }
+
+
+            var arDbTSInfo;
+            if (checkTsInfoIndexEnd == -1) {
+              arDbTSInfo = dbTransInfo.slice(checkTsInfoIndexStart);
+            } else {
+              arDbTSInfo = dbTransInfo.slice(checkTsInfoIndexStart, checkTsInfoIndexEnd);
+            }
+            console.log("LENGTH arDbTSInfo AFTER: " + arDbTSInfo.length);
             var j = 0;
             var gasUsedInBlockOfAccount = 0;
 
@@ -301,12 +349,12 @@ module.exports = {
             // PUSH ARRAY [BLOCK NUMBER, GAS SPENT OF ACCOUNT, GAS LIMIT OF BLOCK]
             for (var i = 0; i <= end-start; i++) {
 
-              while( (j < res.length) && (res[j].blockNumber <= dbBlocks[check+i].number)) {
+              while( (j < arDbTSInfo.length) && (arDbTSInfo[j].blockNumber <= dbBlocks[check+i].number)) {
 
-                if ((res[j].blockNumber == dbBlocks[check+i].number) && (account == res[j].from.toUpperCase())) {
-                  // console.log("Account1: " + account)
+                if ((arDbTSInfo[j].blockNumber == dbBlocks[check+i].number) && (account == arDbTSInfo[j].from.toUpperCase())) {
+                  console.log("Account1: " + account);
                   // console.log("Account2: " + res[j].from.toUpperCase())
-                  gasUsedInBlockOfAccount += res[j].gasUsed;
+                  gasUsedInBlockOfAccount += arDbTSInfo[j].gasUsed;
                 }
                 j++;
               }
@@ -828,10 +876,28 @@ module.exports = {
     });
   },
 
+  searchTsInfoDB: function(ts) {
+    // console.log("A: " +JSON.stringify(dbBlocks));
+    return dbTransInfo.findIndex(element => {
+      return element.transactionHash == ts.transactionHash;
+    });
+  },
+
   searchForSilentBugs: function(hash) {
     return silentBugs.findIndex(element => {
       return element[0] == hash;
     });
+  },
+
+  saveTsInfoDB(ts) {
+    var rs = dbTransInfo.find((element) => {
+      return element.hash = ts.hash;
+    });
+
+    console.log("RET: " + rs);
+    if (rs == null) {
+      dbTransInfo.push(ts);
+    }
   },
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -981,6 +1047,9 @@ module.exports = {
             if (res != null) {
               // console.log("Input: " + rs.input);
               res.input = rs.input;
+              // console.log("SAVE ON arDbTSInfo: " + JSON.stringify(res));
+              // dbTransInfo.push(res);
+              this.saveTsInfoDB(res);
               resolve(res);
             }
           }).catch(err => {
@@ -993,8 +1062,6 @@ module.exports = {
         console.log("ERROR getTransaction => getTranscationInfo: " + err);
         resolve([]);
       });
-
-      
       
     });
   },
