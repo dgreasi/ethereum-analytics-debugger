@@ -44,7 +44,7 @@ module.exports = {
   getAccountTransactionsGasSpentClearings: function(startBlockNumber, endBlockNumber, contract_arg, nickname) {
     // if (contract_arg != "") {
     //   previous_contracts_accounts.push(contract_arg);
-      console.log("Contract_arg: " + JSON.stringify(contract_arg));
+      // console.log("Contract_arg: " + JSON.stringify(contract_arg));
     // }
 
     return new Promise((resolve, reject) => {
@@ -359,13 +359,14 @@ module.exports = {
             web3.eth.getBlock(blockNumber, true).then(bl => {
               // console.log("GET BLOCK: " + blockNumber);
               // SAVE TO DB
+              bl.timestamp = this.decodeTime(bl.timestamp);
+
               dbBlocks.push(bl);
               dbBlocks.sort(function(a, b) {
                 return a.number - b.number;
               });
               // console.log(JSON.stringify(dbBlocks));
 
-              bl.timestamp = this.decodeTime(bl.timestamp);
               resolve(bl);
 
             });

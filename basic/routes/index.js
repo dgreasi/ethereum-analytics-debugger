@@ -407,15 +407,15 @@ router.post('/get', function(req, res, next) {
 function checkReturnHex(arg) {
   prvAC = analytics.getPreviousAccounts();
   if (isHex(arg)) {
-    console.log("RETURN: " + arg);
+    // console.log("RETURN: " + arg);
     return arg;
   } else {
     var ret = searchPrevAcc(prvAC, arg);
     if (ret) {
-      console.log("RETURN: " + ret.hex);
+      // console.log("RETURN: " + ret.hex);
       return ret.hex;
     } else {
-      console.log("RETURN: FALSE");
+      // console.log("RETURN: FALSE");
 
       return false;
     }

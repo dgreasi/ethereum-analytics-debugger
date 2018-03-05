@@ -56,7 +56,10 @@ $(document).on('ready', function() {
 			y: zeros,
 			name: 'Time',
 			xaxis: 'x2',
-			type: 'scatter'
+			type: 'scatter',
+			marker: {
+              color: 'white'
+            }
 		};
 
 		var data = [trace1, trace2, trace3];
@@ -80,8 +83,7 @@ $(document).on('ready', function() {
 		    side: 'right'
 		  },
 		  xaxis2: {
-            title: 'Timestamp', 
-            titlefont: {color: 'rgb(148, 103, 189)'}, 
+            titlefont: {color: 'white'}, 
             tickfont: {color: 'rgb(148, 103, 189)'}, 
             overlaying: 'x', 
             side: 'top'
