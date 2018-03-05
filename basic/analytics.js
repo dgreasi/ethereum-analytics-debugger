@@ -716,9 +716,9 @@ module.exports = {
     return new Promise((resolve, reject) => {
       var promiseGetStorageAll = [];
 
-      promiseGetStorageAll.push(this.getStorageAtBlockPrice(block, contract_arg));
-      promiseGetStorageAll.push(this.getStorageAtBlockQuantity(block, contract_arg));
-      promiseGetStorageAll.push(this.getStorageAtBlockType(block, contract_arg));
+      promiseGetStorageAll.push(this.getStorageAtBlockPriceCheck(block, contract_arg));
+      promiseGetStorageAll.push(this.getStorageAtBlockQuantityCheck(block, contract_arg));
+      promiseGetStorageAll.push(this.getStorageAtBlockTypeCheck(block, contract_arg));
 
       Promise.all(promiseGetStorageAll).then(clearings => {
         var result = [];
@@ -742,6 +742,19 @@ module.exports = {
     });
   },
 
+  getStorageAtBlockPriceCheck: function(block, contract_arg) {
+    return new Promise((resolve, reject) => {
+      this.getStorageAtBlockPrice(block, contract_arg).then(rs => {
+        if (rs == -99) {
+          console.log("CALLING getStorageAt AGAIN");
+          this.getStorageAtBlockPriceCheck(block, contract_arg);
+        } else {
+          resolve(rs);
+        }
+      })
+    });
+  },
+
   getStorageAtBlockPrice: function(block, contract_arg) {
     return web3.eth.getStorageAt(contract_arg, 6, block).catch(err => {
       console.log("ERROR getStorageAtBlockPrice: " + err);
@@ -749,10 +762,36 @@ module.exports = {
     });
   },
 
+  getStorageAtBlockQuantityCheck: function(block, contract_arg) {
+    return new Promise((resolve, reject) => {
+      this.getStorageAtBlockQuantity(block, contract_arg).then(rs => {
+        if (rs == -99) {
+          console.log("CALLING getStorageAt AGAIN");
+          this.getStorageAtBlockQuantityCheck(block, contract_arg);
+        } else {
+          resolve(rs);
+        }
+      })
+    });
+  },
+
   getStorageAtBlockQuantity: function(block, contract_arg) {
     return web3.eth.getStorageAt(contract_arg, 5, block).catch(err => {
       console.log("ERROR getStorageAtBlockQuantity: " + err);
       return -99;
+    });
+  },
+
+  getStorageAtBlockTypeCheck: function(block, contract_arg) {
+    return new Promise((resolve, reject) => {
+      this.getStorageAtBlockType(block, contract_arg).then(rs => {
+        if (rs == -99) {
+          console.log("CALLING getStorageAtBlockTypeCheck AGAIN");
+          this.getStorageAtBlockTypeCheck(block, contract_arg);
+        } else {
+          resolve(rs);
+        }
+      })
     });
   },
 
