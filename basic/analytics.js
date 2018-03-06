@@ -235,10 +235,13 @@ module.exports = {
             // console.log("Get from DB. block: " + blockSaved.number);
             blockSaved.transactions.forEach(e => {
               if (e.input != "0x" && (this.searchTsInfoDB(e) == -1)) {
-                transactionsReceiptsPromises.push(this.getTranscationInfo(e.hash));
-              } else {
-                console.log("Found on db");
+                // console.log("CALL transactionsReceiptsPromises 1");
+
+                transactionsReceiptsPromises.push(this.getTranscationInfo(e));
               }
+              // else {
+              //   console.log("Found on db");
+              // }
             });
 
           }
@@ -259,10 +262,12 @@ module.exports = {
               // console.log("Block: " + block.number + ", length ts: " + block.transactions.length);
               block.transactions.forEach(e => {
                 if (e.input != "0x" && (this.searchTsInfoDB(e) == -1)) {
-                  transactionsReceiptsPromises.push(this.getTranscationInfo(e.hash));
-                } else {
-                  console.log("Found on db");                  
+                  // console.log("CALL transactionsReceiptsPromises 2");
+                  transactionsReceiptsPromises.push(this.getTranscationInfo(e));
                 }
+                // else {
+                //   console.log("Found on db");                  
+                // }
               });
               
             }
@@ -279,7 +284,7 @@ module.exports = {
             dbTransInfo.sort(function(a, b) {
               return a.blockNumber - b.blockNumber;
             });
-            console.log("LENGTH dbTransInfo: " + dbTransInfo.length);
+            // console.log("LENGTH dbTransInfo: " + dbTransInfo.length);
             // console.log("First block dbTransInfo: " + JSON.stringify(dbTransInfo[0]));
             // console.log("Last block dbTransInfo: " + JSON.stringify(dbTransInfo[dbTransInfo.length-1]));
             // res.sort(function(a, b) {
@@ -306,7 +311,7 @@ module.exports = {
               
             // }
 
-            console.log("START INDEX: " + checkTsInfoIndexStart);
+            // console.log("START INDEX: " + checkTsInfoIndexStart);
 
             // checkTsInfoIndexEnd = -1;
             // while (checkTsInfoIndexEnd == -1) {
@@ -319,7 +324,7 @@ module.exports = {
               }
             }
 
-            console.log("END INDEX: " + checkTsInfoIndexEnd);
+            // console.log("END INDEX: " + checkTsInfoIndexEnd);
 
             // if (checkTsInfoIndexEnd == -1) {
             //   console.log("START == END");
@@ -331,11 +336,13 @@ module.exports = {
             if (checkTsInfoIndexEnd == -1) {
               arDbTSInfo = dbTransInfo.slice(checkTsInfoIndexStart);
             } else {
-              arDbTSInfo = dbTransInfo.slice(checkTsInfoIndexStart, checkTsInfoIndexEnd);
+              arDbTSInfo = dbTransInfo.slice(checkTsInfoIndexStart, checkTsInfoIndexEnd+1);
             }
-            console.log("LENGTH arDbTSInfo AFTER: " + arDbTSInfo.length);
+            // console.log("LENGTH arDbTSInfo AFTER: " + arDbTSInfo.length);
             var j = 0;
             var gasUsedInBlockOfAccount = 0;
+            // console.log("A: " +JSON.stringify(dbTransInfo));
+
 
             // dbBlocks.forEach((res, index) => {
             //   console.log(index + " : " + res.number);
@@ -352,7 +359,7 @@ module.exports = {
               while( (j < arDbTSInfo.length) && (arDbTSInfo[j].blockNumber <= dbBlocks[check+i].number)) {
 
                 if ((arDbTSInfo[j].blockNumber == dbBlocks[check+i].number) && (account == arDbTSInfo[j].from.toUpperCase())) {
-                  console.log("Account1: " + account);
+                  // console.log("Account1: " + account);
                   // console.log("Account2: " + res[j].from.toUpperCase())
                   gasUsedInBlockOfAccount += arDbTSInfo[j].gasUsed;
                 }
@@ -878,9 +885,12 @@ module.exports = {
 
   searchTsInfoDB: function(ts) {
     // console.log("A: " +JSON.stringify(dbBlocks));
-    return dbTransInfo.findIndex(element => {
-      return element.transactionHash == ts.transactionHash;
+    var rt = dbTransInfo.findIndex(element => {
+      return element.transactionHash == ts.hash;
     });
+
+    // console.log("RETUNR: " + rt);
+    return rt;
   },
 
   searchForSilentBugs: function(hash) {
@@ -890,12 +900,13 @@ module.exports = {
   },
 
   saveTsInfoDB(ts) {
-    var rs = dbTransInfo.find((element) => {
-      return element.hash = ts.hash;
+    var rs = dbTransInfo.findIndex(element => {
+      return element.transactionHash == ts.transactionHash;
     });
 
-    console.log("RET: " + rs);
-    if (rs == null) {
+    // console.log("RET: " + JSON.stringify(rs));
+    if (rs == -1) {
+      // console.log("PUSH");
       dbTransInfo.push(ts);
     }
   },
@@ -981,7 +992,7 @@ module.exports = {
             // console.log("Get from DB. block: " + blockSaved.number);
             blockSaved.transactions.forEach(e => {
               if (e.input != "0x") {
-                transactionsReceiptsPromises.push(this.getTranscationInfo(e.hash));
+                transactionsReceiptsPromises.push(this.getTranscationInfo(e));
               }
             });
 
@@ -1001,7 +1012,7 @@ module.exports = {
 
               block.transactions.forEach(e => {
                 if (e.input != "0x") {
-                  transactionsReceiptsPromises.push(this.getTranscationInfo(e.hash));
+                  transactionsReceiptsPromises.push(this.getTranscationInfo(e));
                 }
               });
               
@@ -1038,16 +1049,16 @@ module.exports = {
     });
   },
 
-  getTranscationInfo: function(hash) {
+  getTranscationInfo: function(e) {
     return new Promise((resolve, reject) => {
-      web3.eth.getTransaction(hash).then(rs => {
+      // web3.eth.getTransaction(hash).then(rs => {
 
-        if (rs != null) {
-          web3.eth.getTransactionReceipt(hash).then(res => {
+        // if (rs != null) {
+          web3.eth.getTransactionReceipt(e.hash).then(res => {
             if (res != null) {
               // console.log("Input: " + rs.input);
-              res.input = rs.input;
-              // console.log("SAVE ON arDbTSInfo: " + JSON.stringify(res));
+              res.input = e.input;
+              // console.log("SAVE ON arDbTSInfo: ");
               // dbTransInfo.push(res);
               this.saveTsInfoDB(res);
               resolve(res);
@@ -1057,11 +1068,12 @@ module.exports = {
             resolve([]);
           });
 
-        }
-      }).catch(err => {
-        console.log("ERROR getTransaction => getTranscationInfo: " + err);
-        resolve([]);
-      });
+        // }
+
+      // }).catch(err => {
+      //   console.log("ERROR getTransaction => getTranscationInfo: " + err);
+      //   resolve([]);
+      // });
       
     });
   },

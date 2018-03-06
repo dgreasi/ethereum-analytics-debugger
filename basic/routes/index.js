@@ -21,9 +21,9 @@ router.get('/', function(req, res, next) {
 ///////////////////////////////////////////////////////////////
 /////////////////////// Get Functions /////////////////////////
 ///////////////////////////////////////////////////////////////
-analytics.getLastBlockLocally().then(block => {
+// analytics.getLastBlockLocally().then(block => {
 
-});
+// });
 
 router.post('/get', function(req, res, next) {
   var start_block = req.body.start_block;
@@ -81,7 +81,7 @@ router.post('/get', function(req, res, next) {
         });
       });
     }
-  } else if (id_function == "2") { // GET CLEARINGS THROUGH TIME
+  } else if (id_function == "2") { // GET STATE OF CONTRACT THROUGH TIME
 
     if (contract == "") {
       noData = "Contract doesn't exist.";
