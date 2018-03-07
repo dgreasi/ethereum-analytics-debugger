@@ -35,7 +35,7 @@ Each line contains:
 
 >This function will generate a chart that contains the total gas used on each block.
 
-![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/gas_per_block.png?raw=true "Transaction Info")
+![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/gas_per_block.png?raw=true "Gas Per Block")
 
 5) **Get Gas Spent of Account** - ARGS: (Start block, End block, Account)
 

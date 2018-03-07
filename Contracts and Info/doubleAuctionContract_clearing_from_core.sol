@@ -45,18 +45,6 @@ contract DoubleAuction {
         } else {
           consumptionBids[_price] = consumptionBids[_price] + _quantity;
         }
-
-        marketClearing();
-        // if ((block.number-blockCleared)>5) {
-        //     blockCleared = block.number;
-        //     marketClearing();
-        // }
-
-        // SECOND OPTION
-        // if ((block.number - blockCleared)%3 == 0) {
-        //     blockCleared = block.number;
-        //     marketClearing();
-        // }
     }
 
     function generationBid(int _quantity, int _price) public{
@@ -66,12 +54,6 @@ contract DoubleAuction {
         } else {
           generationBids[_price] = generationBids[_price] + _quantity;    
         }
-
-        marketClearing();
-        // if ((block.number-blockCleared)>5) {
-        //     blockCleared = block.number;
-        //     marketClearing();
-        // }
     }
 
     function getPriceCap() pure private returns(int){
@@ -123,9 +105,18 @@ contract DoubleAuction {
     }
 
     function marketClearing() public{
-        if ((block.number-blockCleared) > 60) {
-            blockCleared = block.number;
+        if ((block.number-blockCleared) > 64) {
+		    blockCleared = block.number;
+    		if(_consumptionPrices.length > 340 || _generationPrices.length > 100){
+    			deleteMapArrays();
+    		}
+    		else{
+    			computeClearing();
+    		}
+	    }
+    }
 
+    function computeClearing() private{
             bool check = false;
             int a = getPriceCap();
             int b = -getPriceCap();
@@ -354,7 +345,7 @@ contract DoubleAuction {
 
             _consumptionPrices.length = 0;
             _generationPrices.length = 0;
-        }
+        
     }
 
 

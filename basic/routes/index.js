@@ -585,7 +585,7 @@ router.get('/account/:acc', function(req, res, next) {
 router.post('/get_transaction_info', function(req, res, next) {
   var hash = req.body.hash;
 
-  analytics.getTranscationInfo(hash).then(val => {
+  analytics.getTranscationInfoHash(hash).then(val => {
     noData = null;
 
     if (val.length < 1) {
@@ -610,7 +610,7 @@ router.get('/get_transaction/:hash', function(req, res, next) {
   var hash = req.params.hash;
   // console.log("Account: " + JSON.stringify(account));
 
-  analytics.getTranscationInfo(hash).then(val => {
+  analytics.getTranscationInfoHash(hash).then(val => {
 
     prvAC = analytics.getPreviousAccounts();
     analytics.getLastBlockLocally().then(block => {

@@ -1104,13 +1104,33 @@ module.exports = {
 
   getTranscationInfo: function(e) {
     return new Promise((resolve, reject) => {
-      // web3.eth.getTransaction(hash).then(rs => {
+      web3.eth.getTransactionReceipt(e.hash).then(res => {
+        if (res != null) {
+          // console.log("Input: " + rs.input);
+          res.input = e.input;
+          res.gasPrice = e.gasPrice;
+          // console.log("SAVE ON arDbTSInfo: ");
+          // dbTransInfo.push(res);
+          this.saveTsInfoDB(res);
+          resolve(res);
+        }
+      }).catch(err => {
+        console.log("ERROR getTransactionReceipt getTranscationInfo: " + err);
+        resolve([]);
+      });
+    });
+  },
 
-        // if (rs != null) {
-          web3.eth.getTransactionReceipt(e.hash).then(res => {
+  getTranscationInfoHash: function(hash) {
+    return new Promise((resolve, reject) => {
+      web3.eth.getTransaction(hash).then(rs => {
+
+        if (rs != null) {
+          web3.eth.getTransactionReceipt(rs.hash).then(res => {
             if (res != null) {
               // console.log("Input: " + rs.input);
-              res.input = e.input;
+              res.input = rs.input;
+              res.gasPrice = rs.gasPrice;
               // console.log("SAVE ON arDbTSInfo: ");
               // dbTransInfo.push(res);
               this.saveTsInfoDB(res);
@@ -1121,12 +1141,12 @@ module.exports = {
             resolve([]);
           });
 
-        // }
+        }
 
-      // }).catch(err => {
-      //   console.log("ERROR getTransaction => getTranscationInfo: " + err);
-      //   resolve([]);
-      // });
+      }).catch(err => {
+        console.log("ERROR getTransaction => getTranscationInfo: " + err);
+        resolve([]);
+      });
       
     });
   },

@@ -596,6 +596,10 @@
                   <td>gasUsed</td>
                   <td>{{ transaction_info.gasUsed }}</td>
               </tr>
+              <tr>
+                  <td>gasPrice</td>
+                  <td>{{ transaction_info.gasPrice }}</td>
+              </tr>
         </tbody>
       </table>
     {{/if}}
@@ -680,6 +684,22 @@
                   <td>uncles</td>
                   <td>{{ blockInfo.uncles }}</td>
               </tr>
+        </tbody>
+      </table>
+
+      <h4>Transactions of block</h4>
+      <table>
+        <thead>
+          <th class="center_text">#</th> 
+          <th class="center_text">Hash of Transaction</th>
+        </thead>
+        <tbody>
+          {{#each blockInfo.transactions}}
+            <tr>
+                <td>{{ @index }}</td>
+                <td><a href="/get_transaction/{{this.hash}}">{{ this.hash }}</a></td>
+            </tr>
+          {{/each}}
         </tbody>
       </table>
     {{/if}}
