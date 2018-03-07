@@ -395,6 +395,59 @@ module.exports = {
     });
   },
 
+  getGasPerBlock: function(startBlockNumber, endBlockNumber) {
+    return new Promise((resolve, reject) => {
+
+      var getBlockPromises = [];
+      var blockNumberPromise = web3.eth.getBlockNumber();
+
+      blockNumberPromise.then(res => {
+        this.checkStartEndInput(startBlockNumber, endBlockNumber, res);
+        startBlockNumber = start;
+        endBlockNumber = end;
+
+        for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+          check = this.searchFor(i);
+          
+          if (check == -1) { // DOESN'T EXIST
+            var getBlock = web3.eth.getBlock(i, true);
+            getBlockPromises.push(getBlock);
+          }
+
+        }
+
+        Promise.all(getBlockPromises).then(blocks => {
+          // SAVE TO DB
+          dbBlocks = dbBlocks.concat(blocks);
+          dbBlocks.sort(function(a, b) {
+            return a.number - b.number;
+          });
+
+          startEndGasPerBlock = [start, end];
+
+          check = this.searchFor(start);
+          if (check != -1) {
+            for (var j = 0; j <= end - start; j++) {
+              startEndGasPerBlock.push([dbBlocks[check+j].number, dbBlocks[check+j].gasUsed]);
+            }
+          } else {
+            console.log("Unexpected error, block didn't found in DB");
+          }
+
+          resolve(startEndGasPerBlock);
+
+        }).catch(err => {
+          console.log("ERROR getBlockPromises: " + err);
+          reject(err);
+        });
+      }).catch(err => {
+        console.log("ERROR getBlockNumber: " + err);
+        reject(err);
+      });
+
+    });
+  },
+
   getBlockInfoMinimal: function(blockNumber) {
     return new Promise((resolve, reject) => {
 

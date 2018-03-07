@@ -5,6 +5,7 @@ $(document).on('ready', function() {
 	price_chart = document.getElementById('price_chart');
 	array_block_gas_spent_chart = document.getElementById('array_block_gas_spent_chart');
 	transactions_per_block_chart = document.getElementById('transactions_per_block_chart');
+	gas_per_block_chart = document.getElementById('gas_per_block_chart');
 
 	if (price_chart) {
 		var data_chart = price_chart.getAttribute('data-for');
@@ -177,6 +178,37 @@ $(document).on('ready', function() {
 
 		Plotly.plot('transactions_per_block_chart', data, layout);
 	}
+
+	if (gas_per_block_chart) {
+		var data1_chart = gas_per_block_chart.getAttribute('data-for');
+		var dataToArray1_chart = data1_chart.split(",");
+
+		var blocks = [];
+		var gasSpent = [];
+
+		for (var i = 0; i < dataToArray1_chart.length; i=i+2) {
+			blocks.push(dataToArray1_chart[i]);
+			gasSpent.push(dataToArray1_chart[i+1]);
+		}
+
+		// NEW CHART
+		var trace1 = {
+		  	x: blocks,
+			y: gasSpent,
+			name: 'gasSpent',
+			fill: 'tozeroy',
+  			type: 'scatter'
+		};
+
+		var data = [trace1];
+
+		var layout = {
+		  title: 'Gas Spent - Blocks',
+		  yaxis: {title: 'Gas Spent'},
+		};
+
+		Plotly.plot('gas_per_block_chart', data, layout);
+	}
 });
 
 
@@ -233,5 +265,11 @@ $( "#get_account_info" ).click(function() {
 $( "#get_clr_last_block" ).click(function() {
   // alert( "Handler for .click() called." );
   $( "#id_function" ).val("7");
+  $( "#submit_global" ).click();
+});
+
+$( "#gas_per_block" ).click(function() {
+  // alert( "Handler for .click() called." );
+  $( "#id_function" ).val("8");
   $( "#submit_global" ).click();
 });

@@ -59,7 +59,7 @@
       </button>
       {{!-- data-toggle="modal" data-target="#get_clearing_through_time" --}}
       <button class="btn btn-default blue_btn" id="get_clr" title="Address + Blocks => Chart">
-        Get Clearing Through Blocks
+        Get State of Contract at Blocks
         <span class="glyphicon glyphicon-exclamation-sign"></span>
         <span class="glyphicon glyphicon glyphicon-plus-sign green_btn"></span>
         <span class="glyphicon glyphicon-hdd"></span>
@@ -69,7 +69,7 @@
       
       {{!-- <form method="post" action="/get_clearing"> --}}
       <button class="btn btn-default blue_btn" id="get_clr_last_block" title="Address => Results">
-        Last Block Clearing
+        State of Contract Now
         <span class="glyphicon glyphicon-exclamation-sign"></span>
         <span class="glyphicon glyphicon-arrow-right green_btn"></span>
         <span class="glyphicon glyphicon-th-list"></span>
@@ -87,11 +87,11 @@
         <span class="glyphicon glyphicon-th-list"></span>
       </button>
 
-      <button class="btn btn-default red_btn" data-toggle="modal" data-target="#get_transaction_info" title="Address => Results">
-        Get Transaction Info
-        <span class="glyphicon glyphicon-exclamation-sign"></span>
+      <button class="btn btn-default red_btn" id="gas_per_block" title="Blocks => Results">
+        Gas Per Block
+        <span class="glyphicon glyphicon-hdd"></span>
         <span class="glyphicon glyphicon-arrow-right green_btn"></span>
-        <span class="glyphicon glyphicon-th-list"></span>
+        <span class="glyphicon glyphicon-stats"></span>
       </button>
 
       <button class="btn btn-default red_btn" id="get_account_gas_spent" title="Address + Blocks => Chart">
@@ -117,6 +117,13 @@
       <br>
       
       <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_block_info">Get Block</button>
+
+      <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_transaction_info" title="Address => Results">
+        Get Transaction Info
+        <span class="glyphicon glyphicon-exclamation-sign"></span>
+        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
+        <span class="glyphicon glyphicon-th-list"></span>
+      </button>
       
       <button class="btn btn-default green_btn" id="get_account_info">Get Account Info</button>
 
@@ -301,6 +308,12 @@
     {{#if transactionsPerBlock}}
       <div id="transactions_per_block_chart" data-for="{{transactionsPerBlock}}" class="center"></div>
     {{/if}}
+
+    {{!-- GET GAS PER BLOCK --}}
+    {{#if gasPerBlock}}
+      <div id="gas_per_block_chart" data-for="{{gasPerBlock}}" class="center"></div>
+    {{/if}}
+
 
     {{!-- <div id="bids_chart" class="center"></div> --}}
     

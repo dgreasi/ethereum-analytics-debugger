@@ -352,6 +352,33 @@ router.post('/get', function(req, res, next) {
       }
 
     }
+  } else if (id_function == "8") { // GET GAS PER BLOCK
+    analytics.getGasPerBlock(start_block, end_block).then(val => {
+      noData = null;
+
+      if (val[1].length < 1) {
+        // console.log("ASSING NoDATA get_clearing_through_time");
+        noData = "No available Info! Probably there are no blocks for the specified scenario.";
+      }
+
+      var start = val[0][0];
+      var end = val[0][1];
+      val.shift();
+      val.shift();
+
+      prvAC = analytics.getPreviousAccounts();
+      analytics.getLastBlockLocally().then(block => {
+        res.render('home', { 
+          title: 'Ethereum Analytics Debugger - Get Gas Per Block',
+          start: start,
+          end: end,
+          gasPerBlock: val,
+          noData: noData,
+          lastBlock: block,
+          previous_contracts_accounts: prvAC
+        });
+      });
+    });
   } else {
     var ret = checkReturnHex(contract);
 
