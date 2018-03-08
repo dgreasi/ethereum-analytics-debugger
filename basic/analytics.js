@@ -1374,6 +1374,14 @@ module.exports = {
     });
   },
 
+  getGasPrice() {
+    return web3.eth.getGasPrice();
+  },
+
+  getLastBlock() {
+    return web3.eth.getBlock("latest",true);
+  },
+
   clearContract: function() {
     // var myContract =  new web3.eth.Contract(ABI, contract);
 

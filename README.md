@@ -4,6 +4,10 @@ A NodeJs project to get various analytics and debug a private ethereum network.
 ## Requirements
 1) A private ethereum network (Instructions to initiate one can be found [here](https://github.com/Temeteron/my_private_blockchain_network))
 2) A node of this network locally running on your pc
+3) If you want to check state of contracts at past blocks you should start your node **from the first time** with the following parameters  **"--syncmode full --gcmode=archive"**, so that the node will be fully synced. An example of a start geth command follows:
+```
+geth --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr=11.10.1.1 --rpccorsdomain "*" --syncmode full --gcmode=archive
+```
 
 ## Basic Functions
 
@@ -81,7 +85,7 @@ $ git clone https://github.com/Temeteron/Ethereum_analytics_debugger.git
 
 2) Cd to directory and install packages:
 ```
-$ cd Ethereum_analytics_debugger
+$ cd Ethereum_analytics_debugger/basic
 $ npm install
 ```
 

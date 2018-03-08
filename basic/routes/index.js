@@ -465,28 +465,6 @@ function searchPrevAcc(prvAC, arg) {
   return found;
 }
 
-// router.post('/get_balance', function(req, res, next) {
-//   var account = req.body.account;
-
-//   analytics.getBalance(account).then(val => {
-//     if (val.length < 1) {
-//       val = "Non-existed Account";
-//     }
-    
-//     prvAC = analytics.getPreviousAccounts();
-//     analytics.getLastBlockLocally().then(block => {
-//       res.render('home', {
-//         title: 'Ethereum Analytics Debugger - Get Balance',
-//         account: account,
-//         balance: val,
-//         lastBlock: block,
-//         previous_contracts_accounts: prvAC
-//       });
-//     });
-    
-//   });
-// });
-
 router.post('/get_peers', function(req, res, next) {
 
   analytics.getPeersNumber().then(peers => {
@@ -622,6 +600,23 @@ router.get('/get_transaction/:hash', function(req, res, next) {
       });
     });
   });
+});
+
+router.get('/get_live', function(req, res){
+  // console.log("CALLED");
+  promT = [];
+
+  promT.push(analytics.getLastBlock());
+  promT.push(analytics.getGasPrice());
+
+
+  Promise.all(promT).then(r => {
+    var dat = new Date();
+    r.push(dat);
+    // console.log("R: " + JSON.stringify(r));
+    res.send(r);
+  });
+  
 });
 
 ///////////////////////////////////////////////////////////////

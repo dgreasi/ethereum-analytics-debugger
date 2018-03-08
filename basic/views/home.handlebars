@@ -8,9 +8,30 @@
     <button class="btn btn-default round" data-toggle="modal" data-target="#tips_modal">
       <span class="glyphicon glyphicon-info-sign"></span>
     </button>
+    
     <hr>
 
-    <p>Last Block: <b>{{ lastBlock }}</b></p>
+    <div class="center_live">
+      <div class="pad_right">
+        Date: <b id="date"> </b>
+      </div>
+      <div class="pad_right">
+        Difficulty: <b id="difficulty"> </b>
+      </div>
+      <div class="pad_right">
+        Gas Limit: <b id="gasLimit"></b> 
+      </div>
+      <div class="pad_right">
+        Gas Used: <b id="gasUsed"></b> 
+      </div>
+      <div class="pad_right">
+        Gas Price: <b id="gas"></b> 
+      </div>
+    </div>
+
+    <hr>
+
+    <p>Last Block: <b id="date">{{ lastBlock }}</b></p>
 
     <form method="post" action="/get">
       <div class="form-inline">

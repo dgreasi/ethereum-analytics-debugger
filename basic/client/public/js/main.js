@@ -1,6 +1,25 @@
 // add scripts
 
 $(document).on('ready', function() {
+
+	setInterval(() => {
+		$.get( '/get_live',"", function(data) {
+			// console.log("DATA: " + data);
+			// data.forEach(r => {
+			// 	console.log(r)
+			// });
+			$('#Block').html(data[0].number);
+			$('#difficulty').html(data[0].difficulty);
+			$('#gasLimit').html(data[0].gasLimit);
+			$('#gasUsed').html(data[0].gasUsed);
+			// $('#Block').html(data[0].number);
+			$('#gas').html(data[1]);
+			$('#date').html(data[2]);
+
+		});
+		// document.getElementById("myButtonId").click();
+
+	}, 3000);
 	// console.log("CHECK");
 	price_chart = document.getElementById('price_chart');
 	array_block_gas_spent_chart = document.getElementById('array_block_gas_spent_chart');
@@ -225,6 +244,7 @@ $('.clickclass').click(function (event) {
   // }
 
 });
+
 
 $( "#get_exp" ).click(function() {
   // alert( "Handler for .click() called." );

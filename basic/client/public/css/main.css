@@ -65,6 +65,16 @@ td a {
     margin: auto;
 }
 
+.center_live {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pad_right {
+  padding-right: 10px;
+}
+
 .center_text {
   text-align: center;
 }
