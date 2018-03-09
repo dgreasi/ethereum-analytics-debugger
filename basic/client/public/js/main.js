@@ -4,7 +4,7 @@ $(document).on('ready', function() {
 
 	setInterval(() => {
 		$.get( '/get_live',"", function(data) {
-			
+
 			$('#Block').html(data[0].number);
 			$('#difficulty').html(data[0].difficulty);
 			$('#gasLimit').html(data[0].gasLimit);
@@ -16,28 +16,16 @@ $(document).on('ready', function() {
 			
 			if (diff_chart) {
 				// console.log("diff_chart.data: " + JSON.stringify(diff_chart.data));
-				block = [];
-				diff = [];
-
-				block.push(data[0].number);
-				diff.push(data[0].difficulty);
-
-				var trace1D = {
-				  	x: block,
-					y: diff,
-					name: 'Difficulty',
-		  			type: 'bar'
-				};
-
-				var layoutD = {
-					title: 'Difficulty',
-					yaxis: {title: 'Difficulty of Block'},
-				};
 
 				if (diff_chart.data) {
 					var found = diff_chart.data[0].x.find((el) => {
 						return el == data[0].number;
 					});
+
+					var layoutD = {
+						title: 'Difficulty',
+						yaxis: {title: 'Difficulty of Block'},
+					};
 
 					// console.log("FOUND: " + found);
 					if (found) {
@@ -70,19 +58,29 @@ $(document).on('ready', function() {
 						var dataD = [data_update];
 						// console.log("NEW DATA TO PUSH: " + JSON.stringify(dataD));
 
-						Plotly.update('diff_chart', dataD);
+						Plotly.update('diff_chart', dataD, layoutD);
 
 						// Plotly.plot('diff_chart', dataD, layoutD);
 					}
 				} else {					
 					console.log("INIT CHART");
+					block = [];
+					diff = [];
+
+					block.push(data[0].number);
+					diff.push(data[0].difficulty);
+
+					var trace1D = {
+					  	x: block,
+						y: diff,
+						name: 'Difficulty',
+			  			type: 'bar'
+					};
+
 					var dataD = [trace1D];
 
 					Plotly.plot('diff_chart', dataD, layoutD);
 				}
-
-
-
 			}
 
 
