@@ -4,22 +4,93 @@ $(document).on('ready', function() {
 
 	setInterval(() => {
 		$.get( '/get_live',"", function(data) {
-			// console.log("DATA: " + data);
-			// data.forEach(r => {
-			// 	console.log(r)
-			// });
+			
 			$('#Block').html(data[0].number);
 			$('#difficulty').html(data[0].difficulty);
 			$('#gasLimit').html(data[0].gasLimit);
 			$('#gasUsed').html(data[0].gasUsed);
-			// $('#Block').html(data[0].number);
 			$('#gas').html(data[1]);
 			$('#date').html(data[2]);
 
-		});
-		// document.getElementById("myButtonId").click();
+			diff_chart = document.getElementById('diff_chart');
+			
+			if (diff_chart) {
+				// console.log("diff_chart.data: " + JSON.stringify(diff_chart.data));
+				block = [];
+				diff = [];
 
+				block.push(data[0].number);
+				diff.push(data[0].difficulty);
+
+				var trace1D = {
+				  	x: block,
+					y: diff,
+					name: 'Difficulty',
+		  			type: 'bar'
+				};
+
+				var layoutD = {
+					title: 'Difficulty',
+					yaxis: {title: 'Difficulty of Block'},
+				};
+
+				if (diff_chart.data) {
+					var found = diff_chart.data[0].x.find((el) => {
+						return el == data[0].number;
+					});
+
+					// console.log("FOUND: " + found);
+					if (found) {
+						console.log("ALREADY IN");
+					} else {
+						var blockN = [];
+						blockN = diff_chart.data[0].x;
+						var diffN = [];
+						diffN = diff_chart.data[0].y;
+
+						// console.log("BLOCK TO PUSH: " + blockN);
+						// console.log("DIFF TO PUSH: " + diffN);
+						blockN.push(data[0].number);
+						diffN.push(data[0].difficulty);
+
+						if (blockN.length > 10) {
+							blockN.shift();
+							diffN.shift();
+						}
+						// console.log("AFTER    BLOCK TO PUSH: " + blockN);
+						// console.log("AFTER    DIFF TO PUSH: " + diffN);
+						
+						var data_update = {
+						    x: blockN,
+						    y: diffN,
+							name: 'Difficulty',
+				  			type: 'bar'
+						};
+
+						var dataD = [data_update];
+						// console.log("NEW DATA TO PUSH: " + JSON.stringify(dataD));
+
+						Plotly.update('diff_chart', dataD);
+
+						// Plotly.plot('diff_chart', dataD, layoutD);
+					}
+				} else {					
+					console.log("INIT CHART");
+					var dataD = [trace1D];
+
+					Plotly.plot('diff_chart', dataD, layoutD);
+				}
+
+
+
+			}
+
+
+
+
+		});
 	}, 3000);
+
 	// console.log("CHECK");
 	price_chart = document.getElementById('price_chart');
 	array_block_gas_spent_chart = document.getElementById('array_block_gas_spent_chart');
