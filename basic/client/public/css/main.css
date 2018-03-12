@@ -75,6 +75,11 @@ td a {
   padding-right: 10px;
 }
 
+.size_live_chart {
+  width: 500px;
+  height: 400px;
+}
+
 .center_text {
   text-align: center;
 }

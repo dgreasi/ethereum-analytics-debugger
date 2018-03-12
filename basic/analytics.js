@@ -855,7 +855,11 @@ module.exports = {
       this.getStorageAtBlockPrice(block, contract_arg).then(rs => {
         if (rs == -99) {
           console.log("CALLING getStorageAt AGAIN");
-          this.getStorageAtBlockPriceCheck(block, contract_arg);
+          this.getStorageAtBlockPrice(block, contract_arg).then(r => {
+            console.log("RESOLVING: " + parseInt(r));
+            resolve(r);
+          });
+          // resolve(rs);
         } else {
           resolve(rs);
         }
@@ -874,8 +878,12 @@ module.exports = {
     return new Promise((resolve, reject) => {
       this.getStorageAtBlockQuantity(block, contract_arg).then(rs => {
         if (rs == -99) {
-          console.log("CALLING getStorageAt AGAIN");
-          this.getStorageAtBlockQuantityCheck(block, contract_arg);
+          // console.log("CALLING getStorageAt AGAIN");
+          // this.getStorageAtBlockQuantityCheck(block, contract_arg);
+          this.getStorageAtBlockQuantity(block, contract_arg).then(r => {
+            console.log("RESOLVING: " +  parseInt(r));
+            resolve(r);
+          });
         } else {
           resolve(rs);
         }
@@ -895,7 +903,11 @@ module.exports = {
       this.getStorageAtBlockType(block, contract_arg).then(rs => {
         if (rs == -99) {
           console.log("CALLING getStorageAtBlockTypeCheck AGAIN");
-          this.getStorageAtBlockTypeCheck(block, contract_arg);
+          // this.getStorageAtBlockTypeCheck(block, contract_arg);
+          this.getStorageAtBlockType(block, contract_arg).then(r => {
+            console.log("RESOLVING: " + parseInt(r));
+            resolve(r);
+          });
         } else {
           resolve(rs);
         }

@@ -13,19 +13,21 @@ $(document).on('ready', function() {
 			$('#date').html(data[2]);
 
 			diff_chart = document.getElementById('diff_chart');
+			gasLimit_chart = document.getElementById('gasLimit_chart');
+			gasUsed_chart = document.getElementById('gasUsed_chart');
+
 			
 			if (diff_chart) {
 				// console.log("diff_chart.data: " + JSON.stringify(diff_chart.data));
+				var layoutD = {
+					title: 'Difficulty',
+					yaxis: {title: 'Difficulty of Block'},
+				};
 
 				if (diff_chart.data) {
 					var found = diff_chart.data[0].x.find((el) => {
 						return el == data[0].number;
 					});
-
-					var layoutD = {
-						title: 'Difficulty',
-						yaxis: {title: 'Difficulty of Block'},
-					};
 
 					// console.log("FOUND: " + found);
 					if (found) {
@@ -83,7 +85,141 @@ $(document).on('ready', function() {
 				}
 			}
 
+			if (gasLimit_chart) {
+				// console.log("diff_chart.data: " + JSON.stringify(diff_chart.data));
+				var layoutD1 = {
+					title: 'Gas Limit',
+					yaxis: {title: 'gas'},
+				};
 
+				if (gasLimit_chart.data) {
+					var found = gasLimit_chart.data[0].x.find((el) => {
+						return el == data[0].number;
+					});
+
+					// console.log("FOUND: " + found);
+					if (found) {
+						console.log("ALREADY IN");
+					} else {
+						var blockN1 = [];
+						blockN1 = gasLimit_chart.data[0].x;
+						var diffN1 = [];
+						diffN1 = gasLimit_chart.data[0].y;
+
+						// console.log("BLOCK TO PUSH: " + blockN);
+						// console.log("DIFF TO PUSH: " + diffN);
+						blockN1.push(data[0].number);
+						diffN1.push(data[0].gasLimit);
+
+						if (blockN1.length > 10) {
+							blockN1.shift();
+							diffN1.shift();
+						}
+						// console.log("AFTER    BLOCK TO PUSH: " + blockN);
+						// console.log("AFTER    DIFF TO PUSH: " + diffN);
+						
+						var data_update1 = {
+						    x: blockN1,
+						    y: diffN1,
+							name: 'Gas Limit',
+				  			type: 'bar'
+						};
+
+						var dataD1 = [data_update1];
+						// console.log("NEW DATA TO PUSH: " + JSON.stringify(dataD));
+
+						Plotly.update('gasLimit_chart', dataD1, layoutD1);
+
+						// Plotly.plot('diff_chart', dataD, layoutD);
+					}
+				} else {					
+					console.log("INIT CHART");
+					block1 = [];
+					diff1 = [];
+
+					block1.push(data[0].number);
+					diff1.push(data[0].gasLimit);
+
+					var trace1D = {
+					  	x: block1,
+						y: diff1,
+						name: 'Gas Limit',
+			  			type: 'bar'
+					};
+
+					var dataD1 = [trace1D];
+
+					Plotly.plot('gasLimit_chart', dataD1, layoutD1);
+				}
+			}
+
+			if (gasUsed_chart) {
+				// console.log("diff_chart.data: " + JSON.stringify(diff_chart.data));
+				var layoutD2 = {
+					title: 'Gas Used',
+					yaxis: {title: 'gas'},
+				};
+
+				if (gasUsed_chart.data) {
+					var found = gasUsed_chart.data[0].x.find((el) => {
+						return el == data[0].number;
+					});
+
+					// console.log("FOUND: " + found);
+					if (found) {
+						console.log("ALREADY IN");
+					} else {
+						var blockN2 = [];
+						blockN2 = gasUsed_chart.data[0].x;
+						var diffN2 = [];
+						diffN2 = gasUsed_chart.data[0].y;
+
+						// console.log("BLOCK TO PUSH: " + blockN);
+						// console.log("DIFF TO PUSH: " + diffN);
+						blockN2.push(data[0].number);
+						diffN2.push(data[0].gasLimit);
+
+						if (blockN2.length > 10) {
+							blockN2.shift();
+							diffN2.shift();
+						}
+						// console.log("AFTER    BLOCK TO PUSH: " + blockN);
+						// console.log("AFTER    DIFF TO PUSH: " + diffN);
+						
+						var data_update2 = {
+						    x: blockN2,
+						    y: diffN2,
+							name: 'Gas Used',
+				  			type: 'bar'
+						};
+
+						var dataD2 = [data_update2];
+						// console.log("NEW DATA TO PUSH: " + JSON.stringify(dataD));
+
+						Plotly.update('gasUsed_chart', dataD2, layoutD2);
+
+						// Plotly.plot('diff_chart', dataD, layoutD);
+					}
+				} else {					
+					console.log("INIT CHART");
+					block2 = [];
+					diff2 = [];
+
+					block2.push(data[0].number);
+					diff2.push(data[0].gasUsed);
+
+					var traceD2 = {
+					  	x: block2,
+						y: diff2,
+						name: 'Gas Used',
+			  			type: 'bar'
+					};
+
+					var dataD2 = [traceD2];
+
+					Plotly.plot('gasUsed_chart', dataD2, layoutD2);
+				}
+			}
 
 
 		});

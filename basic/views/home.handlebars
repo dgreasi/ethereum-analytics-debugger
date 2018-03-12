@@ -334,11 +334,6 @@
     {{#if gasPerBlock}}
       <div id="gas_per_block_chart" data-for="{{gasPerBlock}}" class="center"></div>
     {{/if}}
-
-    <div id="diff_chart" class="center"></div>
-
-
-    {{!-- <div id="bids_chart" class="center"></div> --}}
     
 
     {{!-- BLOCKS START/END --}}
@@ -727,7 +722,18 @@
       </table>
     {{/if}}
 
- 
+    {{!-- LIVE CHARTS --}}
+    <div class="center_live">
+      <div id="diff_chart" class="size_live_chart"></div>
+
+      {{!-- <div id="bids_chart" class="center"></div> --}}
+
+      <div id="gasLimit_chart" class="size_live_chart"></div>
+
+      <div id="gasUsed_chart" class="size_live_chart"></div>
+    </div>
+
+
     {{!-- <div>
       <h2 style="color: red;">
         <b>No transactions from this account at the specified blocks<b/>
