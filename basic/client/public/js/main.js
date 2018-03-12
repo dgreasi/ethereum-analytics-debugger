@@ -15,6 +15,8 @@ $(document).on('ready', function() {
 			diff_chart = document.getElementById('diff_chart');
 			gasLimit_chart = document.getElementById('gasLimit_chart');
 			gasUsed_chart = document.getElementById('gasUsed_chart');
+			ts_number_chart = document.getElementById('ts_number_chart');
+
 
 			
 			if (diff_chart) {
@@ -156,7 +158,7 @@ $(document).on('ready', function() {
 			if (gasUsed_chart) {
 				// console.log("diff_chart.data: " + JSON.stringify(diff_chart.data));
 				var layoutD2 = {
-					title: 'Gas Used',
+					title: 'Gas Spending',
 					yaxis: {title: 'gas'},
 				};
 
@@ -177,7 +179,7 @@ $(document).on('ready', function() {
 						// console.log("BLOCK TO PUSH: " + blockN);
 						// console.log("DIFF TO PUSH: " + diffN);
 						blockN2.push(data[0].number);
-						diffN2.push(data[0].gasLimit);
+						diffN2.push(data[0].gasUsed);
 
 						if (blockN2.length > 10) {
 							blockN2.shift();
@@ -218,6 +220,74 @@ $(document).on('ready', function() {
 					var dataD2 = [traceD2];
 
 					Plotly.plot('gasUsed_chart', dataD2, layoutD2);
+				}
+			}
+
+			if (ts_number_chart) {
+				// console.log("diff_chart.data: " + JSON.stringify(diff_chart.data));
+				var layoutD3 = {
+					title: 'Transactions',
+					yaxis: {title: '# of ts'},
+				};
+
+				if (ts_number_chart.data) {
+					var found = ts_number_chart.data[0].x.find((el) => {
+						return el == data[0].number;
+					});
+
+					// console.log("FOUND: " + found);
+					if (found) {
+						console.log("ALREADY IN");
+					} else {
+						var blockN3 = [];
+						blockN3 = ts_number_chart.data[0].x;
+						var diffN3 = [];
+						diffN3 = ts_number_chart.data[0].y;
+
+						// console.log("BLOCK TO PUSH: " + blockN);
+						// console.log("DIFF TO PUSH: " + diffN);
+						blockN3.push(data[0].number);
+						diffN3.push(data[0].transcations.length);
+
+						if (blockN3.length > 10) {
+							blockN3.shift();
+							diffN3.shift();
+						}
+						// console.log("AFTER    BLOCK TO PUSH: " + blockN);
+						// console.log("AFTER    DIFF TO PUSH: " + diffN);
+						
+						var data_update3 = {
+						    x: blockN3,
+						    y: diffN3,
+							name: '# of ts',
+				  			type: 'bar'
+						};
+
+						var dataD3 = [data_update3];
+						// console.log("NEW DATA TO PUSH: " + JSON.stringify(dataD));
+
+						Plotly.update('ts_number_chart', dataD3, layoutD3);
+
+						// Plotly.plot('diff_chart', dataD, layoutD);
+					}
+				} else {					
+					console.log("INIT CHART");
+					block3 = [];
+					diff3 = [];
+
+					block3.push(data[0].number);
+					diff3.push(data[0].gasUsed);
+
+					var traceD3 = {
+					  	x: block3,
+						y: diff3,
+						name: '# of ts',
+			  			type: 'bar'
+					};
+
+					var dataD3 = [traceD3];
+
+					Plotly.plot('ts_number_chart', dataD3, layoutD3);
 				}
 			}
 

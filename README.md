@@ -13,7 +13,7 @@ geth --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100
 
 1) **Get Experiment** - ARGS: (Start block, End block, (?) Contract)
 
->This function will generate a table which contains the addresses of the accounts that made transactions through the specified range of blocks. Also a table will be generated, if there are silent bugs, which will contain the transaction in which occurred the bug. Silent Bugs: a transaction that was mined but didn't execute the code of the contract because of insufficient gas, also know as Rolled Back transactions.
+>This function will generate a table which contains the addresses of the accounts that made transactions through the specified range of blocks. Also a table will be generated, if there are silent bugs, which will contain the transaction in which occurred the bug. Silent Bugs: a transaction that was mined but didn't execute the code of the contract because of insufficient gas, gasless send unexisted address of function, a command throw, the reached call stack limit. Such transactions are also known as Rolled Back transactions.
 
 Each line contains: 
 - (address of account)
