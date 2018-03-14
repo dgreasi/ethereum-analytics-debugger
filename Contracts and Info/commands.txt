@@ -38,6 +38,9 @@ ssh mgdfoti@10.96.12.80
 ```
 geth --datadir /home/ubuntu/tmp/eth/1923/00 init /home/ubuntu/tmp/eth/1923/genesis.json
 geth --datadir /home/mgdfoti/tmp/eth/1923/00 init /home/mgdfoti/tmp/eth/1923/genesis.json
+
+geth --datadir /home2/mgdfoti/tmp/eth/1923/00 init /home2/mgdfoti/tmp/eth/1923/genesis.json
+
 ```
 
 1.3) Start central node:
@@ -152,20 +155,23 @@ geth --datadir /home2/mgdfoti/tmp/eth/1923/00 --identity mynode-00 --unlock '0' 
 
 ######################################################################################################
 
-geth --bootnodes enode://8009c590a7483af4b4a938b0bd84e2172663e1e111f4790352e508143cb693013da20b575489856a3b3c90793a01d353e217aa04c452c49e92657470b9a2ce1c@11.10.1.1:30299,enode://7081726e1d93378897626a13f79944ddba061a6450d9c8a228099702362984eb1df41aee2d0dece2e7a93eeee2b8e09ad9cf283cb64affe174e60c6aa7a2aef4@11.10.1.2:30299 --datadir /home2/mgdfoti/tmp/eth/1923/00 --identity mynode-00-79 --unlock '0' --password <(echo 0) --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr=11.10.1.3 --rpccorsdomain "*" --ipcpath /home2/mgdfoti/tmp/eth/1923/00/geth.ipc --networkid 1923 --mine --minerthreads 4 --cache 1024 --maxpeers 400 --targetgaslimit 9000000000000 console
 
-geth --bootnodes enode://8009c590a7483af4b4a938b0bd84e2172663e1e111f4790352e508143cb693013da20b575489856a3b3c90793a01d353e217aa04c452c49e92657470b9a2ce1c@11.10.1.1:30299,enode://2a090b460fb557a6475fdacd29b85d81588df81bfba1de25a9a88705159322cdf93a183afe2902388c2dd1af2a71db129ee1d7ee0f19b5ee4bcd1074cda3430b@11.10.1.3:30299 --datadir /home2/mgdfoti/tmp/eth/1923/00 --identity mynode-00-79 --unlock '0' --password <(echo 0) --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr=11.10.1.2 --rpccorsdomain "*" --ipcpath /home2/mgdfoti/tmp/eth/1923/00/geth.ipc --networkid 1923 --mine --minerthreads 4 --cache 1024 --maxpeers 400 --targetgaslimit 9000000000000 console
+/home/mgdfoti/mygeth/bin/geth --bootnodes enode://f254a7b9c54c7352074b571b67e5b4d8977bd381ff639f8fbd4502c88a48811793e725cca94d5501b94c93e44abbd401f4d16f66571ef5e23589827353cf28b7@11.10.1.3:30299,enode://5b01aea0cb77fbb80d6ec0cd9fc456ae2ef53dd966229326a39b972dac51165c601a97bba32f1c32c8aee4878bcd4fd5eec3c159719e33f2e8d8e3afa8073ae8@11.10.1.2:30299 --datadir /home2/mgdfoti/tmp/eth/1923/00 --identity mynode-00-69 --unlock '0' --password <(echo 0) --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr=11.10.1.1 --rpccorsdomain "*" --ipcpath /home2/mgdfoti/tmp/eth/1923/00/geth.ipc --networkid 1923 --syncmode full --gcmode=archive --mine --minerthreads 4 --cache 1024 --maxpeers 400 --targetgaslimit 9000000000000 console
 
-geth --datadir /home2/mgdfoti/tmp/eth/1923/00 --identity mynode-00-80 --unlock '0' --password <(echo 0) --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr=11.10.1.1 --rpccorsdomain "*" --ipcpath /home2/mgdfoti/tmp/eth/1923/00/geth.ipc --networkid 1923 --mine --minerthreads 4 --cache 1024 --maxpeers 400 --targetgaslimit 9000000000000 console
+/home/mgdfoti/mygeth/bin/geth --bootnodes enode://f254a7b9c54c7352074b571b67e5b4d8977bd381ff639f8fbd4502c88a48811793e725cca94d5501b94c93e44abbd401f4d16f66571ef5e23589827353cf28b7@11.10.1.3:30299,enode://13026c0cb3e913312f0cae21d95a8ff3e079ba80da9a395905f8a0624c494224b4c151198e307fdbb1ad4d6329e528263a5e73779eca82652df36a9d1fa0cfe6@11.10.1.1:30299 --datadir /home2/mgdfoti/tmp/eth/1923/00 --identity mynode-00-80 --unlock '0' --password <(echo 0) --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr=11.10.1.2 --rpccorsdomain "*" --ipcpath /home2/mgdfoti/tmp/eth/1923/00/geth.ipc --networkid 1923 --syncmode full --gcmode=archive --mine --minerthreads 4 --cache 1024 --maxpeers 400 --targetgaslimit 9000000000000 console
+
+
+/home/mgdfoti/mygeth/bin/geth --bootnodes enode://5b01aea0cb77fbb80d6ec0cd9fc456ae2ef53dd966229326a39b972dac51165c601a97bba32f1c32c8aee4878bcd4fd5eec3c159719e33f2e8d8e3afa8073ae8@11.10.1.2:30299,enode://13026c0cb3e913312f0cae21d95a8ff3e079ba80da9a395905f8a0624c494224b4c151198e307fdbb1ad4d6329e528263a5e73779eca82652df36a9d1fa0cfe6@11.10.1.1:30299  --datadir /home2/mgdfoti/tmp/eth/1923/00 --identity mynode-00-79 --unlock '0' --password <(echo 0) --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr=11.10.1.3 --rpccorsdomain "*" --ipcpath /home2/mgdfoti/tmp/eth/1923/00/geth.ipc --networkid 1923 --syncmode full --gcmode=archive --mine --minerthreads 4 --cache 1024 --maxpeers 400 --targetgaslimit 9000000000000 console
+
 
 VM 69:
-enode://8009c590a7483af4b4a938b0bd84e2172663e1e111f4790352e508143cb693013da20b575489856a3b3c90793a01d353e217aa04c452c49e92657470b9a2ce1c@11.10.1.1:30299
+enode://13026c0cb3e913312f0cae21d95a8ff3e079ba80da9a395905f8a0624c494224b4c151198e307fdbb1ad4d6329e528263a5e73779eca82652df36a9d1fa0cfe6@11.10.1.1:30299
 
 VM 79:
-enode://2a090b460fb557a6475fdacd29b85d81588df81bfba1de25a9a88705159322cdf93a183afe2902388c2dd1af2a71db129ee1d7ee0f19b5ee4bcd1074cda3430b@11.10.1.3:30299
+enode://f254a7b9c54c7352074b571b67e5b4d8977bd381ff639f8fbd4502c88a48811793e725cca94d5501b94c93e44abbd401f4d16f66571ef5e23589827353cf28b7@11.10.1.3:30299
 
 VM 80:
-enode://7081726e1d93378897626a13f79944ddba061a6450d9c8a228099702362984eb1df41aee2d0dece2e7a93eeee2b8e09ad9cf283cb64affe174e60c6aa7a2aef4@11.10.1.2:30299
+enode://5b01aea0cb77fbb80d6ec0cd9fc456ae2ef53dd966229326a39b972dac51165c601a97bba32f1c32c8aee4878bcd4fd5eec3c159719e33f2e8d8e3afa8073ae8@11.10.1.2:30299
 
 FIREWALL:
 sudo ufw allow from 10.96.12.69

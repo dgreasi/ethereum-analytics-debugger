@@ -247,7 +247,7 @@ $(document).on('ready', function() {
 						// console.log("BLOCK TO PUSH: " + blockN);
 						// console.log("DIFF TO PUSH: " + diffN);
 						blockN3.push(data[0].number);
-						diffN3.push(data[0].transcations.length);
+						diffN3.push(data[0].transactions.length);
 
 						if (blockN3.length > 10) {
 							blockN3.shift();
