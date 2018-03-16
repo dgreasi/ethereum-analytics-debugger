@@ -38,10 +38,6 @@ module.exports = {
   ////////// Get only transactions that are calls to functions of a Contract /////
   ///////////// IE a send Gas transaction will not be shown here /////////////////
   getAccountTransactionsGasSpentClearings: function(startBlockNumber, endBlockNumber, contract_arg, nickname) {
-    // if (contract_arg != "") {
-    //   previous_contracts_accounts.push(contract_arg);
-      // console.log("Contract_arg: " + JSON.stringify(contract_arg));
-    // }
 
     return new Promise((resolve, reject) => {
 
@@ -74,14 +70,9 @@ module.exports = {
           dbBlocks.sort(function(a, b) {
             return a.number - b.number;
           });
- 
-          accounts = [];
-          check = this.searchFor(startBlockNumber);
-          var block;
-          for (var i = 0; i <= endBlockNumber - startBlockNumber; i++) {
-            block = dbBlocks[check+i]
 
-            if (block != null && block.transactions != null) {
+          blocks.forEach(bl => {
+            if (bl != null && bl.transactions != null) {
               // console.log("Block with transactions");
 
               if (contract_arg != "") {
@@ -89,13 +80,13 @@ module.exports = {
                 this.addToHistory(onj);
                     console.log("Call with contract_arg");
                 
-                block.transactions.forEach(e => {
+                bl.transactions.forEach(e => {
                   if ((e.input != "0x") && (e.to == contract_arg)) {
                     receiptsPromises.push(this.getTransactionReceiptFun(e));
                   }
                 });
               } else {
-                block.transactions.forEach(e => {
+                bl.transactions.forEach(e => {
                   if (e.input != "0x") {
                     // console.log("Call WITHOUT contract_arg");
                     receiptsPromises.push(this.getTransactionReceiptFun(e));
@@ -103,7 +94,7 @@ module.exports = {
                 });
               }
             }
-          }
+          });
 
           Promise.all(receiptsPromises).then(res => {
             // SAVE TO DB
@@ -436,6 +427,55 @@ module.exports = {
 
           resolve(startEndGasPerBlock);
 
+        }).catch(err => {
+          console.log("ERROR getBlockPromises: " + err);
+          reject(err);
+        });
+      }).catch(err => {
+        console.log("ERROR getBlockNumber: " + err);
+        reject(err);
+      });
+
+    });
+  },
+
+  getBalancePerBlockOfAccount: function(startBlockNumber, endBlockNumber, account, nickname) {
+    return new Promise((resolve, reject) => {
+
+      var getBlockPromises = [];
+      // var receiptsPromises = [];
+      var blockNumberPromise = web3.eth.getBlockNumber();
+
+      blockNumberPromise.then(res => {
+        this.checkStartEndInput(startBlockNumber, endBlockNumber, res);
+        startBlockNumber = start;
+        endBlockNumber = end;
+
+        // console.log("Using startBlockNumber: " + startBlockNumber);
+        // console.log("Using endBlockNumber: " + endBlockNumber);
+
+        for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+          // check = this.searchFor(i);
+          // console.log("CHECK: " + check);
+          
+          // if (check == -1) { // DOESN'T EXIST
+            // var getBlock = web3.eth.getBlock(i, true);
+            getBlockPromises.push(this.getBalance(account, i));
+          // }
+
+        }
+
+        Promise.all(getBlockPromises).then(blocks => {
+          // SAVE TO DB
+
+          // console.log("JSON: " + JSON.stringify(blocks));
+
+          startEndBalancePerBlock = [start, end];
+
+          startEndBalancePerBlock.push(blocks);
+
+          resolve(startEndBalancePerBlock);
+          
         }).catch(err => {
           console.log("ERROR getBlockPromises: " + err);
           reject(err);
@@ -1174,17 +1214,29 @@ module.exports = {
     }
   },
 
-  getBalance: function(account) {
+  getBalance: function(account, block) {
     return new Promise((resolve, reject) => {
-      web3.eth.getBalance(account).then(res => {
-        if (res != null) {
-          // console.log("PAOK");
-          resolve(res);
-        }
-      }).catch(err => {
-        console.log("ERROR getBalance: " + err);
-        reject(err);
-      });
+      if (block) {
+        web3.eth.getBalance(account, block).then(res => {
+          if (res != null) {
+            // console.log("PAOK");
+            resolve([block, res]);
+          }
+        }).catch(err => {
+          console.log("ERROR getBalance: " + err);
+          reject(err);
+        });
+      } else {
+        web3.eth.getBalance(account).then(res => {
+          if (res != null) {
+            // console.log("PAOK");
+            resolve(res);
+          }
+        }).catch(err => {
+          console.log("ERROR getBalance: " + err);
+          reject(err);
+        });
+      }
       
     });
   },

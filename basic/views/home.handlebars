@@ -124,6 +124,15 @@
         <span class="glyphicon glyphicon-stats"></span>
       </button>
 
+      <button class="btn btn-default red_btn" id="get_balance_account_per_block" title="Address + Blocks => Chart">
+        Get Balance of Account per block
+        <span class="glyphicon glyphicon-exclamation-sign"></span>
+        <span class="glyphicon glyphicon glyphicon-plus-sign green_btn"></span>
+        <span class="glyphicon glyphicon-hdd"></span>
+        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
+        <span class="glyphicon glyphicon-stats"></span>
+      </button>
+
       <button class="btn btn-default red_btn" id="get_transactions_per_block" title="Blocks => Chart">
         Get Transactions Per Block
         <span class="glyphicon glyphicon-hdd"></span>
@@ -333,6 +342,11 @@
     {{!-- GET GAS PER BLOCK --}}
     {{#if gasPerBlock}}
       <div id="gas_per_block_chart" data-for="{{gasPerBlock}}" class="center"></div>
+    {{/if}}
+
+    {{!-- GET BALANCE OF ACCOUNT PER BLOCK --}}
+    {{#if balanceArray}}
+      <div id="balance_of_account_per_block_chart" data-for="{{balanceArray}}" class="center"></div>
     {{/if}}
     
 

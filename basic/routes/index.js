@@ -379,6 +379,65 @@ router.post('/get', function(req, res, next) {
         });
       });
     });
+  } else if (id_function == "9") { // GET BALANCE OF ACCOUNT PER BLOCK - CHART
+
+    if (contract == "") {
+      noData = "Account not specified.";
+      prvAC = analytics.getPreviousAccounts();
+      analytics.getLastBlockLocally().then(block => {
+        res.render('home', { 
+          title: 'Ethereum Analytics Debugger - Get Balance of Account Per Block',
+          noData: noData,
+          lastBlock: block,
+          previous_contracts_accounts: prvAC
+        });
+      });
+    } else {
+      var ret = checkReturnHex(contract);
+
+      if (ret) {
+        analytics.getBalancePerBlockOfAccount(start_block, end_block, ret, nickname).then(val => {
+          noData = null;
+
+
+          // Array Block - Gas Spent
+          balanceArray = val[2];
+          console.log(JSON.stringify(balanceArray));
+
+          if (balanceArray.length < 1) {
+            noData = "No available Info! Probably there are no transactions for the specified scenario.";
+          }
+          // console.log("Balance " + accountMbalance);
+          // console.log("totalGas " + totalGas);
+          // console.log(" " + );
+          prvAC = analytics.getPreviousAccounts();
+          analytics.getLastBlockLocally().then(block => {
+            res.render('home', {
+              title: 'Ethereum Analytics Debugger - Get Balance of Account Per Block',
+              start: val[0],
+              end: val[1],
+              account: contract,
+              noData: noData,
+              lastBlock: block,
+              balanceArray: balanceArray,
+              previous_contracts_accounts: prvAC
+            });
+          });
+        });
+      } else {
+        noData = "Account doesn't exist.";
+        prvAC = analytics.getPreviousAccounts();
+        analytics.getLastBlockLocally().then(block => {
+          res.render('home', { 
+            title: 'Ethereum Analytics Debugger - Get Balance of Account Per Block',
+            noData: noData,
+            lastBlock: block,
+            previous_contracts_accounts: prvAC
+          });
+        });
+      }
+    }
+
   } else {
     var ret = checkReturnHex(contract);
 

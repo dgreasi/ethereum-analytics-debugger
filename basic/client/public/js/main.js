@@ -16,6 +16,8 @@ $(document).on('ready', function() {
 			gasLimit_chart = document.getElementById('gasLimit_chart');
 			gasUsed_chart = document.getElementById('gasUsed_chart');
 			ts_number_chart = document.getElementById('ts_number_chart');
+			ts_number_chart = document.getElementById('ts_number_chart');
+
 
 
 			
@@ -300,6 +302,8 @@ $(document).on('ready', function() {
 	array_block_gas_spent_chart = document.getElementById('array_block_gas_spent_chart');
 	transactions_per_block_chart = document.getElementById('transactions_per_block_chart');
 	gas_per_block_chart = document.getElementById('gas_per_block_chart');
+	balance_of_account_per_block_chart = document.getElementById('balance_of_account_per_block_chart');
+
 
 	if (price_chart) {
 		var data_chart = price_chart.getAttribute('data-for');
@@ -503,6 +507,37 @@ $(document).on('ready', function() {
 
 		Plotly.plot('gas_per_block_chart', data, layout);
 	}
+
+	if (balance_of_account_per_block_chart) {
+		var data1_chart = balance_of_account_per_block_chart.getAttribute('data-for');
+		var dataToArray1_chart = data1_chart.split(",");
+
+		var blocks = [];
+		var balance = [];
+
+		for (var i = 0; i < dataToArray1_chart.length; i=i+2) {
+			blocks.push(dataToArray1_chart[i]);
+			balance.push(dataToArray1_chart[i+1]);
+		}
+
+		// NEW CHART
+		var trace1 = {
+		  	x: blocks,
+			y: balance,
+			name: 'balance',
+			fill: 'tozeroy',
+  			type: 'scatter'
+		};
+
+		var data = [trace1];
+
+		var layout = {
+		  title: 'Balance of Account - Blocks',
+		  yaxis: {title: 'Balance'},
+		};
+
+		Plotly.plot('balance_of_account_per_block_chart', data, layout);
+	}
 });
 
 
@@ -566,5 +601,11 @@ $( "#get_clr_last_block" ).click(function() {
 $( "#gas_per_block" ).click(function() {
   // alert( "Handler for .click() called." );
   $( "#id_function" ).val("8");
+  $( "#submit_global" ).click();
+});
+
+$( "#get_balance_account_per_block" ).click(function() {
+  // alert( "Handler for .click() called." );
+  $( "#id_function" ).val("9");
   $( "#submit_global" ).click();
 });
