@@ -71,30 +71,50 @@ module.exports = {
             return a.number - b.number;
           });
 
-          blocks.forEach(bl => {
+          accounts = [];
+          silentBugs = [];
+
+          check = this.searchFor(startBlockNumber);
+          for (var j = 0; j <= (endBlockNumber - startBlockNumber); j++) {
+            bl = dbBlocks[check+j];
             if (bl != null && bl.transactions != null) {
               // console.log("Block with transactions");
 
               if (contract_arg != "") {
                 var onj = new Object({hex: contract_arg, name: (nickname ? nickname : contract_arg)});
                 this.addToHistory(onj);
-                    console.log("Call with contract_arg");
+                // console.log("Call with contract_arg");
                 
+                var ts = null;
+
                 bl.transactions.forEach(e => {
-                  if ((e.input != "0x") && (e.to == contract_arg)) {
-                    receiptsPromises.push(this.getTransactionReceiptFun(e));
+                  ts = this.searchTsInfoDbElement(e);
+
+                  if (ts == null) {
+                    if ((e.input != "0x") && (e.to == contract_arg)) {
+                      receiptsPromises.push(this.getTransactionReceiptFun(e));
+                    }
+                  } else {
+                    receiptsPromises.push(this.createTableFromTxReceipt(ts));
                   }
                 });
               } else {
+                var ts = null;
                 bl.transactions.forEach(e => {
-                  if (e.input != "0x") {
-                    // console.log("Call WITHOUT contract_arg");
-                    receiptsPromises.push(this.getTransactionReceiptFun(e));
+                  ts = this.searchTsInfoDbElement(e);
+                  // console.log("TS DB: " + ts);
+                  if (ts == null) {
+                    if (e.input != "0x") {
+                      receiptsPromises.push(this.getTransactionReceiptFun(e));
+                    }
+                  } else {
+                    // console.log("GETTING FROM DB");
+                    receiptsPromises.push(this.createTableFromTxReceipt(ts));
                   }
                 });
               }
             }
-          });
+          }
 
           Promise.all(receiptsPromises).then(res => {
             // SAVE TO DB
@@ -455,13 +475,7 @@ module.exports = {
         // console.log("Using endBlockNumber: " + endBlockNumber);
 
         for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-          // check = this.searchFor(i);
-          // console.log("CHECK: " + check);
-          
-          // if (check == -1) { // DOESN'T EXIST
-            // var getBlock = web3.eth.getBlock(i, true);
-            getBlockPromises.push(this.getBalance(account, i));
-          // }
+          getBlockPromises.push(this.getBalance(account, i));
 
         }
 
@@ -608,9 +622,10 @@ module.exports = {
   getTransactionReceiptFun: function(tx) {
     return new Promise((resolve, reject) => {
       web3.eth.getTransactionReceipt(tx.hash).then(res => {
-        // dbTransRec.push(res);
+        dbTransInfo.push(res);
 
         if (res != null) {
+          res.gas = tx.gas;
           // console.log("EXECUTING");
           check = this.searchForSilentBugs(tx.hash);
           if (check == -1) {
@@ -623,12 +638,29 @@ module.exports = {
           this.saveAccountTransactionsSpentGas(res.from, res.gasUsed).then(res => {
             resolve(res);
           });
-        }  
+        }
       }).catch(err => {
         console.log("ERROR getTransactionReceipt: " + err);
         reject(err);
       });
     });
+  },
+
+  createTableFromTxReceipt: function(txRec) {
+    return new Promise((resolve, reject) => {
+      check = this.searchForSilentBugs(txRec.transactionHash);
+      if (check == -1) {
+        if (txRec.gas == txRec.gasUsed) {
+          // console.log("FOUND NEW SILENT BUG");
+          silentBugs.push([txRec.transactionHash, txRec.gas, txRec.gasUsed]);
+        }
+      }
+
+      this.saveAccountTransactionsSpentGas(txRec.from, txRec.gasUsed).then(res => {
+        resolve(res);
+      });
+      
+    })
   },
 
   saveAccountTransactionsSpentGas: function(account, gas) {
@@ -991,6 +1023,16 @@ module.exports = {
   searchTsInfoDB: function(ts) {
     // console.log("A: " +JSON.stringify(dbBlocks));
     var rt = dbTransInfo.findIndex(element => {
+      return element.transactionHash == ts.hash;
+    });
+
+    // console.log("RETUNR: " + rt);
+    return rt;
+  },
+
+  searchTsInfoDbElement: function(ts) {
+    // console.log("A: " +JSON.stringify(dbBlocks));
+    var rt = dbTransInfo.find(element => {
       return element.transactionHash == ts.hash;
     });
 

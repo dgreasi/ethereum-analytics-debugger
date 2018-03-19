@@ -163,6 +163,15 @@ router.post('/get', function(req, res, next) {
       var start = val[0][0];
       var end = val[0][1];
       val.shift();
+      
+      var avgTs= 0;
+
+      val.forEach(bl => {
+        avgTs += bl[1];
+      });
+
+      avgTs = avgTs /(end - start);
+
       prvAC = analytics.getPreviousAccounts();
       analytics.getLastBlockLocally().then(block => {
         res.render('home', { 
@@ -172,6 +181,7 @@ router.post('/get', function(req, res, next) {
           transactionsPerBlock: val,
           noData: noData,
           lastBlock: block,
+          averageTsPerBlock: avgTs,
           previous_contracts_accounts: prvAC
         });
       });
@@ -402,7 +412,7 @@ router.post('/get', function(req, res, next) {
 
           // Array Block - Gas Spent
           balanceArray = val[2];
-          console.log(JSON.stringify(balanceArray));
+          // console.log(JSON.stringify(balanceArray));
 
           if (balanceArray.length < 1) {
             noData = "No available Info! Probably there are no transactions for the specified scenario.";

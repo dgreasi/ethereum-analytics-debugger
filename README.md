@@ -11,6 +11,10 @@ geth --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100
 
 ## Basic Functions
 
+0) **Live Chart** - ARGS: ()
+
+> This function its automatically called every three seconds and creates 4 live charts. Each chart demonstrate the return objects for a window of 10 blocks. 1) Difficulty per Block, 2) Gas Limit per Block 3) Number of Transactions per Block 4) Gas Spend per Block
+
 1) **Get Experiment** - ARGS: (Start block, End block, (?) Contract)
 
 >This function will generate a table which contains the addresses of the accounts that made transactions through the specified range of blocks. Also a table will be generated, if there are silent bugs, which will contain the transaction in which occurred the bug. Silent Bugs: a transaction that was mined but didn't execute the code of the contract because of insufficient gas, gasless send unexisted address of function, a command throw, the reached call stack limit. Such transactions are also known as Rolled Back transactions.
@@ -49,31 +53,37 @@ Each line contains:
 
 ![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/gas_spent_chart_1.png?raw=true "Gas Limit per Block")
 
-6) **Get Transactions Per Blocks** - ARGS: (Start block, End block)
+6) **Get Balance of Account Per Block** - ARGS: (Start block, End block, Account)
+
+>This function will generate a chart that contains the number of transactions on each block which makes easier to monitor your experiment.
+
+![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/balance_of_account_per_block.png?raw=true "Balance of Account per Block")
+
+7) **Get Transactions Per Blocks** - ARGS: (Start block, End block)
 
 >This function will generate a chart that contains the number of transactions on each block which makes easier to monitor your experiment.
 
 ![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/transactions_per_block.png?raw=true "Ts per Block")
 
-7) **Get Block** - ARGS: (Number of Block)
+8) **Get Block** - ARGS: (Number of Block)
 
 >This function returns all the available information about the specified block
 
 ![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/get_block.png?raw=true "Block Info")
 
-8) **Get Transaction** - ARGS: (Hash of Transaction)
+9) **Get Transaction** - ARGS: (Hash of Transaction)
 
 >This function will return all the info available for the specified hash of the transaction.
 
 ![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/transaction_info.png?raw=true "Transaction Info")
 
-9) **Get Account Info** - ARGS: (Start block, End block, Account)
+10) **Get Account Info** - ARGS: (Start block, End block, Account)
 
 >This function will return basic info of the specified account such as his balance and the total number of transactions. It also returns a table with the transactions of the account through the specified range of blocks.
 
 ![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/get_account_info.png?raw=true "Account Info")
 
-10) **Get Number of Peers** - ARGS: ()
+11) **Get Number of Peers** - ARGS: ()
 
 > This function returns the number of peers of the ethereum node that we are connected on.
 
