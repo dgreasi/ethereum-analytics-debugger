@@ -49,7 +49,7 @@ var server = app.listen(3000, function () {
 
 });
 
-// SET TIMOUT TIME TO 3 MINUTES FOR BIG REQUESTS
-// server.timeout = 180000;
+// SET TIMOUT TIME TO 4 MINUTES FOR BIG REQUESTS
+server.timeout = 1240000;
 
 module.exports = app;

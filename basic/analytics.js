@@ -21,6 +21,10 @@ var previous_contracts_accounts = []; //history of contracts-accounts searched
 var contract = "0x368cbd3514a671e3a6c7d5ca865576a6face12fc";
 // var contract = "0xf176c2f03773b63A6e3659423D7380bFA276Dcb3";
 
+var account1 = '0xad56cedb7d9ee48b3b93f682a9e2d87f80221768';
+var account2 = '0x3d7979d2d4f1e4b56d4c70f8259b52504e84d655';
+var account3 = '0xcdeca34ae13ce333bb120bec9aea6b7eedb94284';
+
 var accountOfCentralNode = "0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768";
 
 var start = 1;
@@ -309,6 +313,10 @@ module.exports = {
             var gasSpentBlock = []; // Block - Gas Spent
             var totalGasSpent = 0;
             account = account.toUpperCase();
+            // account1 = account1.toUpperCase();
+            // account2 = account2.toUpperCase();
+            // account3 = account3.toUpperCase();
+
 
             // GET POS of start Block in the saved Blocks
             check = this.searchFor(start);
@@ -622,6 +630,8 @@ module.exports = {
   getTransactionReceiptFun: function(tx) {
     return new Promise((resolve, reject) => {
       web3.eth.getTransactionReceipt(tx.hash).then(res => {
+        res.input = tx.input;
+        res.gasPrice = tx.gasPrice;
         dbTransInfo.push(res);
 
         if (res != null) {
