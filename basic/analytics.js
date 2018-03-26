@@ -49,56 +49,27 @@ module.exports = {
         endBlockNumber = end;
 
         var steps = this.getSteps(startBlockNumber, endBlockNumber);
-        // console.log(JSON.stringify(steps));
-        const stepPromises = [];
-        var allPromises = [];
 
+        var stepCalls = [];
         for (var i = 0; i < steps.length - 1; i++) {
-          if (i < steps.length -2) {
-            stepPromises.push(this.sync(steps[i], steps[i+1]-1));
-          } else {
-            stepPromises.push(this.sync(steps[i], steps[i+1]));              
-          }
+          ((i) => {
+            if (i < steps.length -2) {
+              stepCalls.push(() => this.sync(steps[i], steps[i+1]-1));
+            } else {
+              stepCalls.push(() => this.sync(steps[i], steps[i+1]));
+            }
+          })(i);
         }
 
-        const results = [];
-        const mySeriesPromise = stepPromises.reduce(function(acc, crnt) {
-          return acc.then(crnt.then(result => results.push(result)));
-        }, Promise.resolve()).then(() => {
-          // var numOfTs = 0;
-          // dbBlocks.forEach(bl => {
-          //   numOfTs += bl.transactions.length;
-          // });
-          // console.log("NUM of TS: " + numOfTs);
+        const mySeriesPromise = stepCalls.reduce(
+          (acc, crnt) => acc.then(() => crnt()),
+          Promise.resolve()
+        );
+
+        mySeriesPromise.then(r => {
           endStartAccount = [start, end];
           resolve(endStartAccount);
-          return results;
         });
-
-        // mySeriesPromise.then(r => {
-        //   console.log("END DB BLOCKS LENGTH: " + dbBlocks.length);
-        //   console.log("END DB Trans Receipts LENGTH: " + dbTransInfo.length);
-        //   var numOfTs = 0;
-        //   dbBlocks.forEach(bl => {
-        //     numOfTs += bl.transactions.length;
-        //   });
-        //   console.log("NUM of TS: " + numOfTs);
-        //   endStartAccount = [start, end];
-        //   resolve(endStartAccount);
-        // });
-
-        // Promise.all(stepPromises).then(r => {
-        //   console.log("END DB BLOCKS LENGTH: " + dbBlocks.length);
-        //   console.log("END DB Trans Receipts LENGTH: " + dbTransInfo.length);
-        //   var numOfTs = 0;
-        //   dbBlocks.forEach(bl => {
-        //     numOfTs += bl.transactions.length;
-        //   });
-        //   console.log("NUM of TS: " + numOfTs);
-
-        //   endStartAccount = [start, end];
-        //   resolve(endStartAccount);
-        // });
 
       }).catch(err => {
         console.log("ERROR sync: " + err);
@@ -114,22 +85,13 @@ module.exports = {
 
       this.syncBlocks(startBlockNumber, endBlockNumber).then(rs => {
         this.syncTsReceipts(startBlockNumber, endBlockNumber).then(rsT => {
-          // console.log("SYNC COMPLETE");
-          // console.log(JSON.stringify(dbBlocks));
-          // console.log(JSON.stringify(dbTransInfo));
 
           console.log("IN PROMISE CALL: " + startBlockNumber + " - " + endBlockNumber);
           console.log("DB BLOCKS LENGTH: " + dbBlocks.length);
           console.log("DB Trans Receipts LENGTH: " + dbTransInfo.length);
-          console.log(" "); 
+          console.log(" ");
 
-          endStartAccount = [start, end];
-          // endStartAccount.push(rsT);
-          // endStartAccount.push(silentBugs);
-          // setTimeout
-          // console.log("RESOLVING");
-
-          resolve(endStartAccount);
+          resolve(true);
         });
       });
 
@@ -149,7 +111,7 @@ module.exports = {
           var getBlock = web3.eth.getBlock(i, true);
           getBlockPromises.push(getBlock);
         } else {
-          console.log("BLOCK EXISTS ALREADY");
+          // console.log("BLOCK EXISTS ALREADY");
         }
 
       }
@@ -160,7 +122,6 @@ module.exports = {
         dbBlocks.sort(function(a, b) {
           return a.number - b.number;
         });
-        // console.log("RESOLVE dbBlocks");
 
         resolve(dbBlocks);
       }).catch(err => {

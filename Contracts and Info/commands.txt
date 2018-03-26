@@ -53,8 +53,8 @@ geth --datadir /home/ubuntu/tmp/eth/1923/00 --identity mynode-00 --unlock '0' --
 geth --datadir /home/jim/tmp/eth/1923/00 --identity mynode-00 --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr "127.0.0.1" --rpccorsdomain "*" --ipcpath /home/jim/tmp/eth/1923/00/geth.ipc --networkid 1923 console
 ```
 
-
-geth --datadir /home/mgdfoti/tmp/eth/1923/00 --identity mynode-00 --unlock '0' --password <(echo 0) --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr "127.0.0.1" --rpccorsdomain "*" --ipcpath /home/mgdfoti/tmp/eth/1923/00/geth.ipc --networkid 1923 --cache 1024 --maxpeers 400 --mine --minerthreads 8 console
+Simple Start:
+geth --datadir /home/jim/tmp/eth/1923/00 --identity mynode-00 --unlock '0' --password <(echo 0) --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr=127.0.0.1 --rpccorsdomain "*" --ipcpath /home/jim/tmp/eth/1923/00/geth.ipc --networkid 1923 --syncmode full --gcmode=archive console
 
 1.4) Connect to other Central nodes
 ```
