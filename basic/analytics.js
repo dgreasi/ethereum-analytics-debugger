@@ -39,6 +39,193 @@ module.exports = {
 /////////////////// Smart Contract - Smart Grid Functions /////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
+  syncStep: function(startBlockNumber, endBlockNumber) {
+    return new Promise((resolve, reject) => {
+      var blockNumberPromise = web3.eth.getBlockNumber();
+
+      blockNumberPromise.then(res => {
+        this.checkStartEndInput(startBlockNumber, endBlockNumber, res);
+        startBlockNumber = start;
+        endBlockNumber = end;
+
+        var steps = this.getSteps(startBlockNumber, endBlockNumber);
+        // console.log(JSON.stringify(steps));
+        const stepPromises = [];
+        var allPromises = [];
+
+        for (var i = 0; i < steps.length - 1; i++) {
+          if (i < steps.length -2) {
+            stepPromises.push(this.sync(steps[i], steps[i+1]-1));
+          } else {
+            stepPromises.push(this.sync(steps[i], steps[i+1]));              
+          }
+        }
+
+        const results = [];
+        const mySeriesPromise = stepPromises.reduce(function(acc, crnt) {
+          return acc.then(crnt.then(result => results.push(result)));
+        }, Promise.resolve()).then(() => {
+          // var numOfTs = 0;
+          // dbBlocks.forEach(bl => {
+          //   numOfTs += bl.transactions.length;
+          // });
+          // console.log("NUM of TS: " + numOfTs);
+          endStartAccount = [start, end];
+          resolve(endStartAccount);
+          return results;
+        });
+
+        // mySeriesPromise.then(r => {
+        //   console.log("END DB BLOCKS LENGTH: " + dbBlocks.length);
+        //   console.log("END DB Trans Receipts LENGTH: " + dbTransInfo.length);
+        //   var numOfTs = 0;
+        //   dbBlocks.forEach(bl => {
+        //     numOfTs += bl.transactions.length;
+        //   });
+        //   console.log("NUM of TS: " + numOfTs);
+        //   endStartAccount = [start, end];
+        //   resolve(endStartAccount);
+        // });
+
+        // Promise.all(stepPromises).then(r => {
+        //   console.log("END DB BLOCKS LENGTH: " + dbBlocks.length);
+        //   console.log("END DB Trans Receipts LENGTH: " + dbTransInfo.length);
+        //   var numOfTs = 0;
+        //   dbBlocks.forEach(bl => {
+        //     numOfTs += bl.transactions.length;
+        //   });
+        //   console.log("NUM of TS: " + numOfTs);
+
+        //   endStartAccount = [start, end];
+        //   resolve(endStartAccount);
+        // });
+
+      }).catch(err => {
+        console.log("ERROR sync: " + err);
+        reject(err);
+      });
+
+    });
+  },
+
+  sync: function(startBlockNumber, endBlockNumber) {
+    return new Promise((resolve, reject) => {
+
+
+      this.syncBlocks(startBlockNumber, endBlockNumber).then(rs => {
+        this.syncTsReceipts(startBlockNumber, endBlockNumber).then(rsT => {
+          // console.log("SYNC COMPLETE");
+          // console.log(JSON.stringify(dbBlocks));
+          // console.log(JSON.stringify(dbTransInfo));
+
+          console.log("IN PROMISE CALL: " + startBlockNumber + " - " + endBlockNumber);
+          console.log("DB BLOCKS LENGTH: " + dbBlocks.length);
+          console.log("DB Trans Receipts LENGTH: " + dbTransInfo.length);
+          console.log(" "); 
+
+          endStartAccount = [start, end];
+          // endStartAccount.push(rsT);
+          // endStartAccount.push(silentBugs);
+          // setTimeout
+          // console.log("RESOLVING");
+
+          resolve(endStartAccount);
+        });
+      });
+
+    });
+  },
+
+  syncBlocks: function(startBlockNumber, endBlockNumber) {
+   return new Promise((resolve, reject) => {
+
+      var getBlockPromises = [];
+
+      for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+        check = this.searchFor(i);
+        // console.log("CHECK: " + check);
+        
+        if (check == -1) { // DOESN'T EXIST
+          var getBlock = web3.eth.getBlock(i, true);
+          getBlockPromises.push(getBlock);
+        } else {
+          console.log("BLOCK EXISTS ALREADY");
+        }
+
+      }
+
+      Promise.all(getBlockPromises).then(blocks => {
+        // SAVE TO DB
+        dbBlocks = dbBlocks.concat(blocks);
+        dbBlocks.sort(function(a, b) {
+          return a.number - b.number;
+        });
+        // console.log("RESOLVE dbBlocks");
+
+        resolve(dbBlocks);
+      }).catch(err => {
+        console.log("ERROR syncBlocks: " + err);
+        reject(err);
+      });
+    });
+  },
+
+  syncTsReceipts: function(startBlockNumber, endBlockNumber) {
+    return new Promise((resolve, reject) => {
+      var transactionsReceiptsPromises = [];
+
+      check = this.searchFor(startBlockNumber);
+      if (check == -1) {
+        console.log("DIDN'T found block");
+      } else {
+        for (var i = 0; i <= endBlockNumber - startBlockNumber; i++) {
+          // console.log("CHECK: " + check);
+          bl = dbBlocks[check+i];
+          if (bl != null && bl.transactions != null) {
+            // console.log("Block with transactions");
+            var ts = null;
+            bl.transactions.forEach(e => {
+              ts = this.searchTsInfoDbElement(e);
+              // console.log("TS DB: " + ts);
+              if (ts == null) {
+                if (e.input != "0x") {
+                  transactionsReceiptsPromises.push(this.getTranscationInfo(e));
+                }
+              } else {
+                // console.log("TS EXISTS ALREADY");
+              }
+            });
+          }
+        }
+      }
+
+      Promise.all(transactionsReceiptsPromises).then(tsR => {
+        dbTransInfo.sort(function(a, b) {
+          return a.blockNumber - b.blockNumber;
+        });
+        // console.log("RESOLVE TSREC");
+        resolve(dbTransInfo);
+      }).catch(err => {
+        console.log("ERROR syncTsReceipts: " + err);
+        reject(err);
+      });
+
+    });
+  },
+
+  getSteps: function(startBlockNumber, endBlockNumber) {
+    var startStep = startBlockNumber;
+
+    var step = [startStep];
+    while ((endBlockNumber - startStep) > 1000) {
+      startStep = startStep + 1000;
+      step.push(startStep);
+    }
+    step.push(endBlockNumber);
+    return step;
+  },
+
+
   ////////// Get only transactions that are calls to functions of a Contract /////
   ///////////// IE a send Gas transaction will not be shown here /////////////////
   getAccountTransactionsGasSpentClearings: function(startBlockNumber, endBlockNumber, contract_arg, nickname) {
@@ -1219,7 +1406,7 @@ module.exports = {
           resolve(res);
         }
       }).catch(err => {
-        console.log("ERROR getTransactionReceipt getTranscationInfo: " + err);
+        console.log("ERROR getTranscationInfo: " + err);
         resolve([]);
       });
     });

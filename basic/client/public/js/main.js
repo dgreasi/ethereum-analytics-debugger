@@ -609,3 +609,9 @@ $( "#get_balance_account_per_block" ).click(function() {
   $( "#id_function" ).val("9");
   $( "#submit_global" ).click();
 });
+
+$( "#sync" ).click(function() {
+  // alert( "Handler for .click() called." );
+  $( "#id_function" ).val("10");
+  $( "#submit_global" ).click();
+});

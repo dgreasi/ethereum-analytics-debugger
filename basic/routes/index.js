@@ -447,7 +447,28 @@ router.post('/get', function(req, res, next) {
         });
       }
     }
+  } else if (id_function == "10") { // GET BALANCE OF ACCOUNT PER BLOCK - CHART
 
+    analytics.syncStep(start_block, end_block).then(val => {
+      // console.log(JSON.stringify(res));
+      // val[2].forEach(r => {
+      //   console.log("TS: " + r.blockNumber);
+      // });
+      // console.log("DONE");
+      prvAC = analytics.getPreviousAccounts();
+      analytics.getLastBlockLocally().then(block => {
+        // console.log("REDIRECT");
+
+        res.render('home', { 
+          title: 'Ethereum Analytics Debugger - Sync throug specified blocks Complete',
+          start: val[0],
+          end: val[1],
+          lastBlock: block,
+          previous_contracts_accounts: prvAC
+        });
+
+      });
+    });
   } else {
     var ret = checkReturnHex(contract);
 
