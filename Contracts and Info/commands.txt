@@ -188,3 +188,5 @@ admin.addPeer("enode://9674443c55f2570e0cb3c7c966437a42709f3f37336e063c9783c2edd
 
 
 sudo ufw allow out from any to 10.96.12.79
+
+ulimit -n 70000

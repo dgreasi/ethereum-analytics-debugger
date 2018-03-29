@@ -190,6 +190,7 @@ module.exports = {
   ////////// Get only transactions that are calls to functions of a Contract /////
   ///////////// IE a send Gas transaction will not be shown here /////////////////
   getAccountTransactionsGasSpentClearings: function(startBlockNumber, endBlockNumber, contract_arg, nickname) {
+    console.time("Main Experiment");
 
     return new Promise((resolve, reject) => {
       var receiptsPromises = [];
@@ -256,6 +257,7 @@ module.exports = {
           endStartAccount.push(accounts);
           // setTimeout
           // console.log("RESOLVING");
+          console.timeEnd("Main Experiment");
           resolve(endStartAccount);
 
         }).catch(err => {
@@ -678,6 +680,9 @@ module.exports = {
       }
 
       this.saveAccountTransactionsSpentGas(txRec.from, txRec.gasUsed).then(res => {
+        console.log("BLOCK: " + txRec.blockNumber);
+        console.log("");
+
         resolve(res);
       });
       
@@ -694,8 +699,8 @@ module.exports = {
         var str2 = parseInt(account);
 
         if (str1 == str2) {
-          console.log("Adding to existing account");
-          console.log("");
+          // console.log("Adding to existing account");
+          // console.log("");
           accounts[i][1] += gas;
           accounts[i][2] += 1;
           found = true;
@@ -704,8 +709,8 @@ module.exports = {
       }
 
       if (!found) {
-        console.log("PUSH NEW ACCOUNT");
-        console.log("");
+        // console.log("PUSH NEW ACCOUNT");
+        // console.log("");
         newAccount = new Object([account, gas, 1]);
         accounts.push(newAccount);
       }
