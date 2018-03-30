@@ -111,7 +111,7 @@ module.exports = {
           var getBlock = web3.eth.getBlock(i, true);
           getBlockPromises.push(getBlock);
         } else {
-          // console.log("BLOCK EXISTS ALREADY");
+          console.log("BLOCK EXISTS ALREADY");
         }
 
       }
@@ -153,7 +153,7 @@ module.exports = {
                   transactionsReceiptsPromises.push(this.getTranscationInfo(e));
                 }
               } else {
-                // console.log("TS EXISTS ALREADY");
+                console.log("TS EXISTS ALREADY");
               }
             });
           }
@@ -269,6 +269,7 @@ module.exports = {
   },
 
   getSpentGasOfAccount: function(startBlockNumber, endBlockNumber, account, nickname) {
+    console.time("SpentGasOfAccount");
     var transactionsReceiptsPromises = [];
 
     var onj = new Object({hex: account, name: (nickname ? nickname : account)});
@@ -283,7 +284,7 @@ module.exports = {
 
         transactionsReceiptsPromises.push(this.getBalance(account));
 
-        check = this.searchFor(i);
+        check = this.searchFor(startBlockNumber);
         for (var i = 0; i <= (endBlockNumber - startBlockNumber); i++) {
           
           if (check != -1) { // DOESN'T EXIST
@@ -397,6 +398,7 @@ module.exports = {
           // Push [Block - Gas Spent] Array
           startEndBalanceGasSpentReceipts.push(gasSpentBlock);
 
+          console.timeEnd("SpentGasOfAccount");
           resolve(startEndBalanceGasSpentReceipts);
 
         }).catch(err => {

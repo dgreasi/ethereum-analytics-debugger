@@ -187,6 +187,13 @@ sudo ufw status
 admin.addPeer("enode://9674443c55f2570e0cb3c7c966437a42709f3f37336e063c9783c2eddcb06477d9bad6a00686d27a948df8965ec1c75227d5c75e4811493ff5ab4ab249e2cba1@10.96.12.79:30299")
 
 
-sudo ufw allow out from any to 10.96.12.79
+#### USEFUL COMMANDS
 
+Increase Limit of opened files to get more data from Ethereum Node:
+(Run before starting node)
+```
 ulimit -n 70000
+```
+
+Increase Memory limit of Node:
+node --max_old_space_size=5000000 server.js
