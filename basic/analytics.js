@@ -186,6 +186,15 @@ module.exports = {
     return step;
   },
 
+  sortDB() {
+    dbBlocks.sort(function(a, b) {
+      return a.number - b.number;
+    });
+
+    dbTransInfo.sort(function(a, b) {
+      return a.blockNumber - b.blockNumber;
+    });
+  },
 
   ////////// Get only transactions that are calls to functions of a Contract /////
   ///////////// IE a send Gas transaction will not be shown here /////////////////
@@ -200,8 +209,10 @@ module.exports = {
       this.syncStep(startBlockNumber, endBlockNumber).then(rs => {
         startBlockNumber = start;
         endBlockNumber = end;
+
+        this.sortDB();
       
-        check = this.searchFor(startBlockNumber);
+        var check = this.searchFor(startBlockNumber);
         console.log("FROM - TO BLOCK: " + startBlockNumber + " - " + endBlockNumber);
         var ts = null;
         if (contract_arg != "") {
@@ -222,7 +233,7 @@ module.exports = {
                 //   //   receiptsPromises.push(this.getTransactionReceiptFun(e));
                 //   // }
                 // } else {
-                if (ts.to == contract_arg) {
+                if (ts.to.toUpperCase() == contract_arg.toUpperCase()) {
                   receiptsPromises.push(this.createTableFromTxReceipt(ts));
                 }
                 // }
@@ -287,7 +298,7 @@ module.exports = {
         check = this.searchFor(startBlockNumber);
         for (var i = 0; i <= (endBlockNumber - startBlockNumber); i++) {
           
-          if (check != -1) { // DOESN'T EXIST
+          // if (check != -1) { // DOESN'T EXIST
 
             dbBlocks[check+i].transactions.forEach(e => {
               if (e.input != "0x" && (this.searchTsInfoDB(e) == -1)) {
@@ -296,10 +307,10 @@ module.exports = {
               }
             });
 
-          } else {
-            console.log("ERROR - BLOCK DOESNT EXIST");
+          // } else {
+            // console.log("ERROR - BLOCK DOESNT EXIST");
 
-          }
+          // }
 
         }
 
@@ -380,8 +391,8 @@ module.exports = {
             while( (j < arDbTSInfo.length) && (arDbTSInfo[j].blockNumber <= dbBlocks[check+i].number)) {
 
               if ((arDbTSInfo[j].blockNumber == dbBlocks[check+i].number) && (account == arDbTSInfo[j].from.toUpperCase())) {
-                // console.log("Account1: " + account);
-                // console.log("Account2: " + res[j].from.toUpperCase())
+                console.log("Account: " + arDbTSInfo[j].from.toUpperCase());
+
                 gasUsedInBlockOfAccount += arDbTSInfo[j].gasUsed;
               }
               j++;
@@ -681,9 +692,11 @@ module.exports = {
         }
       }
 
+      console.log("Save ts from block: " + txRec.blockNumber);
+
       this.saveAccountTransactionsSpentGas(txRec.from, txRec.gasUsed).then(res => {
-        console.log("BLOCK: " + txRec.blockNumber);
-        console.log("");
+        // console.log("Save on table from BLOCK: " + txRec.blockNumber);
+        // console.log("");
 
         resolve(res);
       });
@@ -788,8 +801,8 @@ module.exports = {
     }
 
 
-    // console.log("START: " + start);
-    // console.log("END: " + end);
+    console.log("START: " + start);
+    console.log("END: " + end);
     // this.saveStartEndLF(start, end);
   },
 
@@ -1237,6 +1250,8 @@ module.exports = {
           // dbTransInfo.push(res);
           this.saveTsInfoDB(res);
           resolve(res);
+        } else {
+          console.log("NOTHING TO RETURN")
         }
       }).catch(err => {
         console.log("ERROR getTranscationInfo: " + err);
@@ -1255,7 +1270,7 @@ module.exports = {
               // console.log("Input: " + rs.input);
               res.input = rs.input;
               res.gasPrice = rs.gasPrice;
-              // console.log("SAVE ON arDbTSInfo: ");
+              console.log("SAVE ON arDbTSInfo: ");
               // dbTransInfo.push(res);
               this.saveTsInfoDB(res);
               resolve(res);

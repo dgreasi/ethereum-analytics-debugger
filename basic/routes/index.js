@@ -447,7 +447,7 @@ router.post('/get', function(req, res, next) {
         });
       }
     }
-  } else if (id_function == "10") { // GET BALANCE OF ACCOUNT PER BLOCK - CHART
+  } else if (id_function == "10") { // SYNC
 
     analytics.syncStep(start_block, end_block).then(val => {
       // console.log(JSON.stringify(res));
