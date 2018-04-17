@@ -572,7 +572,6 @@ router.post('/get_peers', function(req, res, next) {
   });
 });
 
-
 router.post('/get_block_info',function(req, res, next) {
   var block = req.body.block;
 
