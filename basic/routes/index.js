@@ -469,7 +469,50 @@ router.post('/get', function(req, res, next) {
 
       });
     });
-  } else {
+  } else if (id_function == "11") {
+    var ret = checkReturnHex(contract);
+
+    if (ret || contract == "") {
+      analytics.getTransactions(start_block, end_block, ret, nickname).then(val => {
+        noData = null;
+
+        if (val[2].length < 1) {
+          console.log("ASSING NoDATA");
+          console.log(JSON.stringify(val));
+          noData = "No available Info! Probably there are no transactions for the specified scenario.";
+        }
+
+        prvAC = analytics.getPreviousAccounts();
+        analytics.getLastBlockLocally().then(block => {
+          var dbData = val[2];
+
+          // console.log(JSON.stringify(dbData));
+
+          res.render('home', { 
+            title: 'Ethereum Analytics Debugger - Get Transactions',
+            start: val[0],
+            end: val[1],
+            transactionsAll: dbData,
+            totalTrans: dbData.length,
+            noData: noData,
+            lastBlock: block,
+            previous_contracts_accounts: prvAC
+          });
+        });
+      });
+    } else {
+      noData = "Contract doesn't exist.";
+      prvAC = analytics.getPreviousAccounts();
+      analytics.getLastBlockLocally().then(block => {
+        res.render('home', { 
+          title: 'Ethereum Analytics Debugger - Get Transactions',
+          noData: noData,
+          lastBlock: block,
+          previous_contracts_accounts: prvAC
+        });
+      });
+    }
+  }  else {
     var ret = checkReturnHex(contract);
 
     if (ret || contract == "") {

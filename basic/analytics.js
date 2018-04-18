@@ -361,6 +361,86 @@ module.exports = {
     });
   },
 
+  getTransactions: function(startBlockNumber, endBlockNumber, contract_arg, nickname) {
+    console.time("getTransactions");
+
+    return new Promise((resolve, reject) => {
+      var receiptsPromises = [];
+
+      accounts = [];
+      silentBugs = [];
+      this.syncStep(startBlockNumber, endBlockNumber).then(rs => {
+        startBlockNumber = start;
+        endBlockNumber = end;
+
+        this.sortDB();
+      
+        var check = this.searchFor(startBlockNumber);
+        console.log("FROM - TO BLOCK: " + startBlockNumber + " - " + endBlockNumber);
+        var ts = null;
+        if (contract_arg != "") {
+
+          for (var j = 0; j <= (endBlockNumber - startBlockNumber); j++) {
+            bl = dbBlocks[check+j];
+            if (bl != null && bl.transactions != null) {
+              // console.log("Block with transactions");
+              var onj = new Object({hex: contract_arg, name: (nickname ? nickname : contract_arg)});
+              this.addToHistory(onj);
+              // console.log("Call with contract_arg");
+              
+              bl.transactions.forEach(e => {
+                ts = this.searchTsInfoDbElement(e);
+                // if (ts == null) {
+                //   console.log("ERROR - DIDINT FOUND TS RECEIPT");
+                //   // if ((e.input != "0x") && (e.to == contract_arg)) {
+                //   //   receiptsPromises.push(this.getTransactionReceiptFun(e));
+                //   // }
+                // } else {
+                if (ts.to.toUpperCase() == contract_arg.toUpperCase()) {
+                  receiptsPromises.push(this.creteTableOfTransactions(ts));
+                }
+                // }
+              });
+            }
+          }
+        } else {
+          for (var j = 0; j <= (endBlockNumber - startBlockNumber); j++) {
+            bl = dbBlocks[check+j];
+            if (bl != null && bl.transactions != null) {
+              bl.transactions.forEach(e => {
+                ts = this.searchTsInfoDbElement(e);
+                // if (ts == null) {
+                //   console.log("ERROR - DIDINT FOUND TS RECEIPT");
+                //   // if (e.input != "0x") {
+                //   //   receiptsPromises.push(this.getTransactionReceiptFun(e));
+                //   // }
+                // } else {
+                //   // console.log("GETTING FROM DB");
+                receiptsPromises.push(this.creteTableOfTransactions(ts));
+                // }
+              });
+            }
+          }
+        }
+
+        Promise.all(receiptsPromises).then(res => {
+          // SAVE TO DB
+          // console.log("Transactions Receipt: " + JSON.stringify(this.flatten(dbTransRec)));
+          endStartAccount = [start, end];
+          endStartAccount.push(res);
+          // setTimeout
+          // console.log("RESOLVING");
+          console.timeEnd("getTransactions");
+          resolve(endStartAccount);
+
+        }).catch(err => {
+          console.log("ERROR receiptsPromises: " + err);
+          reject(err);
+        });
+      });
+    });
+  },
+
   getSpentGasOfAccount: function(startBlockNumber, endBlockNumber, account, nickname) {
     console.time("SpentGasOfAccount");
     var transactionsReceiptsPromises = [];
@@ -795,7 +875,7 @@ module.exports = {
         resolve(res);
       });
       
-    })
+    });
   },
 
   saveAccountTransactionsSpentGas: function(account, gas) {
@@ -829,6 +909,33 @@ module.exports = {
       });
 
       resolve(true);
+    });
+  },
+
+  creteTableOfTransactions: function(txRec) {
+    return new Promise((resolve, reject) => {
+      console.log("Save ts from block: " + txRec.blockNumber);
+      var input = txRec.input.toString();
+      fun = input.slice(0,10);
+      if (input.length > 10) {
+        input = input.slice(10);
+        input = "0x".concat(input);
+        help = web3.eth.abi.decodeParameters(['int256', 'int256'], input);
+        input = "";
+        input = input.concat(help[0]);
+        input = input.concat(", ");
+        input = input.concat(help[1]);
+        input = fun.concat(", ".concat(input));
+      }
+
+      var obj = new Object({
+        block: txRec.blockNumber,
+        hash: txRec.transactionHash,
+        to: txRec.to,
+        input: input
+      });
+      resolve(obj);
+      
     });
   },
 

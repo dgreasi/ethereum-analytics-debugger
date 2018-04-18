@@ -78,7 +78,14 @@
         <span class="glyphicon glyphicon-arrow-right green_btn"></span>
         <span class="glyphicon glyphicon-th-list"></span>
       </button>
-      {{!-- data-toggle="modal" data-target="#get_clearing_through_time" --}}
+
+      <button class="btn btn-default blue_btn" id="get_trs" title="Blocks => Results">
+        Get Transactions
+        <span class="glyphicon glyphicon-exclamation-sign"></span>
+        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
+        <span class="glyphicon glyphicon-th-list"></span>
+      </button>
+
       <button class="btn btn-default blue_btn" id="get_clr" title="Address + Blocks => Chart">
         Get State of Contract at Blocks
         <span class="glyphicon glyphicon-exclamation-sign"></span>
@@ -562,6 +569,31 @@
         </tbody> 
       </table>
     {{/if}}
+
+    {{!-- ALL TRANSACTIONS --}}
+    {{#if transactionsAll}}
+      <table>
+        <thead>
+            <th>#</th>
+            <th>Block</th>
+            <th>Hash of Transaction</th>
+            <th>To</th>
+            <th>Input (Function + Args)</th> 
+        </thead> 
+        <tbody>
+            {{#each transactionsAll}}
+              <tr>
+                <td>{{ @index }}</td>
+                <td>{{ this.block }}</td>
+                <td><a href="/get_transaction/{{this.hash}}">{{ this.hash }}</a></td>
+                <td>{{ this.to }}</td>
+                <td>{{ this.input }}</td>
+              </tr>
+            {{/each}}
+        </tbody> 
+      </table>
+    {{/if}}
+    
 
     {{!-- GET CONTRACT DETAILS --}}
     {{#if contracts}}
