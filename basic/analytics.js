@@ -39,7 +39,7 @@ module.exports = {
 /////////////////// Smart Contract - Smart Grid Functions /////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-  syncStep: function(startBlockNumber, endBlockNumber) {
+  syncStep: function(startBlockNumber, endBlockNumber, type) {
     return new Promise((resolve, reject) => {
       var blockNumberPromise = web3.eth.getBlockNumber();
 
@@ -51,14 +51,26 @@ module.exports = {
         var steps = this.getSteps(startBlockNumber, endBlockNumber);
 
         var stepCalls = [];
-        for (var i = 0; i < steps.length - 1; i++) {
-          ((i) => {
-            if (i < steps.length -2) {
-              stepCalls.push(() => this.sync(steps[i], steps[i+1]-1));
-            } else {
-              stepCalls.push(() => this.sync(steps[i], steps[i+1]));
-            }
-          })(i);
+        if (type == 1) {
+          for (var i = 0; i < steps.length - 1; i++) {
+            ((i) => {
+              if (i < steps.length -2) {
+                stepCalls.push(() => this.sync(steps[i], steps[i+1]-1));
+              } else {
+                stepCalls.push(() => this.sync(steps[i], steps[i+1]));
+              }
+            })(i);
+          }
+        } else {
+          for (var i = 0; i < steps.length - 1; i++) {
+            ((i) => {
+              if (i < steps.length -2) {
+                stepCalls.push(() => this.syncBl(steps[i], steps[i+1]-1));
+              } else {
+                stepCalls.push(() => this.syncBl(steps[i], steps[i+1]));
+              }
+            })(i);
+          }
         }
 
         const mySeriesPromise = stepCalls.reduce(
@@ -93,6 +105,20 @@ module.exports = {
 
           resolve(true);
         });
+      });
+
+    });
+  },
+
+  syncBl: function(startBlockNumber, endBlockNumber) {
+    return new Promise((resolve, reject) => {
+
+      this.syncBlocks(startBlockNumber, endBlockNumber).then(rs => {
+        console.log("IN PROMISE CALL: " + startBlockNumber + " - " + endBlockNumber);
+        console.log("DB BLOCKS LENGTH: " + dbBlocks.length);
+        console.log(" ");
+
+        resolve(true);
       });
 
     });
@@ -288,7 +314,7 @@ module.exports = {
 
       accounts = [];
       silentBugs = [];
-      this.syncStep(startBlockNumber, endBlockNumber).then(rs => {
+      this.syncStep(startBlockNumber, endBlockNumber, 1).then(rs => {
         startBlockNumber = start;
         endBlockNumber = end;
 
@@ -369,7 +395,7 @@ module.exports = {
 
       accounts = [];
       silentBugs = [];
-      this.syncStep(startBlockNumber, endBlockNumber).then(rs => {
+      this.syncStep(startBlockNumber, endBlockNumber, 1).then(rs => {
         startBlockNumber = start;
         endBlockNumber = end;
 
@@ -451,7 +477,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
 
 
-      this.syncStep(startBlockNumber, endBlockNumber).then(rs => {
+      this.syncStep(startBlockNumber, endBlockNumber, 1).then(rs => {
         startBlockNumber = start;
         endBlockNumber = end;
 
@@ -588,7 +614,7 @@ module.exports = {
 
       var getBlockPromises = [];
 
-      this.syncStep(startBlockNumber, endBlockNumber).then(rs => {
+      this.syncStep(startBlockNumber, endBlockNumber, 2).then(rs => {
         startBlockNumber = start;
         endBlockNumber = end;
 
@@ -786,7 +812,7 @@ module.exports = {
       this.addToHistory(account);
     }
 
-    this.syncStep(startBlockNumber, endBlockNumber).then(rs => {
+    this.syncStep(startBlockNumber, endBlockNumber, 1).then(rs => {
       startBlockNumber = start;
       endBlockNumber = end; 
 
@@ -1063,7 +1089,7 @@ module.exports = {
       var storagePromises = [];
       var getBlocksPromises = [];
 
-      this.syncStep(startBlockNumber, endBlockNumber).then(rs => {
+      this.syncStep(startBlockNumber, endBlockNumber, 1).then(rs => {
         startBlockNumber = start;
         endBlockNumber = end;
 
