@@ -30,13 +30,14 @@ Each line contains:
 
 >This function will generate a table which contains all the transactions through the specified range of blocks, or only the transactions with the specified receiver. The row of the table is consisted from: Block - TimeStamp - Input(function + args) - Contract
 
-![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/transactions.png?raw=true "Transactions")
+![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/get_transactions.png?raw=true "Get Transactions")
 
 2) **Get state of Contract** - ARGS: (Start block, End block, Contract)
 
 >This function will generate a chart that contains the values of the variables of the specified contract, at each block and time of day. The chart represents the values through the specified range of blocks. A table that contains the data of the chart is also generated.
 
 ![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/state_of_contract.png?raw=true "State of Contract")
+![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/transactions.png?raw=true "Transactions to Contract")
 >Currently this function has to be changed from each developer to get the wanted variables. You need to edit the function "getStorageAtBlock()" at line 718 and his sub-functions to match your needs. More specifically you should change the pointer number in each sub-function to target your vars.
 
 3) **Get Contracts** - ARGS: (Start block, End block)
