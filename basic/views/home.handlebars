@@ -635,6 +635,7 @@
         <thead>
             <th>#</th>
             <th>Block</th>
+            <th>From</th>
             <th>Hash of Transaction</th>
             <th>To</th>
             <th>Input (Function + Args)</th> 
@@ -644,6 +645,7 @@
               <tr>
                 <td>{{ @index }}</td>
                 <td>{{ this.block }}</td>
+                <td>{{ this.from }}</td>
                 <td><a href="/get_transaction/{{this.hash}}">{{ this.hash }}</a></td>
                 <td>{{ this.to }}</td>
                 <td>{{ this.input }}</td>
@@ -652,7 +654,33 @@
         </tbody> 
       </table>
     {{/if}}
-    
+
+    {{#if transactionsPerBlock}}
+      <h2 class="red_btn">
+        Data Table
+      </h2>
+      <table>
+        <thead>
+            <th>#</th>
+            <th>Block</th>
+            <th># of Ts</th>
+        </thead> 
+        <tbody> 
+            {{#each transactionsPerBlock}} 
+            <tr>
+              <td>{{ @index }}</td>
+              {{#each this}}
+                {{#if @index}}
+                  <td>{{ this }}</td>
+                {{else}}
+                  <td>{{ this }}</td>
+                {{/if}}
+              {{/each}}
+            </tr> 
+            {{/each}}
+        </tbody> 
+      </table>
+    {{/if}}    
 
     {{!-- GET CONTRACT DETAILS --}}
     {{#if contracts}}

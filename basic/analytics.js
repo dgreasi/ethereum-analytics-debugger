@@ -341,8 +341,10 @@ module.exports = {
                 //   //   receiptsPromises.push(this.getTransactionReceiptFun(e));
                 //   // }
                 // } else {
-                if (ts.to.toUpperCase() == contract_arg.toUpperCase()) {
-                  receiptsPromises.push(this.createTableFromTxReceipt(ts));
+                if (ts.to) {
+                  if (ts.to.toUpperCase() == contract_arg.toUpperCase()) {
+                    receiptsPromises.push(this.createTableFromTxReceipt(ts));
+                  }
                 }
                 // }
               });
@@ -415,15 +417,22 @@ module.exports = {
               // console.log("Call with contract_arg");
               
               bl.transactions.forEach(e => {
+                // console.log("TS: " + e.hash);
                 ts = this.searchTsInfoDbElement(e);
+                // console.log("TS RETURNED: " + JSON.stringify(ts));
                 // if (ts == null) {
                 //   console.log("ERROR - DIDINT FOUND TS RECEIPT");
                 //   // if ((e.input != "0x") && (e.to == contract_arg)) {
                 //   //   receiptsPromises.push(this.getTransactionReceiptFun(e));
                 //   // }
                 // } else {
-                if (ts.to.toUpperCase() == contract_arg.toUpperCase()) {
-                  receiptsPromises.push(this.creteTableOfTransactions(ts));
+                if (ts.to) {
+                  // console.log("TS.to: " + ts.to);
+                  // console.log("TO: " + ts.to.toUpperCase());
+                  // console.log("Contract: " + contract_arg.toUpperCase());
+                  if (ts.to.toUpperCase() == contract_arg.toUpperCase()) {
+                    receiptsPromises.push(this.creteTableOfTransactions(ts));
+                  }
                 }
                 // }
               });
@@ -956,6 +965,7 @@ module.exports = {
 
       var obj = new Object({
         block: txRec.blockNumber,
+        from: txRec.from,
         hash: txRec.transactionHash,
         to: txRec.to,
         input: input
