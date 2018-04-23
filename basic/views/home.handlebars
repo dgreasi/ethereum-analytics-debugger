@@ -341,35 +341,6 @@
     {{!-- GET CLEARINGS --}}
     {{#if clearingTT}}
       <div id="price_chart" data-for="{{clearingTT}}" class="center"></div>
-
-      <h2 class="red_btn">
-        Data Table
-      </h2>
-      <table>
-        <thead>
-            <th>#</th>
-            <th>Block</th>
-            <th>Time</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Type</th>
-            <th>Contract</th>
-        </thead> 
-        <tbody> 
-            {{#each clearingTT}} 
-            <tr>
-              <td>{{ @index }}</td>
-              {{#each this}}
-                {{#if @index}}
-                  <td>{{ this }}</td>
-                {{else}}
-                  <td>{{ this }}</td>
-                {{/if}}
-              {{/each}}
-            </tr> 
-            {{/each}}
-        </tbody> 
-      </table>
     {{/if}}
 
     {{!-- GET GAS SPENT OF ACCOUNT --}}
