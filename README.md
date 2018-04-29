@@ -116,7 +116,7 @@ web3.setProvider(new web3.providers.HttpProvider('http://localhost:{my_port}'));
 5) Start NodeJs Server:
 ```
 $ cd basic
-$ node server.js
+$ npm start
 ```
 
 6) Use the web interface at [http://localhost:3000](http://localhost:3000)
