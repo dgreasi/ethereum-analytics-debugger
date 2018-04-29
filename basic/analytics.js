@@ -1099,7 +1099,7 @@ module.exports = {
       var storagePromises = [];
       var getBlocksPromises = [];
 
-      this.syncStep(startBlockNumber, endBlockNumber, 1).then(rs => {
+      this.syncStep(startBlockNumber, endBlockNumber, 2).then(rs => {
         startBlockNumber = start;
         endBlockNumber = end;
 
@@ -1478,14 +1478,14 @@ module.exports = {
               resolve(res);
             }
           }).catch(err => {
-            console.log("ERROR getTransactionReceipt getTranscationInfo: " + err);
+            console.log("ERROR getTransactionReceipt getTranscationInfoHash: " + err);
             resolve([]);
           });
 
         }
 
       }).catch(err => {
-        console.log("ERROR getTransaction => getTranscationInfo: " + err);
+        console.log("ERROR getTransaction => getTranscationInfoHash: " + err);
         resolve([]);
       });
       

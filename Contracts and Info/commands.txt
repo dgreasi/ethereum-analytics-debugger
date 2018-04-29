@@ -197,3 +197,6 @@ ulimit -n 70000
 
 Increase Memory limit of Node:
 node --max_old_space_size=5000000 server.js
+
+
+geth --datadir /home/ubuntu/tmp/eth/1923/00 --identity mynode-00 --unlock '0' --password <(echo 0) --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr "127.0.0.1" --rpccorsdomain "*" --ipcpath /home/ubuntu/tmp/eth/1923/00/geth.ipc --networkid 1923 --syncmode full console
