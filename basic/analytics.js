@@ -137,7 +137,7 @@ module.exports = {
           var getBlock = this.getBlockInfoMinimalNoChecks(i);
           getBlockPromises.push(getBlock);
         } else {
-          console.log("BLOCK EXISTS ALREADY");
+          console.log("BLOCK: " + i + " EXISTS ALREADY");
         }
 
       }
