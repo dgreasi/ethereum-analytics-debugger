@@ -601,6 +601,7 @@ module.exports = {
             j = 0;
           }
 
+
           // Push Total Gas Spent
           startEndBalanceGasSpentReceipts.push(totalGasSpent);
           // Push [Block - Gas Spent] Array
@@ -1238,6 +1239,123 @@ module.exports = {
       return -99;
     });
   },
+
+  marketChart: function(startBlockNumber, endBlockNumber) {
+    return new Promise((resolve, reject) => {
+      var storagePromises = [];
+      var getBlocksPromises = [];
+
+      this.syncStep(startBlockNumber, endBlockNumber, 2).then(rs => {
+        startBlockNumber = start;
+        endBlockNumber = end;
+      
+        var check = this.searchFor(startBlockNumber);
+        console.log("FROM - TO BLOCK: " + startBlockNumber + " - " + endBlockNumber);
+        var first_clear = null;
+        var second_clear = null;
+        var generation = [];
+        var consumption = [];
+
+        for (var i = 0; i <= end-start; i++) {
+
+          dbBlocks[check+i].transactions.some(ts => {
+            // console.log("IN SOME: " + ts.input);
+            if (ts.input.toString().includes("0x256a9ea1")) {
+              console.log("Found clearing - Block: " + ts.blockNumber + " pos: " + ts.transactionIndex);
+              
+              if (first_clear == null) {
+                first_clear = {block: ts.blockNumber, index: ts.transactionIndex};
+              } else {
+                second_clear = {block: ts.blockNumber, index: ts.transactionIndex};
+                return true;
+              }
+
+            } else {
+              // console.log("ELSE");
+              var inputSh = ts.input.toString();
+              var quant = 0;
+              var pric = 0;
+
+              if (inputSh.length > 10) {
+                inputSh = inputSh.slice(10);
+                inputSh = "0x".concat(inputSh);
+                help = web3.eth.abi.decodeParameters(['int256', 'int256'], inputSh);
+                quant = help[0];
+                pric = help[1];
+              }
+
+              if (first_clear) {
+                if (ts.input.includes("0x0d31d41a")) { // generation
+                  // console.log("GENERATION Q,P: " + quant +', '+ pric);
+
+                  generation = this.marketAdd(generation, quant, (pric > 300 ? 300 : pric));
+                  // generation.push({quantity: quant, price: pric});
+                } else { // consumption
+                  // console.log("CONSUMPTION Q,P: " + quant +', '+ pric);
+                  consumption = this.marketAdd(consumption, quant, (pric > 300 ? 300 : pric));
+
+                  // consumption.push({quantity: quant, price: pric});
+                }
+              }
+            }
+            
+          });
+          
+          if (first_clear && second_clear) {
+            console.log("FOUND BORDERS - STOP");
+            console.log("FIRST CLEAR: " + first_clear.block + " , Index: " + first_clear.index);
+            console.log("SECOND CLEAR: " + second_clear.block + " , Index: " + second_clear.index);
+
+            break;
+          }
+        }
+
+
+
+        endStartClear = [start, end];
+        console.log("GENERATION TABLE:");
+        console.log(generation.length);
+        // console.log(JSON.stringify(generation));
+
+
+        console.log("CONSUMPTION TABLE:");
+        console.log(consumption.length);
+        // console.log(JSON.stringify(consumption));
+
+
+        generation = generation.sort((a, b) => {
+          return a.price - b.price;
+        });
+
+        consumption = consumption.sort((a, b) => {
+          return b.price - a.price;
+        });
+        // console.log(JSON.stringify(res));
+        endStartClear.push(generation);
+        endStartClear.push(consumption);
+
+        resolve(endStartClear);
+
+      });
+
+    });
+  },
+
+  marketAdd: function(table, quantity, price) {
+    var found = table.findIndex(el => {
+      return el.price == parseInt(price);
+    });
+
+    if (found != -1) {
+      table[found].quantity += parseInt(quantity);
+    } else {
+      table.push({quantity: parseInt(quantity), price: parseInt(price)});
+    }
+
+    return table;
+  },
+  // "7f495ea5": "consumptionBid(int256,int256)",
+  // "0d31d41a": "generationBid(int256,int256)",
 
   checkPositionStorage: function() {
     for (var i = 0; i < 10; i++) {

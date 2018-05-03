@@ -16,9 +16,7 @@ $(document).on('ready', function() {
 			gasLimit_chart = document.getElementById('gasLimit_chart');
 			gasUsed_chart = document.getElementById('gasUsed_chart');
 			ts_number_chart = document.getElementById('ts_number_chart');
-			ts_number_chart = document.getElementById('ts_number_chart');
-
-
+			market_chart = document.getElementById('market_chart');
 
 			
 			if (diff_chart) {
@@ -303,6 +301,8 @@ $(document).on('ready', function() {
 	transactions_per_block_chart = document.getElementById('transactions_per_block_chart');
 	gas_per_block_chart = document.getElementById('gas_per_block_chart');
 	balance_of_account_per_block_chart = document.getElementById('balance_of_account_per_block_chart');
+	market_chart = document.getElementById('market_chart');
+
 
 
 	if (price_chart) {
@@ -538,6 +538,67 @@ $(document).on('ready', function() {
 
 		Plotly.plot('balance_of_account_per_block_chart', data, layout);
 	}
+
+	if (market_chart) {
+		console.log("CHART");
+		generation = document.getElementById('generation');
+		consumption = document.getElementById('consumption');
+
+		var data1_chart = generation.getAttribute('data-for');
+		var data2_chart = consumption.getAttribute('data-for');
+
+		var dataToArray1_chart = data1_chart.split(",");
+		var dataToArray2_chart = data2_chart.split(",");
+
+		console.log(JSON.stringify(dataToArray1_chart));
+
+		var genPrice = [];
+		var genQuantity = [];
+
+		var conPrice = [];
+		var conQuantity = [];
+
+		for (var i = 0; i < dataToArray1_chart.length; i=i+2) {
+			genPrice.push(parseInt(dataToArray1_chart[i]));
+			genQuantity.push(parseInt(dataToArray1_chart[i+1]));
+		}
+
+		for (var i = 0; i < dataToArray2_chart.length; i=i+2) {
+			conPrice.push(parseInt(dataToArray2_chart[i]));
+			conQuantity.push(parseInt(dataToArray2_chart[i+1]));
+		}
+
+		console.log("genPrice: " + JSON.stringify(genPrice));
+		console.log("genQuantity: " + JSON.stringify(genQuantity));
+
+		console.log("conPrice: " + JSON.stringify(conPrice));
+		console.log("conQuantity: " + JSON.stringify(conQuantity));
+
+
+		// NEW CHART
+		var trace1 = {
+		  	x: genQuantity,
+			y: genPrice,
+			name: 'Generation',
+  			type: 'scatter'
+		};
+
+		var trace2 = {
+			x: conQuantity,
+			y: conPrice,
+			name: 'Consumption',
+			type: 'scatter'
+		};
+
+		var data = [trace1, trace2];
+
+		var layout = {
+		  title: 'Market State',
+		  yaxis: {title: 'Price'},
+		};
+
+		Plotly.plot('market_chart', data, layout);
+	}
 });
 
 
@@ -622,3 +683,8 @@ $( "#get_trs" ).click(function() {
   $( "#submit_global" ).click();
 });
 
+$( "#get_market_chart" ).click(function() {
+  // alert( "Handler for .click() called." );
+  $( "#id_function" ).val("12");
+  $( "#submit_global" ).click();
+});

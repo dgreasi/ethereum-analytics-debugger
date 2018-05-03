@@ -469,7 +469,7 @@ router.post('/get', function(req, res, next) {
 
       });
     });
-  } else if (id_function == "11") {
+  } else if (id_function == "11") { // Get Transactions
     var ret = checkReturnHex(contract);
 
     if (ret || contract == "") {
@@ -512,7 +512,84 @@ router.post('/get', function(req, res, next) {
         });
       });
     }
-  }  else {
+  } else if (id_function == "12") {
+    analytics.marketChart(start_block, end_block).then(val => {
+        noData = null;
+
+        if (val[2].length < 1) {
+          console.log("ASSING NoDATA");
+          console.log(JSON.stringify(val));
+          noData = "No available Info! Probably there are no transactions for the specified scenario.";
+        }
+
+        prvAC = analytics.getPreviousAccounts();
+        analytics.getLastBlockLocally().then(block => {
+          var dbData = [];
+          var genD = [];
+          var conD = [];
+          
+          var gen = val[2];
+          var con = val[3];
+          var gL = gen.length;
+          var cL = gen.length;
+
+          var genNew = [];
+          var conNew = [];
+          // push at the beggining
+          genNew.push({quantity: 0, price: gen[0].price});
+          genNew.push(gen[0]);
+
+          conNew.push({quantity: 0, price: con[0].price});
+          conNew.push(con[0]);
+
+          for (var i = 1; i < gen.length; i++) {
+            gen[i].quantity += gen[i-1].quantity;
+            genNew.push({quantity: gen[i-1].quantity, price: gen[i].price});
+            genNew.push(gen[i]);
+          }
+
+          for (var j = 1; j < con.length; j++) {
+            // help1 = 0;
+            con[j].quantity += con[j-1].quantity;
+            conNew.push({quantity: con[j-1].quantity, price: con[j].price});
+            conNew.push(con[j]);
+          }
+          
+
+          console.log("Gen length: " + genNew.length);
+          console.log("Con length: " + conNew.length);
+
+          genNew.forEach(el => {
+            genD.push(el.price);
+            genD.push(el.quantity);
+          });
+
+          conNew.forEach(el => {
+            conD.push(el.price);
+            conD.push(el.quantity);
+          });
+          // dbData.push(val[2]);
+          // dbData.push(val[3]);
+
+
+          // console.log(JSON.stringify(dbData));
+          console.log("REDIRECT");
+          res.render('home', { 
+            title: 'Ethereum Analytics Debugger - Get Transactions',
+            start: val[0],
+            end: val[1],
+            market: genNew,
+            generation: val[2],
+            consumption: val[3],
+            genD: genD,
+            conD: conD,
+            noData: noData,
+            lastBlock: block,
+            previous_contracts_accounts: prvAC
+          });
+        });
+      });
+  } else {
     var ret = checkReturnHex(contract);
 
     if (ret || contract == "") {

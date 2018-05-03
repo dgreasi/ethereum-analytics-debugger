@@ -153,6 +153,13 @@
         <span class="glyphicon glyphicon-arrow-right green_btn"></span>
         <span class="glyphicon glyphicon-stats"></span>
       </button>
+
+      <button class="btn btn-default red_btn" id="get_market_chart" title="Blocks => Chart">
+        Market Chart
+        <span class="glyphicon glyphicon-hdd"></span>
+        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
+        <span class="glyphicon glyphicon-stats"></span>
+      </button>
     </div>
     
 
@@ -362,6 +369,10 @@
     {{#if balanceArray}}
       <div id="balance_of_account_per_block_chart" data-for="{{balanceArray}}" class="center"></div>
     {{/if}}
+
+    {{#if market}}
+      <div id="market_chart" data-for="{{market}}" class="center"></div>
+    {{/if}}
     
 
     {{!-- BLOCKS START/END --}}
@@ -406,6 +417,53 @@
         </div>
       {{/if}}      
       <hr>
+    {{/if}}
+
+    {{#if generation}}
+      <div id="generation" data-for="{{genD}}"></div>
+      <h2 class="red_btn">
+        Data Table Generation
+      </h2>
+      <table>
+        <thead>
+            <th>#</th>
+            <th>Price</th>
+            <th>Quantity</th>
+        </thead> 
+        <tbody> 
+          {{#each generation}} 
+            <tr>
+              <td>{{ @index }}</td>
+              <td>{{ this.price }}</td>
+              <td>{{ this.quantity }}</td>
+            </tr>
+          {{/each}}
+        </tbody> 
+      </table>
+    {{/if}}
+
+    {{#if consumption}}
+      <div id="consumption" data-for="{{conD}}"></div>
+
+      <h2 class="red_btn">
+        Data Table Consumption
+      </h2>
+      <table>
+        <thead>
+            <th>#</th>
+            <th>Price</th>
+            <th>Quantity</th>
+        </thead> 
+        <tbody> 
+          {{#each consumption}} 
+            <tr>
+              <td>{{ @index }}</td>
+              <td>{{ this.price }}</td>
+              <td>{{ this.quantity }}</td>
+            </tr>
+          {{/each}}
+        </tbody> 
+      </table>
     {{/if}}
 
     {{!-- GET CLEARINGS --}}
