@@ -95,7 +95,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
 
 
-      this.syncBlocks(startBlockNumber, endBlockNumber).then(rs => {
+      this.syncBlocks(startBlockNumber, endBlockNumber).then((rs, err) => {
         this.syncTsReceipts(startBlockNumber, endBlockNumber).then(rsT => {
 
           console.log("IN PROMISE CALL: " + startBlockNumber + " - " + endBlockNumber);
@@ -317,7 +317,6 @@ module.exports = {
       });
     });
   },
-
 
   ////////// Get only transactions that are calls to functions of a Contract /////
   ///////////// IE a send Gas transaction will not be shown here /////////////////
@@ -907,6 +906,61 @@ module.exports = {
         console.log("ERROR getTransactionReceipt: " + err);
         reject(err);
       });
+    });
+  },
+
+  getTranscationInfo: function(e) {
+    return new Promise((resolve, reject) => {
+      web3.eth.getTransactionReceipt(e.hash).then(res => {
+        if (res != null) {
+          // console.log("Input: " + rs.input);
+          res.input = e.input;
+          res.gasPrice = e.gasPrice;
+          // console.log("SAVE ON arDbTSInfo: ");
+          // dbTransInfo.push(res);
+          this.saveTsInfoDB(res);
+          resolve(res);
+        } else {
+          // reject();
+          console.log("NOTHING TO RETURN");
+        }
+      }).catch(err => {
+        console.log("ERROR getTranscationInfo: " + err);
+        reject(err);
+      });
+    }).catch(err => {
+      console.log("ERROR getTranscationInfo Promise F: " + err);
+      reject(err);
+    });
+  },
+
+  getTranscationInfoHash: function(hash) {
+    return new Promise((resolve, reject) => {
+      web3.eth.getTransaction(hash).then(rs => {
+
+        if (rs != null) {
+          web3.eth.getTransactionReceipt(rs.hash).then(res => {
+            if (res != null) {
+              // console.log("Input: " + rs.input);
+              res.input = rs.input;
+              res.gasPrice = rs.gasPrice;
+              console.log("SAVE ON arDbTSInfo: ");
+              // dbTransInfo.push(res);
+              this.saveTsInfoDB(res);
+              resolve(res);
+            }
+          }).catch(err => {
+            console.log("ERROR getTransactionReceipt getTranscationInfoHash: " + err);
+            resolve([]);
+          });
+
+        }
+
+      }).catch(err => {
+        console.log("ERROR getTransaction => getTranscationInfoHash: " + err);
+        resolve([]);
+      });
+      
     });
   },
 
@@ -1564,58 +1618,6 @@ module.exports = {
         reject(err);
       });
 
-    });
-  },
-
-  getTranscationInfo: function(e) {
-    return new Promise((resolve, reject) => {
-      web3.eth.getTransactionReceipt(e.hash).then(res => {
-        if (res != null) {
-          // console.log("Input: " + rs.input);
-          res.input = e.input;
-          res.gasPrice = e.gasPrice;
-          // console.log("SAVE ON arDbTSInfo: ");
-          // dbTransInfo.push(res);
-          this.saveTsInfoDB(res);
-          resolve(res);
-        } else {
-          reject();
-          console.log("NOTHING TO RETURN");
-        }
-      }).catch(err => {
-        console.log("ERROR getTranscationInfo: " + err);
-        reject(err);
-      });
-    });
-  },
-
-  getTranscationInfoHash: function(hash) {
-    return new Promise((resolve, reject) => {
-      web3.eth.getTransaction(hash).then(rs => {
-
-        if (rs != null) {
-          web3.eth.getTransactionReceipt(rs.hash).then(res => {
-            if (res != null) {
-              // console.log("Input: " + rs.input);
-              res.input = rs.input;
-              res.gasPrice = rs.gasPrice;
-              console.log("SAVE ON arDbTSInfo: ");
-              // dbTransInfo.push(res);
-              this.saveTsInfoDB(res);
-              resolve(res);
-            }
-          }).catch(err => {
-            console.log("ERROR getTransactionReceipt getTranscationInfoHash: " + err);
-            resolve([]);
-          });
-
-        }
-
-      }).catch(err => {
-        console.log("ERROR getTransaction => getTranscationInfoHash: " + err);
-        resolve([]);
-      });
-      
     });
   },
 
