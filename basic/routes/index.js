@@ -530,8 +530,6 @@ router.post('/get', function(req, res, next) {
           
           var gen = val[2];
           var con = val[3];
-          var gL = gen.length;
-          var cL = gen.length;
 
           var genNew = [];
           var conNew = [];
@@ -556,8 +554,8 @@ router.post('/get', function(req, res, next) {
           }
           
 
-          console.log("Gen length: " + genNew.length);
-          console.log("Con length: " + conNew.length);
+          // console.log("Gen length: " + genNew.length);
+          // console.log("Con length: " + conNew.length);
 
           genNew.forEach(el => {
             genD.push(el.price);
@@ -573,7 +571,7 @@ router.post('/get', function(req, res, next) {
 
 
           // console.log(JSON.stringify(dbData));
-          console.log("REDIRECT");
+          // console.log("REDIRECT");
           res.render('home', { 
             title: 'Ethereum Analytics Debugger - Get Transactions',
             start: val[0],

@@ -193,6 +193,11 @@ Increase Limit of opened files to get more data from Ethereum Node:
 (Run before starting node)
 ```
 ulimit -n 70000
+
+OR
+
+su ubuntu
+ulimit -n
 ```
 
 Increase Memory limit of Node:

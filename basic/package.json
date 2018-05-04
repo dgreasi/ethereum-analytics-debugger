@@ -6,7 +6,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --max_old_space_size=5000000 server.js"
+    "start": "node --max_old_space_size=500000000 server.js"
   },
   "author": "Eric Ferraiuolo <eferraiuolo@gmail.com>",
   "license": "BSD",
