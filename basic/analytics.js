@@ -106,11 +106,12 @@ module.exports = {
           resolve(true);
         }).catch(err => {
           console.log("ERROR syncTsReceipts Call: " + err);
-          resolve([]);
+          reject(err);
         });
       }).catch(err => {
         console.log("ERROR syncBlocks Call: " + err);
-        resolve([]);
+        reject(err);
+        // resolve([]);
       });
 
     });
@@ -158,7 +159,9 @@ module.exports = {
         resolve(dbBlocks);
       }).catch(err => {
         console.log("ERROR syncBlocks: " + err);
-        resolve([]);
+        reject(err);
+
+        // resolve([]);
       });
     });
   },
@@ -197,10 +200,16 @@ module.exports = {
           return a.blockNumber - b.blockNumber;
         });
         // console.log("RESOLVE TSREC");
-        resolve(dbTransInfo);
+        if (dbTransInfo) {
+          resolve(dbTransInfo);
+        } else {
+          reject(dbTransInfo);
+        }
       }).catch(err => {
         console.log("ERROR syncTsReceipts: " + err);
-        resolve([]);
+        reject(err);
+
+        // resolve([]);
       });
 
     });
@@ -391,6 +400,9 @@ module.exports = {
           console.log("ERROR receiptsPromises: " + err);
           reject(err);
         });
+      }).catch(err => {
+        console.log("ERROR syncStep: " + err);
+        reject(err);
       });
     });
   },
@@ -981,20 +993,6 @@ module.exports = {
       
     });
   },
-
-  printsAccountsResults: function() {
-    console.log("");
-    for (var i = 0; i < accounts.length; i++) {
-      console.log((i+1) + ")" + "Account: " + accounts[i][0] + " , gas spent: " + accounts[i][1] + " , # of transactions: " + accounts[i][2]);
-    }
-    console.log("");
-  },
-
-  printTransactionInfo: function(e) {
-    console.log("");
-    console.log("Account: " + e.from + " ,TO: " + e.to  + " , called FUNCTION: " + e.input);
-    console.log("");
-  },
   
   ////////////////////////// Fix START && END block /////////////////////////
 
@@ -1050,47 +1048,12 @@ module.exports = {
     // this.saveStartEndLF(start, end);
   },
 
-  /////////////////////////// Get Clearing Values //////////////////////////////
-
-  getContractResults: function(contract_arg, nickname) {
-    var onj = new Object({hex: contract_arg, name: (nickname ? nickname : contract_arg)});
-    this.addToHistory(onj);
-
-    return new Promise((resolve, reject) => {
-      var promisesAllgetClearing = [];
-
-      promisesAllgetClearing.push(this.getClearingPrice(contract_arg));
-      promisesAllgetClearing.push(this.getclearingQuantity(contract_arg));
-      promisesAllgetClearing.push(this.getclearingType(contract_arg));
-
-      Promise.all(promisesAllgetClearing).then(clearings => {
-        resolve(clearings);
-
-      }).catch(err => {
-        reject(err);
-        console.log("ERROR: " + err);
-      });
-
-    });
-  },
-
-  getClearingPrice: function(contract_arg) {
-    return web3.eth.call({to: contract_arg, data: "0x901a40a7"});
-  },
-
-  getclearingQuantity: function(contract_arg) {
-    return web3.eth.call({to: contract_arg, data: "0x14fffa15"});
-  },
-
-  getclearingType: function(contract_arg) {
-    return web3.eth.call({to: contract_arg, data: "0xbc3d513f"});
-  },
-
   ///////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////
 
   ///////////////////////////////////////////////////////////////////////////////
   ////////////////////// Get Storage on Previous Blocks /////////////////////////
+  ////////////////////// FUNCTIONS FOR SPECIFIC CONTRACT ////////////////////////
   ///////////////////////////////////////////////////////////////////////////////
 
   // More info about storage at specified block here:
@@ -1246,6 +1209,53 @@ module.exports = {
     });
   },
 
+  checkPositionStorage: function() {
+    for (var i = 0; i < 10; i++) {
+      web3.eth.getStorageAt(contract, i).then(res => {
+        // console.log("Index: " + i +" , val: " + res);
+        console.log("Index: " + i +" , val: " + parseInt(res));
+      });
+    }
+  },
+
+  /////////////////////////// Get Clearing Values At Current STATE //////////////////////////////
+
+  getContractResults: function(contract_arg, nickname) {
+    var onj = new Object({hex: contract_arg, name: (nickname ? nickname : contract_arg)});
+    this.addToHistory(onj);
+
+    return new Promise((resolve, reject) => {
+      var promisesAllgetClearing = [];
+
+      promisesAllgetClearing.push(this.getClearingPrice(contract_arg));
+      promisesAllgetClearing.push(this.getclearingQuantity(contract_arg));
+      promisesAllgetClearing.push(this.getclearingType(contract_arg));
+
+      Promise.all(promisesAllgetClearing).then(clearings => {
+        resolve(clearings);
+
+      }).catch(err => {
+        reject(err);
+        console.log("ERROR: " + err);
+      });
+
+    });
+  },
+
+  getClearingPrice: function(contract_arg) {
+    return web3.eth.call({to: contract_arg, data: "0x901a40a7"});
+  },
+
+  getclearingQuantity: function(contract_arg) {
+    return web3.eth.call({to: contract_arg, data: "0x14fffa15"});
+  },
+
+  getclearingType: function(contract_arg) {
+    return web3.eth.call({to: contract_arg, data: "0xbc3d513f"});
+  },
+
+  ///////////////////////////////////// MARKET CHART ///////////////////////////////////////////
+
   marketChart: function(startBlockNumber, endBlockNumber) {
     return new Promise((resolve, reject) => {
       var storagePromises = [];
@@ -1359,18 +1369,13 @@ module.exports = {
     }
 
     return table;
-  },
   // "7f495ea5": "consumptionBid(int256,int256)",
   // "0d31d41a": "generationBid(int256,int256)",
-
-  checkPositionStorage: function() {
-    for (var i = 0; i < 10; i++) {
-      web3.eth.getStorageAt(contract, i).then(res => {
-        // console.log("Index: " + i +" , val: " + res);
-        console.log("Index: " + i +" , val: " + parseInt(res));
-      });
-    }
   },
+
+  ///////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////// SEARCH - SAVE ///////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////
 
   searchFor: function(blockNumber) {
     // console.log("A: " +JSON.stringify(dbBlocks));
@@ -1379,8 +1384,8 @@ module.exports = {
     });
   },
 
-  searchForInArray: function(gasSpentBlock, blockNumber) {
-    return gasSpentBlock.findIndex(element => {
+  searchForInArray: function(array, blockNumber) {
+    return array.findIndex(element => {
       if (element) {
         return element[0] == blockNumber;
       } else {
@@ -1426,9 +1431,6 @@ module.exports = {
       dbTransInfo.push(ts);
     }
   },
-
-  ///////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////////////////////
 
   ///////////////////////////////////////////////////////////////////////////////
   ////////////////////////// EXTRA HELP FUNCTIONS ///////////////////////////////
@@ -1577,11 +1579,12 @@ module.exports = {
           this.saveTsInfoDB(res);
           resolve(res);
         } else {
-          console.log("NOTHING TO RETURN")
+          reject();
+          console.log("NOTHING TO RETURN");
         }
       }).catch(err => {
         console.log("ERROR getTranscationInfo: " + err);
-        resolve([]);
+        reject(err);
       });
     });
   },
@@ -1614,17 +1617,6 @@ module.exports = {
       });
       
     });
-  },
-  
-  printBalanceOfAccounts: function() {
-    console.log("BALANCES");
-    for (var i = 0; i < accounts.length; i++) {
-      web3.eth.getBalance(accounts[i][0]).then(bal => {
-        console.log("Account: " + accounts[i][0] + " ,balance: " + bal);
-      }).catch(err => {
-        console.log("ERROR: " + err);
-      });
-    }
   },
 
   getBalance: function(account, block) {
@@ -1869,7 +1861,6 @@ module.exports = {
     // myContract.options.gas = 5000000;
   },
 
-
   decodeTime: function(timestamp) {
     var date = new Date(timestamp*1000);
     // Hours part from the timestamp
@@ -1889,6 +1880,33 @@ module.exports = {
     return arr.reduce((flat, toFlatten) => {
       return flat.concat(Array.isArray(toFlatten) ? this.flatten(toFlatten) : toFlatten);
     }, []);
+  },
+
+  ////////////////////////////// PRINTS ///////////////////////////////////////
+
+  printBalanceOfAccounts: function() {
+    console.log("BALANCES");
+    for (var i = 0; i < accounts.length; i++) {
+      web3.eth.getBalance(accounts[i][0]).then(bal => {
+        console.log("Account: " + accounts[i][0] + " ,balance: " + bal);
+      }).catch(err => {
+        console.log("ERROR: " + err);
+      });
+    }
+  },
+
+  printsAccountsResults: function() {
+    console.log("");
+    for (var i = 0; i < accounts.length; i++) {
+      console.log((i+1) + ")" + "Account: " + accounts[i][0] + " , gas spent: " + accounts[i][1] + " , # of transactions: " + accounts[i][2]);
+    }
+    console.log("");
+  },
+
+  printTransactionInfo: function(e) {
+    console.log("");
+    console.log("Account: " + e.from + " ,TO: " + e.to  + " , called FUNCTION: " + e.input);
+    console.log("");
   },
 
 }

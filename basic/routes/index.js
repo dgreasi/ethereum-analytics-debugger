@@ -68,6 +68,9 @@ router.post('/get', function(req, res, next) {
             previous_contracts_accounts: prvAC
           });
         });
+      }).catch(err => {
+        console.log("ERROR getAccountTransactionsGasSpentClearings: " + err);
+        reject(err);
       });
     } else {
       noData = "Contract doesn't exist.";
