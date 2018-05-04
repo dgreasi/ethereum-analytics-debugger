@@ -104,7 +104,13 @@ module.exports = {
           console.log(" ");
 
           resolve(true);
+        }).catch(err => {
+          console.log("ERROR syncTsReceipts Call: " + err);
+          resolve([]);
         });
+      }).catch(err => {
+        console.log("ERROR syncBlocks Call: " + err);
+        resolve([]);
       });
 
     });
@@ -152,7 +158,7 @@ module.exports = {
         resolve(dbBlocks);
       }).catch(err => {
         console.log("ERROR syncBlocks: " + err);
-        reject(err);
+        resolve([]);
       });
     });
   },
@@ -194,7 +200,7 @@ module.exports = {
         resolve(dbTransInfo);
       }).catch(err => {
         console.log("ERROR syncTsReceipts: " + err);
-        reject(err);
+        resolve([]);
       });
 
     });

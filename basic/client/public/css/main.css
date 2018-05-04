@@ -28,6 +28,10 @@ form{
 	color: blue;	
 }
 
+.magenta_btn {
+  color: magenta;  
+}
+
 .astext {
     background:none;
     border:none;

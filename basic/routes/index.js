@@ -512,7 +512,7 @@ router.post('/get', function(req, res, next) {
         });
       });
     }
-  } else if (id_function == "12") {
+  } else if (id_function == "12") { // Market Chart
     analytics.marketChart(start_block, end_block).then(val => {
         noData = null;
 
@@ -520,10 +520,7 @@ router.post('/get', function(req, res, next) {
           console.log("ASSING NoDATA");
           console.log(JSON.stringify(val));
           noData = "No available Info! Probably there are no transactions for the specified scenario.";
-        }
-
-        prvAC = analytics.getPreviousAccounts();
-        analytics.getLastBlockLocally().then(block => {
+        } else {
           var dbData = [];
           var genD = [];
           var conD = [];
@@ -572,6 +569,11 @@ router.post('/get', function(req, res, next) {
 
           // console.log(JSON.stringify(dbData));
           // console.log("REDIRECT");
+          
+        }
+
+        prvAC = analytics.getPreviousAccounts();
+        analytics.getLastBlockLocally().then(block => {
           res.render('home', { 
             title: 'Ethereum Analytics Debugger - Get Transactions',
             start: val[0],
