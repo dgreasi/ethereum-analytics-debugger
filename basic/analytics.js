@@ -1356,12 +1356,12 @@ module.exports = {
 
               if (first_clear) {
                 if (ts.input.includes("0x0d31d41a")) { // generation
-                  // console.log("GENERATION Q,P: " + quant +', '+ pric);
+                  console.log("GENERATION Q,P: " + quant +', '+ pric);
 
                   generation = this.marketAdd(generation, quant, (pric > 300 ? 300 : pric));
                   // generation.push({quantity: quant, price: pric});
                 } else { // consumption
-                  // console.log("CONSUMPTION Q,P: " + quant +', '+ pric);
+                  console.log("CONSUMPTION Q,P: " + quant +', '+ pric);
                   consumption = this.marketAdd(consumption, quant, (pric > 300 ? 300 : pric));
 
                   // consumption.push({quantity: quant, price: pric});
