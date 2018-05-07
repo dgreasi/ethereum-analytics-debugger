@@ -69,7 +69,7 @@ router.post('/get', function(req, res, next) {
           });
         });
       }).catch(err => {
-        console.log("ERROR getAccountTransactionsGasSpentClearings: " + err);
+        console.log("ERROR getAccountTransactionsGasSpentClearings Index: " + err);
         reject(err);
       });
     } else {

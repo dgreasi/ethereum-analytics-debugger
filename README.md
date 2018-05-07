@@ -127,6 +127,16 @@ $ npm start
 
 >There is a version of the implementation that can be used for faster testing in terminal. Just run the terminal_analytics.js with node after choosing which functions you want to call.
 
+## Important
+The web3 library, which is the official library of Ethereum to enable communication between a nodejs server and an Ethereum Node, has bugs for node version >= 8.
+
+The only function that fails sometimes is:
+```
+web.eth.getTransactionReceipt()
+```
+You can rerun your scenario and this call will fail less times.
+
+On node < 8 it works just fine!
 
 ### Home Interface
 

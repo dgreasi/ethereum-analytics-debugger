@@ -85,9 +85,12 @@ module.exports = {
 
       }).catch(err => {
         console.log("ERROR sync: " + err);
-        reject(err);
+        resolve([]);
       });
 
+    }).catch(err => {
+      console.log("ERROR syncStep: " + err);
+      reject(err);
     });
   },
 
@@ -106,14 +109,18 @@ module.exports = {
           resolve(true);
         }).catch(err => {
           console.log("ERROR syncTsReceipts Call: " + err);
-          reject(err);
+          // reject(err);
         });
       }).catch(err => {
         console.log("ERROR syncBlocks Call: " + err);
-        reject(err);
-        // resolve([]);
+        // reject(err);
+        resolve([]);
       });
 
+    }).catch(err => {
+      console.log("ERROR sync Call: " + err);
+      reject(err);
+      // resolve([]);
     });
   },
 
@@ -199,19 +206,23 @@ module.exports = {
         dbTransInfo.sort(function(a, b) {
           return a.blockNumber - b.blockNumber;
         });
-        // console.log("RESOLVE TSREC");
         if (dbTransInfo) {
+          console.log("RESOLVE TSREC");
           resolve(dbTransInfo);
         } else {
-          reject(dbTransInfo);
+          console.log("NO transactionsReceiptsPromises");
+          resolve([]);
         }
       }).catch(err => {
         console.log("ERROR syncTsReceipts: " + err);
-        reject(err);
+        resolve([]);
 
         // resolve([]);
       });
 
+    }).catch(err => {
+      console.log("ERROR syncTsReceipts F: " + err);
+      reject(err);
     });
   },
 
@@ -350,7 +361,7 @@ module.exports = {
               bl.transactions.forEach(e => {
                 ts = this.searchTsInfoDbElement(e);
                 // if (ts == null) {
-                //   console.log("ERROR - DIDINT FOUND TS RECEIPT");
+                  console.log("ERROR - DIDINT FOUND TS RECEIPT getAccountTransactionsGasSpentClearings");
                 //   // if ((e.input != "0x") && (e.to == contract_arg)) {
                 //   //   receiptsPromises.push(this.getTransactionReceiptFun(e));
                 //   // }
@@ -370,15 +381,16 @@ module.exports = {
             if (bl != null && bl.transactions != null) {
               bl.transactions.forEach(e => {
                 ts = this.searchTsInfoDbElement(e);
-                // if (ts == null) {
-                //   console.log("ERROR - DIDINT FOUND TS RECEIPT");
-                //   // if (e.input != "0x") {
-                //   //   receiptsPromises.push(this.getTransactionReceiptFun(e));
-                //   // }
-                // } else {
-                //   // console.log("GETTING FROM DB");
-                receiptsPromises.push(this.createTableFromTxReceipt(ts));
-                // }
+                if (ts == null) {
+                  console.log("ERROR - DIDINT FOUND TS RECEIPT getAccountTransactionsGasSpentClearings");
+                  // if (e.input != "0x") {
+                  //   console.log("RE GETTING TS RECEIPT");
+                  //   receiptsPromises.push(this.getTranscationInfo(e));
+                  // }
+                } else {
+                  console.log("GETTING FROM DB");
+                  receiptsPromises.push(this.createTableFromTxReceipt(ts));
+                }
               });
             }
           }
@@ -403,6 +415,8 @@ module.exports = {
         console.log("ERROR syncStep: " + err);
         reject(err);
       });
+    }).catch(err => {
+      console.log("ERROR getAccountTransactionsGasSpentClearings: " + err);
     });
   },
 
@@ -883,12 +897,12 @@ module.exports = {
   getTransactionReceiptFun: function(tx) {
     return new Promise((resolve, reject) => {
       web3.eth.getTransactionReceipt(tx.hash).then(res => {
-        res.input = tx.input;
-        res.gasPrice = tx.gasPrice;
-        dbTransInfo.push(res);
 
         if (res != null) {
+          res.input = tx.input;
+          res.gasPrice = tx.gasPrice;
           res.gas = tx.gas;
+          dbTransInfo.push(res);
           // console.log("EXECUTING");
           check = this.searchForSilentBugs(tx.hash);
           if (check == -1) {
@@ -916,21 +930,24 @@ module.exports = {
           // console.log("Input: " + rs.input);
           res.input = e.input;
           res.gasPrice = e.gasPrice;
-          // console.log("SAVE ON arDbTSInfo: ");
+          console.log("SAVE ON arDbTSInfo getTranscationInfo: ");
           // dbTransInfo.push(res);
           this.saveTsInfoDB(res);
           resolve(res);
         } else {
+          resolve([]);
           // reject();
           console.log("NOTHING TO RETURN");
         }
       }).catch(err => {
         console.log("ERROR getTranscationInfo: " + err);
-        reject(err);
+        resolve();
+        
       });
     }).catch(err => {
       console.log("ERROR getTranscationInfo Promise F: " + err);
-      reject(err);
+        reject(err);
+      // reject(err);
     });
   },
 
@@ -1596,7 +1613,7 @@ module.exports = {
             var transactionsReceiptsValid = [];
             // console.log("Lenght of receipts: " + receipts.length);
             receipts.forEach(rs => {
-              if (rs.contractAddress) {
+              if (rs && rs.contractAddress) {
                 // console.log("Found contract");
                 transactionsReceiptsValid.push(rs);
               }

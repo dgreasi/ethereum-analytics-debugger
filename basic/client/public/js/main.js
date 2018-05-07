@@ -33,7 +33,7 @@ $(document).on('ready', function() {
 
 					// console.log("FOUND: " + found);
 					if (found) {
-						console.log("ALREADY IN");
+						// console.log("ALREADY IN");
 					} else {
 						var blockN = [];
 						blockN = diff_chart.data[0].x;
@@ -67,7 +67,7 @@ $(document).on('ready', function() {
 						// Plotly.plot('diff_chart', dataD, layoutD);
 					}
 				} else {					
-					console.log("INIT CHART");
+					// console.log("INIT CHART");
 					block = [];
 					diff = [];
 
@@ -101,7 +101,7 @@ $(document).on('ready', function() {
 
 					// console.log("FOUND: " + found);
 					if (found) {
-						console.log("ALREADY IN");
+						// console.log("ALREADY IN");
 					} else {
 						var blockN1 = [];
 						blockN1 = gasLimit_chart.data[0].x;
@@ -135,7 +135,7 @@ $(document).on('ready', function() {
 						// Plotly.plot('diff_chart', dataD, layoutD);
 					}
 				} else {					
-					console.log("INIT CHART");
+					// console.log("INIT CHART");
 					block1 = [];
 					diff1 = [];
 
@@ -169,7 +169,7 @@ $(document).on('ready', function() {
 
 					// console.log("FOUND: " + found);
 					if (found) {
-						console.log("ALREADY IN");
+						// console.log("ALREADY IN");
 					} else {
 						var blockN2 = [];
 						blockN2 = gasUsed_chart.data[0].x;
@@ -203,7 +203,7 @@ $(document).on('ready', function() {
 						// Plotly.plot('diff_chart', dataD, layoutD);
 					}
 				} else {					
-					console.log("INIT CHART");
+					// console.log("INIT CHART");
 					block2 = [];
 					diff2 = [];
 
@@ -237,7 +237,7 @@ $(document).on('ready', function() {
 
 					// console.log("FOUND: " + found);
 					if (found) {
-						console.log("ALREADY IN");
+						// console.log("ALREADY IN");
 					} else {
 						var blockN3 = [];
 						blockN3 = ts_number_chart.data[0].x;
@@ -271,7 +271,7 @@ $(document).on('ready', function() {
 						// Plotly.plot('diff_chart', dataD, layoutD);
 					}
 				} else {					
-					console.log("INIT CHART");
+					// console.log("INIT CHART");
 					block3 = [];
 					diff3 = [];
 
