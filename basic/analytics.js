@@ -1444,13 +1444,13 @@ module.exports = {
           return b.price - a.price;
         });
         // console.log(JSON.stringify(res));
-        console.log("GENERATION TABLE:");
-        console.log(generation.length);
+        // console.log("GENERATION TABLE:");
+        // console.log(generation.length);
         // console.log(JSON.stringify(generation));
 
 
-        console.log("CONSUMPTION TABLE:");
-        console.log(consumption.length);
+        // console.log("CONSUMPTION TABLE:");
+        // console.log(consumption.length);
 
         if (generation.length == 0) {
           generation.push({quantity: -99, price: -99})
@@ -1478,7 +1478,7 @@ module.exports = {
     var found = table.findIndex(el => {
       if (el) {
         console.log("EL: " + JSON.stringify(el));
-        console.log("PRICE: " + el.price);
+        // console.log("PRICE: " + el.price);
         return el.price == parseInt(price);
       }
     });
