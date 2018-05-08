@@ -457,7 +457,7 @@ module.exports = {
                 //   //   receiptsPromises.push(this.getTransactionReceiptFun(e));
                 //   // }
                 // } else {
-                if (ts.to) {
+                if (ts && ts.to) {
                   // console.log("TS.to: " + ts.to);
                   // console.log("TO: " + ts.to.toUpperCase());
                   // console.log("Contract: " + contract_arg.toUpperCase());
@@ -475,15 +475,15 @@ module.exports = {
             if (bl != null && bl.transactions != null) {
               bl.transactions.forEach(e => {
                 ts = this.searchTsInfoDbElement(e);
-                // if (ts == null) {
-                //   console.log("ERROR - DIDINT FOUND TS RECEIPT");
+                if (ts == null) {
+                  console.log("ERROR - DIDINT FOUND TS RECEIPT");
                 //   // if (e.input != "0x") {
                 //   //   receiptsPromises.push(this.getTransactionReceiptFun(e));
                 //   // }
-                // } else {
+                } else {
                 //   // console.log("GETTING FROM DB");
                 receiptsPromises.push(this.creteTableOfTransactions(ts));
-                // }
+                }
               });
             }
           }
@@ -1409,6 +1409,32 @@ module.exports = {
         console.log(consumption.length);
         // console.log(JSON.stringify(consumption));
 
+        if (first_clear == null && second_clear == null) {
+          for (var j = 0; j < 65; j++) {
+            dbBlocks[check+j].transactions.some(ts => {
+              inputSh = ts.input.toString();
+              quant = 0;
+              pric = 0;
+
+              if (inputSh.length > 10) {
+                inputSh = inputSh.slice(10);
+                inputSh = "0x".concat(inputSh);
+                help = web3.eth.abi.decodeParameters(['int256', 'int256'], inputSh);
+                quant = help[0];
+                pric = help[1];
+              }
+
+              if (ts.input.includes("0x0d31d41a")) { // generation
+                console.log("GENERATION Q,P: " + quant +', '+ pric);
+                generation = this.marketAdd(generation, quant, (pric > 300 ? 300 : pric));
+              } else { // consumption
+                console.log("CONSUMPTION Q,P: " + quant +', '+ pric);
+                consumption = this.marketAdd(consumption, quant, (pric > 300 ? 300 : pric));
+              }
+            });
+          }
+        }
+
 
         generation = generation.sort((a, b) => {
           return a.price - b.price;
@@ -1418,19 +1444,43 @@ module.exports = {
           return b.price - a.price;
         });
         // console.log(JSON.stringify(res));
+        console.log("GENERATION TABLE:");
+        console.log(generation.length);
+        // console.log(JSON.stringify(generation));
+
+
+        console.log("CONSUMPTION TABLE:");
+        console.log(consumption.length);
+
+        if (generation.length == 0) {
+          generation.push({quantity: -99, price: -99})
+        }
+
+        if (consumption.length == 0) {
+          consumption.push({quantity: -99, price: -99})
+        }
         endStartClear.push(generation);
         endStartClear.push(consumption);
 
         resolve(endStartClear);
 
+      }).catch(err => {
+        console.log("ERROR syncStep marketChart: " + err);
       });
 
+    }).catch(err => {
+      console.log("ERROR marketChart: " + err);
+      reject(err);
     });
   },
 
   marketAdd: function(table, quantity, price) {
     var found = table.findIndex(el => {
-      return el.price == parseInt(price);
+      if (el) {
+        console.log("EL: " + JSON.stringify(el));
+        console.log("PRICE: " + el.price);
+        return el.price == parseInt(price);
+      }
     });
 
     if (found != -1) {
