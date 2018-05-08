@@ -1,0 +1,19 @@
+{
+  "env": {
+    "node": 1,
+    "browser": 1
+  },
+  "globals": {
+    "dbBlocks": true,
+    "dbTransInfo": true,
+    "dbClearings": true
+    "silentBugs": true,
+    "accounts": true,
+    "previous_contracts_accounts": true
+  },
+  "rules": {
+    "eqeqeq": 1
+  },
+  "plugins": [
+  ]
+}
