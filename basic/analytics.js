@@ -430,88 +430,97 @@ module.exports = {
 
   getTransactions: function(startBlockNumber, endBlockNumber, contract_arg, nickname) {
     console.time("getTransactions");
+    accounts = [];
+    silentBugs = [];
 
-    return new Promise((resolve, reject) => {
+
+    return this.syncStep(startBlockNumber, endBlockNumber, 1)
+    .catch(err => {
+      console.log("ERROR syncStep: " + err);
+      throw err;
+    })
+    .then(rs => {
       var receiptsPromises = [];
 
-      accounts = [];
-      silentBugs = [];
-      this.syncStep(startBlockNumber, endBlockNumber, 1).then(rs => {
-        startBlockNumber = start;
-        endBlockNumber = end;
+      startBlockNumber = start;
+      endBlockNumber = end;
 
-        this.sortDB();
+      this.sortDB();
       
-        var check = this.searchFor(startBlockNumber);
-        console.log("FROM - TO BLOCK: " + startBlockNumber + " - " + endBlockNumber);
-        var ts = null;
-        if (contract_arg != "") {
+      var check = this.searchFor(startBlockNumber);
+      console.log("FROM - TO BLOCK: " + startBlockNumber + " - " + endBlockNumber);
+      var ts = null;
+      if (contract_arg) {
 
-          for (var j = 0; j <= (endBlockNumber - startBlockNumber); j++) {
-            bl = dbBlocks[check+j];
-            if (bl != null && bl.transactions != null) {
-              // console.log("Block with transactions");
-              var onj = new Object({hex: contract_arg, name: (nickname ? nickname : contract_arg)});
-              this.addToHistory(onj);
-              // console.log("Call with contract_arg");
-              
-              bl.transactions.forEach(e => {
-                // console.log("TS: " + e.hash);
-                ts = this.searchTsInfoDbElement(e);
-                // console.log("TS RETURNED: " + JSON.stringify(ts));
-                // if (ts == null) {
-                //   console.log("ERROR - DIDINT FOUND TS RECEIPT");
-                //   // if ((e.input != "0x") && (e.to == contract_arg)) {
-                //   //   receiptsPromises.push(this.getTransactionReceiptFun(e));
-                //   // }
-                // } else {
-                if (ts && ts.to) {
-                  // console.log("TS.to: " + ts.to);
-                  // console.log("TO: " + ts.to.toUpperCase());
-                  // console.log("Contract: " + contract_arg.toUpperCase());
+        for (var j = 0; j <= (endBlockNumber - startBlockNumber); j++) {
+          bl = dbBlocks[check+j];
+          if (bl != null && bl.transactions != null) {
+            // console.log("Block with transactions");
+            var onj = new Object({hex: contract_arg, name: (nickname ? nickname : contract_arg)});
+            this.addToHistory(onj);
+            // console.log("Call with contract_arg");
+            
+            bl.transactions.forEach(e => {
+              // console.log("TS: " + e.hash);
+              ts = this.searchTsInfoDbElement(e);
+              // console.log("TS RETURNED: " + JSON.stringify(ts));
+              if (ts == null) {
+                console.log("ERROR - DIDINT FOUND TS RECEIPT getTransactions");
+              //   // if ((e.input != "0x") && (e.to == contract_arg)) {
+              //   //   receiptsPromises.push(this.getTransactionReceiptFun(e));
+              //   // }
+              } else {
+                // console.log("TS.to: " + ts.to);
+                // console.log("TO: " + ts.to.toUpperCase());
+                // console.log("Contract: " + contract_arg.toUpperCase());
+                if (ts.to) {
                   if (ts.to.toUpperCase() == contract_arg.toUpperCase()) {
                     receiptsPromises.push(this.creteTableOfTransactions(ts));
                   }
                 }
-                // }
-              });
-            }
-          }
-        } else {
-          for (var j = 0; j <= (endBlockNumber - startBlockNumber); j++) {
-            bl = dbBlocks[check+j];
-            if (bl != null && bl.transactions != null) {
-              bl.transactions.forEach(e => {
-                ts = this.searchTsInfoDbElement(e);
-                if (ts == null) {
-                  console.log("ERROR - DIDINT FOUND TS RECEIPT");
-                //   // if (e.input != "0x") {
-                //   //   receiptsPromises.push(this.getTransactionReceiptFun(e));
-                //   // }
-                } else {
-                //   // console.log("GETTING FROM DB");
-                receiptsPromises.push(this.creteTableOfTransactions(ts));
-                }
-              });
-            }
+              }
+            });
           }
         }
+      } else {
+        for (var j = 0; j <= (endBlockNumber - startBlockNumber); j++) {
+          bl = dbBlocks[check+j];
+          if (bl != null && bl.transactions != null) {
+            bl.transactions.forEach(e => {
+              ts = this.searchTsInfoDbElement(e);
+              if (ts == null) {
+                console.log("ERROR - DIDINT FOUND TS RECEIPT");
+              //   // if (e.input != "0x") {
+              //   //   receiptsPromises.push(this.getTransactionReceiptFun(e));
+              //   // }
+              } else {
+              //   // console.log("GETTING FROM DB");
+                receiptsPromises.push(this.creteTableOfTransactions(ts));
+              }
+            });
+          }
+        }
+      }
 
-        Promise.all(receiptsPromises).then(res => {
-          // SAVE TO DB
-          // console.log("Transactions Receipt: " + JSON.stringify(this.flatten(dbTransRec)));
-          endStartAccount = [start, end];
-          endStartAccount.push(res);
-          // setTimeout
-          // console.log("RESOLVING");
-          console.timeEnd("getTransactions");
-          resolve(endStartAccount);
-
-        }).catch(err => {
-          console.log("ERROR receiptsPromises: " + err);
-          reject(err);
-        });
+      return Promise.all(receiptsPromises)
+      .catch(err => {
+        console.log("ERROR receiptsPromises: " + err);
+        throw err;
       });
+    })
+    .then(res => {
+      // SAVE TO DB
+      endStartAccount = [start, end];
+      endStartAccount.push(res);
+
+      // setTimeout
+      // console.log("RESOLVING");
+      console.timeEnd("getTransactions");
+
+      return endStartAccount;
+    })
+    .catch(err => {
+      console.log("ERROR getAccountTransactionsGasSpentClearings: " + err);
     });
   },
 
