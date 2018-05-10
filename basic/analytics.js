@@ -898,7 +898,7 @@ module.exports = {
       // SAVE TO DB
       endStartAccount = [start, end];
       endStartAccount.push(timeToMine);
-      console.log(JSON.stringify(timeToMine));
+      // console.log(JSON.stringify(timeToMine));
       // setTimeout
       // console.log("RESOLVING");
 
@@ -1004,12 +1004,12 @@ module.exports = {
         }
       }).catch(err => {
         console.log("ERROR getTranscationInfo: " + err);
-        throw err;
+        resolve(err);
         
       });
     }).catch(err => {
       console.log("ERROR getTranscationInfo Promise F: " + err);
-        reject(err);
+      resolve(err);
       // reject(err);
     });
   },
