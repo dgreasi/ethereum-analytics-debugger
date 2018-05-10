@@ -739,7 +739,8 @@ module.exports = {
   getBlockInfoMinimalNoChecks(blockNumber) {
     return new Promise((resolve, reject) => {
       web3.eth.getBlock(blockNumber, true).then(bl => {
-        bl.timestamp = this.decodeTime(bl.timestamp);
+        // bl.timestamp = this.decodeTime(bl.timestamp);
+        bl.time = this.decodeTime(bl.timestamp);
         resolve(bl);
       });
     }).catch(err => {
@@ -792,7 +793,9 @@ module.exports = {
               return a.number - b.number;
             });
             // console.log(JSON.stringify(dbBlocks));
-            bl.timestamp = this.decodeTime(bl.timestamp);
+            // bl.timestamp = this.decodeTime(bl.timestamp);
+            bl.time = this.decodeTime(bl.timestamp);
+
             resolve(bl);
           });
         }
@@ -862,6 +865,49 @@ module.exports = {
         reject(err);
       });
 
+    });
+  },
+
+  getTimeToMineBlock: function(startBlockNumber, endBlockNumber) {
+    console.time("getTimeToMineBlock");
+    accounts = [];
+    silentBugs = [];
+    var timeToMine = [];
+
+
+    return this.syncStep(startBlockNumber, endBlockNumber, 2)
+    .catch(err => {
+      console.log("ERROR syncStep: " + err);
+      throw err;
+    })
+    .then(rs => {
+      startBlockNumber = start;
+      endBlockNumber = end;
+
+      this.sortDB();
+      
+      var check = this.searchFor(startBlockNumber);
+      console.log("FROM - TO BLOCK: " + startBlockNumber + " - " + endBlockNumber);
+      // timeToMine.push([dbBlocks[check].number, dbBlocks[check].timestamp]);
+      for (var j = 1; j <= (endBlockNumber - startBlockNumber); j++) {
+        bl = dbBlocks[check+j];
+        // console.log("timestamp: " + bl.timestamp);
+        timeToMine.push([bl.number, parseInt(bl.timestamp) - parseInt(dbBlocks[check+j-1].timestamp)]);
+      }
+
+      // SAVE TO DB
+      endStartAccount = [start, end];
+      endStartAccount.push(timeToMine);
+      console.log(JSON.stringify(timeToMine));
+      // setTimeout
+      // console.log("RESOLVING");
+
+      console.timeEnd("getTimeToMineBlock");
+
+      return endStartAccount;
+    })
+    .catch(err => {
+      console.log("ERROR getTimeToMineBlock: " + err);
     });
   },
 

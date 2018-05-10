@@ -302,6 +302,8 @@ $(document).on('ready', function() {
 	gas_per_block_chart = document.getElementById('gas_per_block_chart');
 	balance_of_account_per_block_chart = document.getElementById('balance_of_account_per_block_chart');
 	market_chart = document.getElementById('market_chart');
+	time_to_mine_chart = document.getElementById('time_to_mine_chart');
+
 
 
 
@@ -599,6 +601,37 @@ $(document).on('ready', function() {
 
 		Plotly.plot('market_chart', data, layout);
 	}
+
+	if (time_to_mine_chart) {
+		var data1_chart = time_to_mine_chart.getAttribute('data-for');
+		var dataToArray1_chart = data1_chart.split(",");
+
+		var blocks = [];
+		var balance = [];
+
+		for (var i = 2; i < dataToArray1_chart.length; i=i+2) {
+			blocks.push(dataToArray1_chart[i]);
+			balance.push(dataToArray1_chart[i+1]);
+		}
+
+		// NEW CHART
+		var trace1 = {
+		  	x: blocks,
+			y: balance,
+			name: 'balance',
+			fill: 'tozeroy',
+  			type: 'scatter'
+		};
+
+		var data = [trace1];
+
+		var layout = {
+		  title: 'Time to Mine Block - Blocks',
+		  yaxis: {title: 'Time'},
+		};
+
+		Plotly.plot('time_to_mine_chart', data, layout);
+	}
 });
 
 
@@ -688,3 +721,10 @@ $( "#get_market_chart" ).click(function() {
   $( "#id_function" ).val("12");
   $( "#submit_global" ).click();
 });
+
+$( "#get_time_to_mine_block" ).click(function() {
+  // alert( "Handler for .click() called." );
+  $( "#id_function" ).val("13");
+  $( "#submit_global" ).click();
+});
+

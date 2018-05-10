@@ -137,6 +137,12 @@
         <span class="glyphicon glyphicon-stats"></span>
       </button>
 
+      <button class="btn btn-default red_btn" id="get_time_to_mine_block" title="Blocks => Chart">
+        Get Time to Mine Block
+        <span class="glyphicon glyphicon-hdd"></span>
+        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
+        <span class="glyphicon glyphicon-stats"></span>
+      </button>
       
     </div>
 
@@ -382,6 +388,10 @@
 
     {{#if market}}
       <div id="market_chart" data-for="{{market}}" class="center"></div>
+    {{/if}}
+
+    {{#if timeToMine}}
+      <div id="time_to_mine_chart" data-for="{{timeToMine}}" class="center"></div>
     {{/if}}
     
 

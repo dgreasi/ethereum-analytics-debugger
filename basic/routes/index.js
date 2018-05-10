@@ -592,6 +592,31 @@ router.post('/get', function(req, res, next) {
           });
         });
       });
+  } else if (id_function == "13") { // Get Time to Mine Block
+    analytics.getTimeToMineBlock(start_block, end_block).then(val => {
+      var noData = null;
+
+      prvAC = analytics.getPreviousAccounts();
+      analytics.getLastBlockLocally().then(block => {
+        // console.log("REDIRECT");
+        if (!val[2]) {
+          console.log("ASSING NoDATA");
+          console.log(JSON.stringify(val));
+          noData = "No available Info! Probably there are no transactions for the specified scenario.";
+        }
+
+        res.render('home', { 
+          title: 'Ethereum Analytics Debugger - Time to Mine Block',
+          start: val[0],
+          end: val[1],
+          timeToMine: val[2],
+          noData: noData,
+          lastBlock: block,
+          previous_contracts_accounts: prvAC
+        });
+
+      });
+    });
   } else {
     var ret = checkReturnHex(contract);
 
