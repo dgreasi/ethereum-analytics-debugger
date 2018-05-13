@@ -38,11 +38,14 @@ Each line contains:
 
 ![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/state_of_contract.png?raw=true "State of Contract")
 ![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/transactions.png?raw=true "Transactions to Contract")
->Currently this function has to be changed from each developer to get the wanted variables. You need to edit the function "getStorageAtBlock()" at line 718 and his sub-functions to match your needs. More specifically you should change the pointer number in each sub-function to target your vars.
+>Currently this function has to be changed from each developer to get the wanted variables. You need to edit the function "getStorageAtBlock()" at line 1157 and his sub-functions to match your needs. More specifically you should change the pointer number in each sub-function to target your vars.
+
+>More Info about 'How to read Ethereum contract storage' can be found [here](https://medium.com/aigang-network/how-to-read-ethereum-contract-storage-44252c8af925)
 
 3) **Get Contracts** - ARGS: (Start block, End block)
 
 >This function will search through the specified range of blocks to find mined contracts. It will return some information about the mined Contract, such as , block number, miner, owner, address of contract (needed) etc.
+
 
 ![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/get_contract.png?raw=true "Contracts")
 
