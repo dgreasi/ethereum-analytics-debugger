@@ -40,142 +40,137 @@ module.exports = {
 ///////////////////////////////////////////////////////////////////////////////
 
   syncStep: function(startBlockNumber, endBlockNumber, type) {
-    return new Promise ((resolve, reject) => {
-      var blockNumberPromise = web3.eth.getBlockNumber();
+    return web3.eth.getBlockNumber()
+    .then(res => {
+      this.checkStartEndInput(startBlockNumber, endBlockNumber, res);
+      startBlockNumber = start;
+      endBlockNumber = end;
 
-      blockNumberPromise.then(res => {
-        this.checkStartEndInput(startBlockNumber, endBlockNumber, res);
-        startBlockNumber = start;
-        endBlockNumber = end;
+      var steps = this.getSteps(startBlockNumber, endBlockNumber);
 
-        var steps = this.getSteps(startBlockNumber, endBlockNumber);
+      var stepCalls = [];
 
-        var stepCalls = [];
-        if (type == 1) {
-          for (var i = 0; i < steps.length - 1; i++) {
-            ((i) => {
-              if (i < steps.length -2) {
-                stepCalls.push(() => this.sync(steps[i], steps[i+1]-1));
-              } else {
-                stepCalls.push(() => this.sync(steps[i], steps[i+1]));
-              }
-            })(i);
-          }
-        } else {
-          for (var i = 0; i < steps.length - 1; i++) {
-            ((i) => {
-              if (i < steps.length -2) {
-                stepCalls.push(() => this.syncBl(steps[i], steps[i+1]-1));
-              } else {
-                stepCalls.push(() => this.syncBl(steps[i], steps[i+1]));
-              }
-            })(i);
-          }
-        }
+      // if (type === 1) {
+      //   for (var i = 0; i < steps.length - 1; i++) {
+      //     const startBlockNumber = steps[i];
+      //     const endBlockNumber = i < steps.length -2 ?
+      //       steps[i+1]-1 :
+      //       steps[i+1];
+      //     stepCalls.push(() => this.sync(startBlockNumber, endBlockNumber));
+      //   }
+      // } else {
+      //   for (var i = 0; i < steps.length - 1; i++) {
+      //     const startBlockNumber = steps[i];
+      //     const endBlockNumber = i < steps.length -2 ?
+      //       steps[i+1]-1 :
+      //       steps[i+1];
+      //     stepCalls.push(() => this.syncBl(startBlockNumber, endBlockNumber));
+      //   }
+      // }
 
-        const mySeriesPromise = stepCalls.reduce(
-          (acc, crnt) => acc.then(() => crnt()),
-          Promise.resolve()
-        );
+      const syncFn = (
+          type === 1 ?
+              this.sync :
+              this.syncBl
+      ).bind(this);
+          
+      for (var i = 0; i < steps.length - 1; i++) {
+        const startBlockNumber = steps[i];
+        const endBlockNumber = i < steps.length - 2 ?
+          steps[i+1]-1 :
+          steps[i+1];
+        stepCalls.push(() => syncFn(startBlockNumber, endBlockNumber));
+      }
 
-        mySeriesPromise.then(r => {
-          endStartAccount = [start, end];
-          resolve(endStartAccount);
-        });
+      const mySeriesPromise = stepCalls.reduce(
+        (acc, crntFn) => acc.then(crntFn),
+        Promise.resolve()
+      );
 
-      }).catch(err => {
-        console.log("ERROR sync: " + err);
-        throw err;
-      });
-
-    }).catch(err => {
-      console.log("ERROR syncStep: " + err);
-      reject(err);
+      return mySeriesPromise;
+    })
+    .then(() => {
+      endStartAccount = [start, end];
+      return endStartAccount;
+    })
+    .catch(err => {
+      console.log("ERROR sync: " + err);
+      return [];
     });
   },
 
   sync: function(startBlockNumber, endBlockNumber) {
-    return new Promise((resolve, reject) => {
+    return this.syncBlocks(startBlockNumber, endBlockNumber)
+    .then(() => this.syncTsReceipts(startBlockNumber, endBlockNumber))
+    .then(() => {
 
-
-      this.syncBlocks(startBlockNumber, endBlockNumber).then((rs, err) => {
-        this.syncTsReceipts(startBlockNumber, endBlockNumber).then(rsT => {
-
-          console.log("IN PROMISE CALL: " + startBlockNumber + " - " + endBlockNumber);
-          console.log("DB BLOCKS LENGTH: " + dbBlocks.length);
-          console.log("DB Trans Receipts LENGTH: " + dbTransInfo.length);
-          console.log(" ");
-
-          resolve(true);
-        }).catch(err => {
-          console.log("ERROR syncTsReceipts Call: " + err);
-          throw err;
-        });
-      }).catch(err => {
-        console.log("ERROR syncBlocks Call: " + err);
-        // reject(err);
-        throw err;
-      });
-
-    }).catch(err => {
-      console.log("ERROR sync Call: " + err);
-      reject(err);
-      // resolve([]);
+      console.log("IN PROMISE CALL: " + startBlockNumber + " - " + endBlockNumber);
+      console.log("DB BLOCKS LENGTH: " + dbBlocks.length);
+      console.log("DB Trans Receipts LENGTH: " + dbTransInfo.length);
+      console.log(" ");
+  
+      return true;
+    })
+    .catch(err => {
+      console.log("ERROR syncTsReceipts Call: " + err);
+      throw err;
+    })
+    .catch(err => {
+      console.log("ERROR syncBlocks Call: " + err);
+      // reject(err);
+      return [];
     });
   },
 
   syncBl: function(startBlockNumber, endBlockNumber) {
-    return new Promise((resolve, reject) => {
+    return this.syncBlocks(startBlockNumber, endBlockNumber)
+    .then(() => {
 
-      this.syncBlocks(startBlockNumber, endBlockNumber).then(rs => {
-        console.log("IN PROMISE CALL: " + startBlockNumber + " - " + endBlockNumber);
-        console.log("DB BLOCKS LENGTH: " + dbBlocks.length);
-        console.log(" ");
+      console.log("IN PROMISE CALL: " + startBlockNumber + " - " + endBlockNumber);
+      console.log("DB BLOCKS LENGTH: " + dbBlocks.length);
+      console.log(" ");
 
-        resolve(true);
-      });
-
+      return true;
+    })
+    .catch(err => {
+      console.log("ERROR syncBlocks Call: " + err);
+      // reject(err);
+      return [];
     });
   },
 
   syncBlocks: function(startBlockNumber, endBlockNumber) {
-   return new Promise((resolve, reject) => {
-
-      var getBlockPromises = [];
-
-      for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-        check = this.searchFor(i);
-        // console.log("CHECK: " + check);
-        
-        if (check == -1) { // DOESN'T EXIST
-          var getBlock = this.getBlockInfoMinimalNoChecks(i);
-          getBlockPromises.push(getBlock);
-        } else {
-          // console.log("BLOCK: " + i + " EXISTS ALREADY");
-        }
-
+    var getBlockPromises = [];
+    
+    for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+      check = this.searchFor(i);
+      // console.log("CHECK: " + check);
+      
+      if (check == -1) { // DOESN'T EXIST
+        var getBlock = this.getBlockInfoMinimalNoChecks(i);
+        getBlockPromises.push(getBlock);
+      } else {
+        console.log("BLOCK: " + i + " EXISTS ALREADY");
       }
-
-      Promise.all(getBlockPromises).then(blocks => {
-        // SAVE TO DB
-        dbBlocks = dbBlocks.concat(blocks);
-        dbBlocks.sort(function(a, b) {
-          return a.number - b.number;
-        });
-
-        resolve(dbBlocks);
-      }).catch(err => {
-        console.log("ERROR syncBlocks: " + err);
-        throw err;
+  
+    }
+  
+    return Promise.all(getBlockPromises).then(blocks => {
+      // SAVE TO DB
+      dbBlocks = dbBlocks.concat(blocks);
+      dbBlocks.sort(function(a, b) {
+        return a.number - b.number;
       });
+  
+      return dbBlocks;
     }).catch(err => {
-      console.log("ERROR syncBlocks Promise: " + err);
-      reject(err);
+      console.log("ERROR syncBlocks: " + err);
+      throw err;
     });
   },
 
   syncTsReceipts: function(startBlockNumber, endBlockNumber) {
-    return new Promise((resolve, reject) => {
+    return Promise.resolve().then(() => {
       var transactionsReceiptsPromises = [];
 
       check = this.searchFor(startBlockNumber);
@@ -184,7 +179,7 @@ module.exports = {
       } else {
         for (var i = 0; i <= endBlockNumber - startBlockNumber; i++) {
           // console.log("CHECK: " + check);
-          bl = dbBlocks[check+i];
+          var bl = dbBlocks[check+i];
           if (bl != null && bl.transactions != null) {
             // console.log("Block with transactions");
             var ts = null;
@@ -196,32 +191,29 @@ module.exports = {
                   transactionsReceiptsPromises.push(this.getTranscationInfo(e));
                 }
               } else {
-                // console.log("TS EXISTS ALREADY");
+                console.log("TS EXISTS ALREADY");
               }
             });
           }
         }
       }
-
-      Promise.all(transactionsReceiptsPromises).then(tsR => {
-        dbTransInfo.sort(function(a, b) {
-          return a.blockNumber - b.blockNumber;
-        });
-        if (dbTransInfo) {
-          console.log("RESOLVE TSREC");
-          resolve(dbTransInfo);
-        } else {
-          console.log("NO transactionsReceiptsPromises");
-          resolve([]);
-        }
-      }).catch(err => {
-        console.log("ERROR syncTsReceipts: " + err);
-        throw err;
+      return Promise.all(transactionsReceiptsPromises);  
+    })
+    .then(tsR => {
+      dbTransInfo.sort(function(a, b) {
+        return a.blockNumber - b.blockNumber;
       });
-
-    }).catch(err => {
-      console.log("ERROR syncTsReceipts F: " + err);
-      reject(err);
+      if (dbTransInfo) {
+        console.log("RESOLVE TSREC");
+        return dbTransInfo;
+      } else {
+        console.log("NO transactionsReceiptsPromises");
+        return [];
+      }
+    })
+    .catch(err => {
+      console.log("ERROR syncTsReceipts: " + err);
+      return [];
     });
   },
 
@@ -248,42 +240,37 @@ module.exports = {
   },
 
   syncContractVars: function(startBlockNumber, endBlockNumber, contract) {
-    return new Promise((resolve, reject) => {
-      var blockNumberPromise = web3.eth.getBlockNumber();
+    return web3.eth.getBlockNumber()
+    .then(res => {
+      this.checkStartEndInput(startBlockNumber, endBlockNumber, res);
+      startBlockNumber = start;
+      endBlockNumber = end;
 
-      blockNumberPromise.then(res => {
-        this.checkStartEndInput(startBlockNumber, endBlockNumber, res);
-        startBlockNumber = start;
-        endBlockNumber = end;
+      var steps = this.getSteps(startBlockNumber, endBlockNumber);
 
-        var steps = this.getSteps(startBlockNumber, endBlockNumber);
+      var stepCalls = [];
+      for (var i = 0; i < steps.length - 1; i++) {
+        const startBlockNumber = steps[i];
+        const endBlockNumber = i < steps.length -2 ?
+          steps[i+1]-1 :
+          steps[i+1];
+        stepCalls.push(() => this.syncGetVarsStep(startBlockNumber, endBlockNumber, contract));
+      }
 
-        var stepCalls = [];
-        for (var i = 0; i < steps.length - 1; i++) {
-          ((i) => {
-            if (i < steps.length -2) {
-              stepCalls.push(() => this.syncGetVarsStep(steps[i], steps[i+1]-1, contract));
-            } else {
-              stepCalls.push(() => this.syncGetVarsStep(steps[i], steps[i+1], contract));
-            }
-          })(i);
-        }
+      const mySeriesPromise = stepCalls.reduce(
+        (acc, crntFn) => acc.then(crntFn),
+        Promise.resolve()
+      );
 
-        const mySeriesPromise = stepCalls.reduce(
-          (acc, crnt) => acc.then(() => crnt()),
-          Promise.resolve()
-        );
-
-        mySeriesPromise.then(r => {
-          endStartAccount = [start, end];
-          resolve(endStartAccount);
-        });
-
-      }).catch(err => {
-        console.log("ERROR syncContractVars: " + err);
-        reject(err);
-      });
-
+      return mySeriesPromise;
+    })
+    .then(() => {
+      endStartAccount = [start, end];
+      return endStartAccount;
+    })
+    .catch(err => {
+      console.log("ERROR syncContractVars: " + err);
+      return [];
     });
   },
 
@@ -333,9 +320,7 @@ module.exports = {
   getAccountTransactionsGasSpentClearings: function(startBlockNumber, endBlockNumber, contract_arg, nickname) {
     console.time("Main Experiment");
 
-    // *** xreiazetai na einai auta ta 2 global? ***
-    // prin to var eleipe!?
-    // xrisimopoiountai pouthena?
+    // Empty global vars
     accounts = [];
     silentBugs = [];
     return this.syncStep(startBlockNumber, endBlockNumber, 1)
@@ -344,81 +329,59 @@ module.exports = {
       throw err;
     })
     .then(rs => {
-      var receiptsPromises = [];
-      // *** pou einai to start & to end dilomena? ***
+
       startBlockNumber = start;
       endBlockNumber = end;
 
       this.sortDB();
 
       var check = this.searchFor(startBlockNumber);
+      console.log("BUILDING TABLE");
       console.log("FROM - TO BLOCK: " + startBlockNumber + " - " + endBlockNumber);
-
-      for (var j = 0; j <= (parseInt(endBlockNumber) - parseInt(startBlockNumber)); j++) {
+      for (var j = 0; j <= (endBlockNumber - startBlockNumber); j++) {
         var bl = dbBlocks[check+j];
-        // *** isws tha mporouse na einai if (bl && bl.transactions) { ***
+
         if (bl && bl.transactions) {
-        // console.log("GOT IN");
-          // console.log("COn: " + contract_arg);
-          if (contract_arg) { // H' apla if (contract_arg)
+          if (contract_arg) {
             // console.log("Block with transactions");
-            var onj = new Object({hex: contract_arg, name: (nickname ? nickname : contract_arg)});
+            var onj = {
+                hex: contract_arg,
+                name: (nickname ? nickname : contract_arg)
+            };
             this.addToHistory(onj);
             // console.log("Call with contract_arg");
-            
             bl.transactions.forEach(e => {
-              // *** giati na min einai edw to var? ***
               var ts = this.searchTsInfoDbElement(e);
               if (ts == null) {
                 console.log("ERROR - DIDINT FOUND TS RECEIPT getAccountTransactionsGasSpentClearings");
-              //   // if ((e.input != "0x") && (e.to == contract_arg)) {
-              //   //   receiptsPromises.push(this.getTransactionReceiptFun(e));
-              //   // }
               } else {
                 if (ts.to) {
-                  if (ts.to.toUpperCase() == String(contract_arg).toUpperCase()) {
-                    receiptsPromises.push(this.createTableFromTxReceipt(ts));
+                  if (ts.to.toUpperCase() == contract_arg.toUpperCase()) {
+                    this.createTableFromTxReceipt(ts);
                   }
                 }
               }
             });
           } else {
             bl.transactions.forEach(e => {
-              // *** giati na min einai edw to var? ***
-              // console.log("TEST");
               var ts = this.searchTsInfoDbElement(e);
-              // *** isws mporei na einai if (ts) ***
               if (ts == null) {
                 console.log("ERROR - DIDINT FOUND TS RECEIPT getAccountTransactionsGasSpentClearings");
-                // if (e.input != "0x") {
-                //   console.log("RE GETTING TS RECEIPT");
-                //   receiptsPromises.push(this.getTranscationInfo(e));
-                // }
               } else {
                 // console.log("GETTING FROM DB");
-                receiptsPromises.push(this.createTableFromTxReceipt(ts));
+                this.createTableFromTxReceipt(ts);
               }
             });
           }
         }
       }
-
-      return Promise.all(receiptsPromises)
-      .catch(err => {
-        console.log("ERROR receiptsPromises: " + err);
-        throw err;
-      });
     })
-    .then(res => {
-      // console.log("LEN: " + res.length);
-      // SAVE TO DB
-      // console.log("Transactions Receipt: " + JSON.stringify(this.flatten(dbTransRec)));
-      // *** pou einai to start & to end dilomena? ***
+    .then(() => {
+
       endStartAccount = [start, end];
       endStartAccount.push(silentBugs);
-      // console.log("Accounts: " + accounts.length);
       endStartAccount.push(accounts);
-      // setTimeout
+
       // console.log("RESOLVING");
       console.timeEnd("Main Experiment");
       return endStartAccount;
@@ -453,8 +416,8 @@ module.exports = {
       if (contract_arg) {
 
         for (var j = 0; j <= (endBlockNumber - startBlockNumber); j++) {
-          bl = dbBlocks[check+j];
-          if (bl != null && bl.transactions != null) {
+          var bl = dbBlocks[check+j];
+          if (bl && bl.transactions) {
             // console.log("Block with transactions");
             var onj = new Object({hex: contract_arg, name: (nickname ? nickname : contract_arg)});
             this.addToHistory(onj);
@@ -484,8 +447,8 @@ module.exports = {
         }
       } else {
         for (var j = 0; j <= (endBlockNumber - startBlockNumber); j++) {
-          bl = dbBlocks[check+j];
-          if (bl != null && bl.transactions != null) {
+          var bl = dbBlocks[check+j];
+          if (bl && bl.transactions) {
             bl.transactions.forEach(e => {
               ts = this.searchTsInfoDbElement(e);
               if (ts == null) {
@@ -520,7 +483,7 @@ module.exports = {
       return endStartAccount;
     })
     .catch(err => {
-      console.log("ERROR getAccountTransactionsGasSpentClearings: " + err);
+      console.log("ERROR getTransactions: " + err);
     });
   },
 
@@ -737,15 +700,14 @@ module.exports = {
   },
 
   getBlockInfoMinimalNoChecks(blockNumber) {
-    return new Promise((resolve, reject) => {
-      web3.eth.getBlock(blockNumber, true).then(bl => {
-        // bl.timestamp = this.decodeTime(bl.timestamp);
-        bl.time = this.decodeTime(bl.timestamp);
-        resolve(bl);
-      });
+    return web3.eth.getBlock(blockNumber, true)
+    .then(bl => {
+      // bl.timestamp = this.decodeTime(bl.timestamp);
+      bl.time = this.decodeTime(bl.timestamp);
+      return bl;
     }).catch(err => {
       console.log("ERROR getBlockInfoMinimalNoChecks: " + err);
-      reject(err);
+      return [];
     });
   },
 
@@ -987,30 +949,24 @@ module.exports = {
   },
 
   getTranscationInfo: function(e) {
-    return new Promise((resolve, reject) => {
-      web3.eth.getTransactionReceipt(e.hash).then(res => {
-        if (res != null) {
-          // console.log("Input: " + rs.input);
-          res.input = e.input;
-          res.gasPrice = e.gasPrice;
-          // console.log("SAVE ON arDbTSInfo getTranscationInfo: ");
-          // dbTransInfo.push(res);
-          this.saveTsInfoDB(res);
-          resolve(res);
-        } else {
-          resolve([]);
-          // reject();
-          console.log("NOTHING TO RETURN");
-        }
-      }).catch(err => {
-        console.log("ERROR getTranscationInfo: " + err);
-        resolve(err);
-        
-      });
-    }).catch(err => {
-      console.log("ERROR getTranscationInfo Promise F: " + err);
-      resolve(err);
-      // reject(err);
+    return web3.eth.getTransactionReceipt(e.hash)
+    .then(res => {
+      if (res != null) {
+        // console.log("Input: " + rs.input);
+        res.input = e.input;
+        res.gasPrice = e.gasPrice;
+        // console.log("SAVE ON arDbTSInfo getTranscationInfo");
+        // dbTransInfo.push(res);
+        this.saveTsInfoDB(res);
+        return res;
+      } else {
+        console.log("NOTHING TO RETURN");
+        return [];
+      }
+    })
+    .catch(err => {
+      console.log("ERROR getTranscationInfo: " + err);
+      return [];
     });
   },
 
@@ -1045,58 +1001,44 @@ module.exports = {
   },
 
   createTableFromTxReceipt: function(txRec) {
-    return new Promise((resolve, reject) => {
-      check = this.searchForSilentBugs(txRec.transactionHash);
-      if (check == -1) {
-        if (txRec.gas == txRec.gasUsed) {
-          // console.log("FOUND NEW SILENT BUG");
-          silentBugs.push([txRec.transactionHash, txRec.gas, txRec.gasUsed]);
-        }
+    check = this.searchForSilentBugs(txRec.transactionHash);
+    if (check == -1) {
+      if (txRec.gas == txRec.gasUsed) {
+        // console.log("FOUND NEW SILENT BUG");
+        silentBugs.push([txRec.transactionHash, txRec.gas, txRec.gasUsed]);
       }
+    }
 
-      // console.log("Save ts from block: " + txRec.blockNumber);
-
-      this.saveAccountTransactionsSpentGas(txRec.from, txRec.gasUsed).then(res => {
-        // console.log("Save on table from BLOCK: " + txRec.blockNumber);
-        // console.log("");
-
-        resolve(res);
-      });
-      
-    });
+    this.saveAccountTransactionsSpentGas(txRec.from, txRec.gasUsed);
   },
 
   saveAccountTransactionsSpentGas: function(account, gas) {
-    return new Promise((resolve, reject) => {
-      var found = false;
-
-      for (var i = 0; i < accounts.length; i++) {
-
-        var str1 = parseInt(accounts[i][0]);
-        var str2 = parseInt(account);
-
-        if (str1 == str2) {
-          // console.log("Adding to existing account");
-          // console.log("");
-          accounts[i][1] += gas;
-          accounts[i][2] += 1;
-          found = true;
-          break;
-        }
-      }
-
-      if (!found) {
-        // console.log("PUSH NEW ACCOUNT");
+    var found = false;
+    
+    for (var i = 0; i < accounts.length; i++) {
+  
+      var str1 = parseInt(accounts[i][0]);
+      var str2 = parseInt(account);
+  
+      if (str1 == str2) {
+        // console.log("Adding to existing account");
         // console.log("");
-        newAccount = new Object([account, gas, 1]);
-        accounts.push(newAccount);
+        accounts[i][1] += gas;
+        accounts[i][2] += 1;
+        found = true;
+        break;
       }
+    }
 
-      accounts.sort(function(a, b) {
-        return a[2] - b[2];
-      });
+    if (!found) {
+      // console.log("PUSH NEW ACCOUNT");
+      // console.log("");
+      newAccount = new Object([account, gas, 1]);
+      accounts.push(newAccount);
+    }
 
-      resolve(true);
+    accounts.sort(function(a, b) {
+      return a[2] - b[2];
     });
   },
 
