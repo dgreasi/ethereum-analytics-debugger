@@ -50,24 +50,6 @@ module.exports = {
 
       var stepCalls = [];
 
-      // if (type === 1) {
-      //   for (var i = 0; i < steps.length - 1; i++) {
-      //     const startBlockNumber = steps[i];
-      //     const endBlockNumber = i < steps.length -2 ?
-      //       steps[i+1]-1 :
-      //       steps[i+1];
-      //     stepCalls.push(() => this.sync(startBlockNumber, endBlockNumber));
-      //   }
-      // } else {
-      //   for (var i = 0; i < steps.length - 1; i++) {
-      //     const startBlockNumber = steps[i];
-      //     const endBlockNumber = i < steps.length -2 ?
-      //       steps[i+1]-1 :
-      //       steps[i+1];
-      //     stepCalls.push(() => this.syncBl(startBlockNumber, endBlockNumber));
-      //   }
-      // }
-
       const syncFn = (
           type === 1 ?
               this.sync :
