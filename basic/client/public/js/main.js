@@ -352,18 +352,18 @@ $(document).on('ready', function() {
 			type: 'scatter'
 		};
 
-		var trace3 = {
-			x: time,
-			y: zeros,
-			name: 'Time',
-			xaxis: 'x2',
-			type: 'scatter',
-			marker: {
-              color: 'white'
-            }
-		};
+		// var trace3 = {
+		// 	x: time,
+		// 	y: zeros,
+		// 	name: 'Time',
+		// 	xaxis: 'x2',
+		// 	type: 'scatter',
+		// 	marker: {
+  //             color: 'white'
+  //           }
+		// };
 
-		var data = [trace1, trace2, trace3];
+		var data = [trace1, trace2];
 		// var data = [trace1, trace2];
 
 
