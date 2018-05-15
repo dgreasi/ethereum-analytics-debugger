@@ -994,7 +994,6 @@ const getTranscationInfo = function(e) {
 
 const getTranscationInfoHash = function(hash) {
   return new Promise((resolve, reject) => {
-<<<<<<< HEAD
     web3.eth.getTransaction(hash).then(rs => {
 
       if (rs != null) {
@@ -1020,38 +1019,6 @@ const getTranscationInfoHash = function(hash) {
       console.log("ERROR getTransaction => getTranscationInfoHash: " + err);
       resolve([]);
     });
-    
-=======
-    web3.eth
-      .getTransaction(hash)
-      .then(rs => {
-        if (rs != null) {
-          web3.eth
-            .getTransactionReceipt(rs.hash)
-            .then(res => {
-              if (res != null) {
-                // console.log("Input: " + rs.input);
-                res.input = rs.input;
-                res.gasPrice = rs.gasPrice;
-                console.log('SAVE ON arDbTSInfo: ');
-                // dbTransInfo.push(res);
-                saveTsInfoDB(res);
-                resolve(res);
-              }
-            })
-            .catch(err => {
-              console.log(
-                'ERROR getTransactionReceipt getTranscationInfoHash: ' + err
-              );
-              resolve([]);
-            });
-        }
-      })
-      .catch(err => {
-        console.log('ERROR getTransaction => getTranscationInfoHash: ' + err);
-        resolve([]);
-      });
->>>>>>> master
   });
 };
 
@@ -2146,12 +2113,8 @@ module.exports = {
   syncStep,
   getTransactions,
   marketChart,
-<<<<<<< HEAD
   getTimeToMineBlock,
-  getTranscationInfoHash
-}
-
-=======
-  getTimeToMineBlock
+  getTranscationInfoHash,
+  getBlockInfoMinimal,
+  getPeersNumber
 };
->>>>>>> master

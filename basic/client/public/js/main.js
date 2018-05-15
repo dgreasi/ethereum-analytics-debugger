@@ -346,22 +346,7 @@ $(document).on('ready', function() {
 			type: 'scatter'
 		};
 
-<<<<<<< HEAD
-=======
-		// var trace3 = {
-		// 	x: time,
-		// 	y: zeros,
-		// 	name: 'Time',
-		// 	xaxis: 'x2',
-		// 	type: 'scatter',
-		// 	marker: {
-		//             color: 'white'
-		//           }
-		// };
-
->>>>>>> master
 		var data = [trace1, trace2];
-		// var data = [trace1, trace2];
 
 		var layout = {
 			title: 'Clearing Price && Quantity',
@@ -392,13 +377,8 @@ $(document).on('ready', function() {
 
 	if (array_block_gas_spent_account_chart) {
 		var data1_chart = array_block_gas_spent_chart.getAttribute('data-for');
-<<<<<<< HEAD
 		var dataToArray1_chart = data1_chart.split(",");
 		// console.log("TEST array_block_gas_spent_account_chart: " + JSON.stringify(dataToArray1_chart));
-=======
-		var dataToArray1_chart = data1_chart.split(',');
-		// console.log("TEST array_block_gas_spent_chart: " + JSON.stringify(dataToArray1_chart));
->>>>>>> master
 
 		var blocks = [];
 		var gasSpent = [];
@@ -488,17 +468,11 @@ $(document).on('ready', function() {
 		var gasSent = [];
 		var gasLimit = [];
 
-<<<<<<< HEAD
 		for (var i = 0; i < dataToArray1_chart.length; i=i+4) {
 			blocks.push(dataToArray1_chart[i]);
 			gasSpent.push(dataToArray1_chart[i+1]);
 			gasSent.push(dataToArray1_chart[i+2]);
 			gasLimit.push(dataToArray1_chart[i+3]);
-=======
-		for (var i = 0; i < dataToArray1_chart.length; i = i + 2) {
-			blocks.push(dataToArray1_chart[i]);
-			gasSpent.push(dataToArray1_chart[i + 1]);
->>>>>>> master
 		}
 
 		// NEW CHART
