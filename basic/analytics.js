@@ -1,4 +1,3 @@
-var fs = require('fs');
 var Web3 = require('web3');
 
 ////////////////////////////////////////////////////////////////////////////
@@ -55,7 +54,7 @@ const syncStep = function(startBlockNumber, endBlockNumber, type) {
       return mySeriesPromise;
     })
     .then(() => {
-      endStartAccount = [start, end];
+      var endStartAccount = [start, end];
       return endStartAccount;
     })
     .catch(err => {
@@ -110,10 +109,10 @@ const syncBlocks = function(startBlockNumber, endBlockNumber) {
   var getBlockPromises = [];
 
   for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-    check = searchFor(i);
+    var check = searchFor(i);
     // console.log("CHECK: " + check);
 
-    if (check == -1) {
+    if (check === -1) {
       // DOESN'T EXIST
       var getBlock = getBlockInfoMinimalNoChecks(i);
       getBlockPromises.push(getBlock);
@@ -143,25 +142,25 @@ const syncTsReceipts = function(startBlockNumber, endBlockNumber) {
     .then(() => {
       var transactionsReceiptsPromises = [];
 
-      check = searchFor(startBlockNumber);
-      if (check == -1) {
+      var check = searchFor(startBlockNumber);
+      if (check === -1) {
         console.log("DIDN'T found block");
       } else {
         for (var i = 0; i <= endBlockNumber - startBlockNumber; i++) {
           // console.log("CHECK: " + check);
           var bl = dbBlocks[check + i];
-          if (bl != null && bl.transactions != null) {
+          if (bl !== null && bl.transactions !== null) {
             // console.log("Block with transactions");
             var ts = null;
             bl.transactions.forEach(e => {
               ts = searchTsInfoDbElement(e);
               // console.log("TS DB: " + ts);
-              if (ts == null) {
-                if (e.input != '0x') {
+              if (ts) {
+                console.log('TS EXISTS ALREADY');
+              } else {
+                if (e.input !== '0x') {
                   transactionsReceiptsPromises.push(getTranscationInfo(e));
                 }
-              } else {
-                console.log('TS EXISTS ALREADY');
               }
             });
           }
@@ -169,7 +168,7 @@ const syncTsReceipts = function(startBlockNumber, endBlockNumber) {
       }
       return Promise.all(transactionsReceiptsPromises);
     })
-    .then(tsR => {
+    .then(() => {
       dbTransInfo.sort(function(a, b) {
         return a.blockNumber - b.blockNumber;
       });
@@ -237,7 +236,7 @@ const syncContractVars = function(startBlockNumber, endBlockNumber, contract) {
       return mySeriesPromise;
     })
     .then(() => {
-      endStartAccount = [start, end];
+      var endStartAccount = [start, end];
       return endStartAccount;
     })
     .catch(err => {
@@ -255,10 +254,10 @@ const syncGetVarsStep = function(
     var getContractVarPromises = [];
 
     for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-      checkCl = searchForInArray(dbClearings, i);
-      if (checkCl == -1) {
-        checkBL = searchFor(i);
-        if (checkBL == -1) {
+      var checkCl = searchForInArray(dbClearings, i);
+      if (checkCl === -1) {
+        var checkBL = searchFor(i);
+        if (checkBL === -1) {
           console.log('BLOCK DINDNT FOUND');
         }
         // console.log("Push promise, timestamp: " + dbBlocks[checkBL].number + " & " + dbBlocks[checkBL].timestamp);
@@ -315,7 +314,7 @@ const getAccountTransactionsGasSpentClearings = function(
       console.log('ERROR syncStep: ' + err);
       throw err;
     })
-    .then(rs => {
+    .then(() => {
       startBlockNumber = start;
       endBlockNumber = end;
 
@@ -340,28 +339,30 @@ const getAccountTransactionsGasSpentClearings = function(
             // console.log("Call with contract_arg");
             bl.transactions.forEach(e => {
               var ts = searchTsInfoDbElement(e);
-              if (ts == null) {
-                console.log(
-                  'ERROR - DIDINT FOUND TS RECEIPT getAccountTransactionsGasSpentClearings'
-                );
-              } else {
+              if (ts) {
                 if (ts.to) {
-                  if (ts.to.toUpperCase() == contract_arg.toUpperCase()) {
+                  if (ts.to.toUpperCase() === contract_arg.toUpperCase()) {
                     createTableFromTxReceipt(ts);
                   }
                 }
+              } else {
+                console.log(
+                  'ERROR - DIDINT FOUND TS RECEIPT getAccountTransactionsGasSpentClearings - ts: ' +
+                    ts
+                );
               }
             });
           } else {
             bl.transactions.forEach(e => {
               var ts = searchTsInfoDbElement(e);
-              if (ts == null) {
-                console.log(
-                  'ERROR - DIDINT FOUND TS RECEIPT getAccountTransactionsGasSpentClearings'
-                );
-              } else {
+              if (ts) {
                 // console.log("GETTING FROM DB");
                 createTableFromTxReceipt(ts);
+              } else {
+                console.log(
+                  'ERROR - DIDINT FOUND TS RECEIPT getAccountTransactionsGasSpentClearings - ts:' +
+                    ts
+                );
               }
             });
           }
@@ -369,7 +370,7 @@ const getAccountTransactionsGasSpentClearings = function(
       }
     })
     .then(() => {
-      endStartAccount = [start, end];
+      var endStartAccount = [start, end];
       endStartAccount.push(silentBugs);
       endStartAccount.push(accounts);
 
@@ -397,7 +398,7 @@ const getTransactions = function(
       console.log('ERROR syncStep: ' + err);
       throw err;
     })
-    .then(rs => {
+    .then(() => {
       var receiptsPromises = [];
 
       startBlockNumber = start;
@@ -426,38 +427,28 @@ const getTransactions = function(
               // console.log("TS: " + e.hash);
               ts = searchTsInfoDbElement(e);
               // console.log("TS RETURNED: " + JSON.stringify(ts));
-              if (ts == null) {
-                console.log('ERROR - DIDINT FOUND TS RECEIPT getTransactions');
-                //   // if ((e.input != "0x") && (e.to == contract_arg)) {
-                //   //   receiptsPromises.push(this.getTransactionReceiptFun(e));
-                //   // }
-              } else {
-                // console.log("TS.to: " + ts.to);
-                // console.log("TO: " + ts.to.toUpperCase());
-                // console.log("Contract: " + contract_arg.toUpperCase());
+              if (ts) {
                 if (ts.to) {
-                  if (ts.to.toUpperCase() == contract_arg.toUpperCase()) {
+                  if (ts.to.toUpperCase() === contract_arg.toUpperCase()) {
                     receiptsPromises.push(creteTableOfTransactions(ts));
                   }
                 }
+              } else {
+                console.log('ERROR - DIDINT FOUND TS RECEIPT getTransactions');
               }
             });
           }
         }
       } else {
-        for (var j = 0; j <= endBlockNumber - startBlockNumber; j++) {
-          var bl = dbBlocks[check + j];
-          if (bl && bl.transactions) {
-            bl.transactions.forEach(e => {
+        for (var i = 0; i <= endBlockNumber - startBlockNumber; i++) {
+          var bl1 = dbBlocks[check + i];
+          if (bl1 && bl1.transactions) {
+            bl1.transactions.forEach(e => {
               ts = searchTsInfoDbElement(e);
-              if (ts == null) {
-                console.log('ERROR - DIDINT FOUND TS RECEIPT');
-                //   // if (e.input != "0x") {
-                //   //   receiptsPromises.push(this.getTransactionReceiptFun(e));
-                //   // }
-              } else {
-                //   // console.log("GETTING FROM DB");
+              if (ts) {
                 receiptsPromises.push(creteTableOfTransactions(ts));
+              } else {
+                console.log('ERROR - DIDINT FOUND TS RECEIPT');
               }
             });
           }
@@ -471,7 +462,7 @@ const getTransactions = function(
     })
     .then(res => {
       // SAVE TO DB
-      endStartAccount = [start, end];
+      var endStartAccount = [start, end];
       endStartAccount.push(res);
 
       // setTimeout
@@ -498,18 +489,18 @@ const getSpentGasOfAccount = function(
   addToHistory(onj);
 
   return new Promise((resolve, reject) => {
-    syncStep(startBlockNumber, endBlockNumber, 1).then(rs => {
+    syncStep(startBlockNumber, endBlockNumber, 1).then(() => {
       startBlockNumber = start;
       endBlockNumber = end;
 
       transactionsReceiptsPromises.push(getBalance(account));
 
-      check = searchFor(startBlockNumber);
+      var check = searchFor(startBlockNumber);
       for (var i = 0; i <= endBlockNumber - startBlockNumber; i++) {
-        // if (check != -1) { // DOESN'T EXIST
+        // if (check !== -1) { // DOESN'T EXIST
 
         dbBlocks[check + i].transactions.forEach(e => {
-          if (e.input != '0x' && searchTsInfoDB(e) == -1) {
+          if (e.input !== '0x' && searchTsInfoDB(e) === -1) {
             console.log('ERROR - DIDINT FOUND TS RECEIPT');
             // transactionsReceiptsPromises.push(this.getTranscationInfo(e));
           }
@@ -523,7 +514,7 @@ const getSpentGasOfAccount = function(
 
       Promise.all(transactionsReceiptsPromises)
         .then(res => {
-          startEndBalanceGasSpentReceipts = [start, end];
+          var startEndBalanceGasSpentReceipts = [start, end];
           // push Balance of Account
           startEndBalanceGasSpentReceipts.push(res[0]);
           // Delete balance from initial array,
@@ -541,9 +532,9 @@ const getSpentGasOfAccount = function(
           check = searchFor(start);
 
           // checkTsInfoIndexStart = -1;
-          // while (checkTsInfoIndexStart == -1) {
+          // while (checkTsInfoIndexStart === -1) {
 
-          checkTsInfoIndexStart = dbTransInfo.findIndex(element => {
+          var checkTsInfoIndexStart = dbTransInfo.findIndex(element => {
             return element.blockNumber >= start;
           });
 
@@ -552,8 +543,8 @@ const getSpentGasOfAccount = function(
           // console.log("START INDEX: " + checkTsInfoIndexStart);
 
           // checkTsInfoIndexEnd = -1;
-          // while (checkTsInfoIndexEnd == -1) {
-          checkTsInfoIndexEnd = -1;
+          // while (checkTsInfoIndexEnd === -1) {
+          var checkTsInfoIndexEnd = -1;
 
           for (var k = dbTransInfo.length - 1; k > checkTsInfoIndexStart; k++) {
             if (dbTransInfo[k].blockNumber <= end) {
@@ -564,13 +555,13 @@ const getSpentGasOfAccount = function(
 
           // console.log("END INDEX: " + checkTsInfoIndexEnd);
 
-          // if (checkTsInfoIndexEnd == -1) {
-          //   console.log("START == END");
+          // if (checkTsInfoIndexEnd === -1) {
+          //   console.log("START === END");
           //   checkTsInfoIndexEnd = checkTsInfoIndexStart;
           // }
 
           var arDbTSInfo;
-          if (checkTsInfoIndexEnd == -1) {
+          if (checkTsInfoIndexEnd === -1) {
             arDbTSInfo = dbTransInfo.slice(checkTsInfoIndexStart);
           } else {
             arDbTSInfo = dbTransInfo.slice(
@@ -599,8 +590,8 @@ const getSpentGasOfAccount = function(
               arDbTSInfo[j].blockNumber <= dbBlocks[check + i].number
             ) {
               if (
-                arDbTSInfo[j].blockNumber == dbBlocks[check + i].number &&
-                account == arDbTSInfo[j].from.toUpperCase()
+                arDbTSInfo[j].blockNumber === dbBlocks[check + i].number &&
+                account === arDbTSInfo[j].from.toUpperCase()
               ) {
                 console.log('Account: ' + arDbTSInfo[j].from.toUpperCase());
 
@@ -636,24 +627,27 @@ const getSpentGasOfAccount = function(
 };
 
 const getGasPerBlock = function(startBlockNumber, endBlockNumber) {
-  return new Promise((resolve, reject) => {
-    var getBlockPromises = [];
-
-    syncStep(startBlockNumber, endBlockNumber, 2).then(rs => {
+  return new Promise(resolve => {
+    syncStep(startBlockNumber, endBlockNumber, 2).then(() => {
       startBlockNumber = start;
       endBlockNumber = end;
 
-      startEndGasPerBlock = [startBlockNumber, endBlockNumber];
+      var startEndGasPerBlock = [startBlockNumber, endBlockNumber];
 
-      check = searchFor(startBlockNumber);
-      if (check != -1) {
+      var check = searchFor(startBlockNumber);
+      if (check !== -1) {
         for (var j = 0; j <= endBlockNumber - startBlockNumber; j++) {
           var total_gas_sent = 0;
-          dbBlocks[check+j].transactions.forEach(ts => {
+          dbBlocks[check + j].transactions.forEach(ts => {
             total_gas_sent += ts.gas;
           });
 
-          startEndGasPerBlock.push([dbBlocks[check+j].number, dbBlocks[check+j].gasUsed, total_gas_sent, dbBlocks[check+j].gasLimit]);
+          startEndGasPerBlock.push([
+            dbBlocks[check + j].number,
+            dbBlocks[check + j].gasUsed,
+            total_gas_sent,
+            dbBlocks[check + j].gasLimit
+          ]);
         }
       } else {
         console.log('ERROR - BLOCK DOESNT EXIST');
@@ -671,6 +665,8 @@ const getBalancePerBlockOfAccount = function(
   nickname
 ) {
   return new Promise((resolve, reject) => {
+    var onj = { hex: account, name: nickname ? nickname : account };
+    addToHistory(onj);
     var getBlockPromises = [];
     // var receiptsPromises = [];
     var blockNumberPromise = web3.eth.getBlockNumber();
@@ -694,7 +690,7 @@ const getBalancePerBlockOfAccount = function(
 
             // console.log("JSON: " + JSON.stringify(blocks));
 
-            startEndBalancePerBlock = [start, end];
+            var startEndBalancePerBlock = [start, end];
 
             startEndBalancePerBlock.push(blocks);
 
@@ -727,15 +723,14 @@ const getBlockInfoMinimalNoChecks = function(blockNumber) {
 };
 
 const getBlockInfoMinimal = function(blockNumber) {
-  return new Promise((resolve, reject) => {
-    var getBlockPromises = [];
+  return new Promise(resolve => {
     var blockNumberPromise = web3.eth.getBlockNumber();
 
     blockNumberPromise.then(res => {
       if (blockNumber <= res) {
-        check = searchFor(blockNumber);
+        var check = searchFor(blockNumber);
 
-        if (check == -1) {
+        if (check === -1) {
           web3.eth.getBlock(blockNumber, true).then(bl => {
             // console.log("GET BLOCK: " + blockNumber);
             // SAVE TO DB
@@ -774,7 +769,7 @@ const getBlockInfoMinimal = function(blockNumber) {
     });
   }).catch(err => {
     console.log('ERROR getBlockInfo: ' + err);
-    reject(err);
+    return [];
   });
 };
 
@@ -793,10 +788,10 @@ const getTransactionsPerBlock = function(startBlockNumber, endBlockNumber) {
         // console.log("Using endBlockNumber: " + endBlockNumber);
 
         for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-          check = searchFor(i);
+          var check = searchFor(i);
           // console.log("CHECK: " + check);
 
-          if (check == -1) {
+          if (check === -1) {
             // DOESN'T EXIST
             var getBlock = web3.eth.getBlock(i, true);
             getBlockPromises.push(getBlock);
@@ -817,8 +812,8 @@ const getTransactionsPerBlock = function(startBlockNumber, endBlockNumber) {
             transactionsPerBlock.push([startBlockNumber, endBlockNumber]);
 
             for (var j = startBlockNumber; j <= endBlockNumber; j++) {
-              rCheck = searchFor(j);
-              if (rCheck != -1) {
+              var rCheck = searchFor(j);
+              if (rCheck !== -1) {
                 transactionsPerBlock.push([
                   j,
                   dbBlocks[rCheck].transactions.length
@@ -854,7 +849,7 @@ const getTimeToMineBlock = function(startBlockNumber, endBlockNumber) {
       console.log('ERROR syncStep: ' + err);
       throw err;
     })
-    .then(rs => {
+    .then(() => {
       startBlockNumber = start;
       endBlockNumber = end;
 
@@ -866,7 +861,7 @@ const getTimeToMineBlock = function(startBlockNumber, endBlockNumber) {
       );
       // timeToMine.push([dbBlocks[check].number, dbBlocks[check].timestamp]);
       for (var j = 1; j <= endBlockNumber - startBlockNumber; j++) {
-        bl = dbBlocks[check + j];
+        var bl = dbBlocks[check + j];
         // console.log("timestamp: " + bl.timestamp);
         timeToMine.push([
           bl.number,
@@ -875,7 +870,7 @@ const getTimeToMineBlock = function(startBlockNumber, endBlockNumber) {
       }
 
       // SAVE TO DB
-      endStartAccount = [start, end];
+      var endStartAccount = [start, end];
       endStartAccount.push(timeToMine);
       // console.log(JSON.stringify(timeToMine));
       // setTimeout
@@ -895,16 +890,16 @@ const getNumberOfTranscationsOfAccountPerBlock = function(
   endBlockNumber,
   account
 ) {
-  if (account != '') {
+  if (account !== '') {
     addToHistory(account);
   }
 
-  syncStep(startBlockNumber, endBlockNumber, 1).then(rs => {
+  syncStep(startBlockNumber, endBlockNumber, 1).then(() => {
     startBlockNumber = start;
     endBlockNumber = end;
 
-    blocks = [];
-    check = searchFor(startBlockNumber);
+    var blocks = [];
+    var check = searchFor(startBlockNumber);
     console.log(
       'FROM - TO BLOCK: ' + startBlockNumber + ' - ' + endBlockNumber
     );
@@ -917,15 +912,14 @@ const getNumberOfTranscationsOfAccountPerBlock = function(
       console.log('Block: ' + rs.number);
     });
 
-    var receiptsPromises = [];
     blocks.forEach(block => {
-      if (block != null && block.transactions != null) {
+      if (block !== null && block.transactions !== null) {
         var numOfTran = 0;
 
         block.transactions.forEach(e => {
           var fromA = e.from.toUpperCase();
           account = account.toUpperCase();
-          if (e.input != '0x' && fromA == account) {
+          if (e.input !== '0x' && fromA === account) {
             numOfTran++;
           }
         });
@@ -938,45 +932,15 @@ const getNumberOfTranscationsOfAccountPerBlock = function(
   });
 };
 
-const getTransactionReceiptFun = function(tx) {
-  return new Promise((resolve, reject) => {
-    web3.eth
-      .getTransactionReceipt(tx.hash)
-      .then(res => {
-        if (res != null) {
-          res.input = tx.input;
-          res.gasPrice = tx.gasPrice;
-          res.gas = tx.gas;
-          dbTransInfo.push(res);
-          // console.log("EXECUTING");
-          check = searchForSilentBugs(tx.hash);
-          if (check == -1) {
-            if (tx.gas == res.gasUsed) {
-              // console.log("FOUND NEW SILENT BUG");
-              silentBugs.push([tx.hash, tx.gas, res.gasUsed]);
-            }
-          }
-
-          saveAccountTransactionsSpentGas(res.from, res.gasUsed).then(res => {
-            resolve(res);
-          });
-        }
-      })
-      .catch(err => {
-        console.log('ERROR getTransactionReceipt: ' + err);
-        reject(err);
-      });
-  });
-};
-
 const getTranscationInfo = function(e) {
   return web3.eth
     .getTransactionReceipt(e.hash)
     .then(res => {
-      if (res != null) {
+      if (res !== null) {
         // console.log("Input: " + rs.input);
         res.input = e.input;
         res.gasPrice = e.gasPrice;
+        // res.gas = e.gas;
         // console.log("SAVE ON arDbTSInfo getTranscationInfo");
         // dbTransInfo.push(res);
         saveTsInfoDB(res);
@@ -993,39 +957,44 @@ const getTranscationInfo = function(e) {
 };
 
 const getTranscationInfoHash = function(hash) {
-  return new Promise((resolve, reject) => {
-    web3.eth.getTransaction(hash).then(rs => {
-
-      if (rs != null) {
-        web3.eth.getTransactionReceipt(rs.hash).then(res => {
-          if (res != null) {
-            // console.log("Input: " + rs.input);
-            res.input = rs.input;
-            res.gasPrice = rs.gasPrice;
-            res.gas = rs.gas
-            console.log("SAVE ON arDbTSInfo: ");
-            // dbTransInfo.push(res);
-            saveTsInfoDB(res);
-            resolve(res);
-          }
-        }).catch(err => {
-          console.log("ERROR getTransactionReceipt getTranscationInfoHash: " + err);
-          resolve([]);
-        });
-
-      }
-
-    }).catch(err => {
-      console.log("ERROR getTransaction => getTranscationInfoHash: " + err);
-      resolve([]);
-    });
+  return new Promise(resolve => {
+    web3.eth
+      .getTransaction(hash)
+      .then(rs => {
+        if (rs !== null) {
+          web3.eth
+            .getTransactionReceipt(rs.hash)
+            .then(res => {
+              if (res !== null) {
+                // console.log("Input: " + rs.input);
+                res.input = rs.input;
+                res.gasPrice = rs.gasPrice;
+                res.gas = rs.gas;
+                console.log('SAVE ON arDbTSInfo: ');
+                // dbTransInfo.push(res);
+                saveTsInfoDB(res);
+                resolve(res);
+              }
+            })
+            .catch(err => {
+              console.log(
+                'ERROR getTransactionReceipt getTranscationInfoHash: ' + err
+              );
+              resolve([]);
+            });
+        }
+      })
+      .catch(err => {
+        console.log('ERROR getTransaction => getTranscationInfoHash: ' + err);
+        resolve([]);
+      });
   });
 };
 
 const createTableFromTxReceipt = function(txRec) {
-  check = searchForSilentBugs(txRec.transactionHash);
-  if (check == -1) {
-    if (txRec.gas == txRec.gasUsed) {
+  var check = searchForSilentBugs(txRec.transactionHash);
+  if (check === -1) {
+    if (txRec.gas === txRec.gasUsed) {
       // console.log("FOUND NEW SILENT BUG");
       silentBugs.push([txRec.transactionHash, txRec.gas, txRec.gasUsed]);
     }
@@ -1041,7 +1010,7 @@ const saveAccountTransactionsSpentGas = function(account, gas) {
     var str1 = parseInt(accounts[i][0]);
     var str2 = parseInt(account);
 
-    if (str1 == str2) {
+    if (str1 === str2) {
       // console.log("Adding to existing account");
       // console.log("");
       accounts[i][1] += gas;
@@ -1054,7 +1023,7 @@ const saveAccountTransactionsSpentGas = function(account, gas) {
   if (!found) {
     // console.log("PUSH NEW ACCOUNT");
     // console.log("");
-    newAccount = new Object([account, gas, 1]);
+    var newAccount = new Object([account, gas, 1]);
     accounts.push(newAccount);
   }
 
@@ -1064,14 +1033,14 @@ const saveAccountTransactionsSpentGas = function(account, gas) {
 };
 
 const creteTableOfTransactions = function(txRec) {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     // console.log("Save ts from block: " + txRec.blockNumber);
     var input = txRec.input.toString();
-    fun = input.slice(0, 10);
+    var fun = input.slice(0, 10);
     if (input.length > 10) {
       input = input.slice(10);
       input = '0x'.concat(input);
-      help = web3.eth.abi.decodeParameters(['int256', 'int256'], input);
+      var help = web3.eth.abi.decodeParameters(['int256', 'int256'], input);
       input = '';
       input = input.concat(help[0]);
       input = input.concat(', ');
@@ -1106,7 +1075,7 @@ const checkStartEndInput = function(
   // console.log("startBlockNumber: " + startBlockNumber);
   // console.log("endBlockNumber: " + endBlockNumber);
 
-  if (endBlockNumber == 1 && startBlockNumber == 1) {
+  if (endBlockNumber === 1 && startBlockNumber === 1) {
     startBlockNumber = start;
     endBlockNumber = end;
   } else {
@@ -1170,13 +1139,10 @@ const getClearingsThroughTime = function(
   var onj = { hex: contract_arg, name: nickname ? nickname : contract_arg };
   addToHistory(onj);
 
-  return new Promise((resolve, reject) => {
-    // console.log("Contract: " + contract_arg);
+  return new Promise(resolve => {
     contract_arg = contract_arg.toLowerCase();
-    var storagePromises = [];
-    var getBlocksPromises = [];
 
-    syncStep(startBlockNumber, endBlockNumber, 2).then(rs => {
+    syncStep(startBlockNumber, endBlockNumber, 2).then(() => {
       startBlockNumber = start;
       endBlockNumber = end;
 
@@ -1188,16 +1154,16 @@ const getClearingsThroughTime = function(
       );
 
       syncContractVars(startBlockNumber, endBlockNumber, contract_arg).then(
-        res => {
-          res = [];
+        () => {
+          var res = [];
 
           check = searchForInArray(dbClearings, startBlockNumber);
           // console.log("DBClearings");
-          for (i = 0; i <= endBlockNumber - startBlockNumber; i++) {
-            if (check == -1) {
+          for (var i = 0; i <= endBlockNumber - startBlockNumber; i++) {
+            if (check === -1) {
               console.log('Didnt found in dbClearings');
             } else {
-              if (contract_arg == dbClearings[check + i][5]) {
+              if (contract_arg === dbClearings[check + i][5]) {
                 // console.log("FOUND CONTRACT IN DB");
                 res.push(dbClearings[check + i]);
               } else {
@@ -1207,7 +1173,7 @@ const getClearingsThroughTime = function(
             }
           }
 
-          endStartClear = [start, end];
+          var endStartClear = [start, end];
           // console.log(JSON.stringify(res));
           endStartClear.push(res);
           resolve(endStartClear);
@@ -1252,9 +1218,9 @@ const getStorageAtBlock = function(block, contract_arg, timestamp) {
 };
 
 const getStorageAtBlockPriceCheck = function(block, contract_arg) {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     getStorageAtBlockPrice(block, contract_arg).then(rs => {
-      if (rs == -99) {
+      if (rs === -99) {
         console.log('CALLING getStorageAt AGAIN');
         getStorageAtBlockPrice(block, contract_arg).then(r => {
           console.log('RESOLVING: ' + parseInt(r));
@@ -1276,9 +1242,9 @@ const getStorageAtBlockPrice = function(block, contract_arg) {
 };
 
 const getStorageAtBlockQuantityCheck = function(block, contract_arg) {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     getStorageAtBlockQuantity(block, contract_arg).then(rs => {
-      if (rs == -99) {
+      if (rs === -99) {
         // console.log("CALLING getStorageAt AGAIN");
         // this.getStorageAtBlockQuantityCheck(block, contract_arg);
         getStorageAtBlockQuantity(block, contract_arg).then(r => {
@@ -1300,9 +1266,9 @@ const getStorageAtBlockQuantity = function(block, contract_arg) {
 };
 
 const getStorageAtBlockTypeCheck = function(block, contract_arg) {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     getStorageAtBlockType(block, contract_arg).then(rs => {
-      if (rs == -99) {
+      if (rs === -99) {
         console.log('CALLING getStorageAtBlockTypeCheck AGAIN');
         // getStorageAtBlockTypeCheck(block, contract_arg);
         getStorageAtBlockType(block, contract_arg).then(r => {
@@ -1321,15 +1287,6 @@ const getStorageAtBlockType = function(block, contract_arg) {
     console.log('ERROR getStorageAtBlockType: ' + err);
     return -99;
   });
-};
-
-const checkPositionStorage = function() {
-  for (var i = 0; i < 10; i++) {
-    web3.eth.getStorageAt(contract, i).then(res => {
-      // console.log("Index: " + i +" , val: " + res);
-      console.log('Index: ' + i + ' , val: ' + parseInt(res));
-    });
-  }
 };
 
 /////////////////////////// Get Clearing Values At Current STATE //////////////////////////////
@@ -1371,12 +1328,9 @@ const getclearingType = function(contract_arg) {
 ///////////////////////////////////// MARKET CHART ///////////////////////////////////////////
 
 const marketChart = function(startBlockNumber, endBlockNumber) {
-  return new Promise((resolve, reject) => {
-    var storagePromises = [];
-    var getBlocksPromises = [];
-
+  return new Promise(resolve => {
     syncStep(startBlockNumber, endBlockNumber, 2)
-      .then(rs => {
+      .then(() => {
         startBlockNumber = start;
         endBlockNumber = end;
 
@@ -1421,7 +1375,7 @@ const marketChart = function(startBlockNumber, endBlockNumber) {
               if (inputSh.length > 10) {
                 inputSh = inputSh.slice(10);
                 inputSh = '0x'.concat(inputSh);
-                help = web3.eth.abi.decodeParameters(
+                var help = web3.eth.abi.decodeParameters(
                   ['int256', 'int256'],
                   inputSh
                 );
@@ -1474,7 +1428,7 @@ const marketChart = function(startBlockNumber, endBlockNumber) {
           }
         }
 
-        endStartClear = [start, end];
+        var endStartClear = [start, end];
         console.log('GENERATION TABLE:');
         console.log(generation.length);
         // console.log(JSON.stringify(generation));
@@ -1486,14 +1440,14 @@ const marketChart = function(startBlockNumber, endBlockNumber) {
         if (first_clear == null && second_clear == null) {
           for (var j = 0; j < 65; j++) {
             dbBlocks[check + j].transactions.some(ts => {
-              inputSh = ts.input.toString();
-              quant = 0;
-              pric = 0;
+              var inputSh = ts.input.toString();
+              var quant = 0;
+              var pric = 0;
 
               if (inputSh.length > 10) {
                 inputSh = inputSh.slice(10);
                 inputSh = '0x'.concat(inputSh);
-                help = web3.eth.abi.decodeParameters(
+                var help = web3.eth.abi.decodeParameters(
                   ['int256', 'int256'],
                   inputSh
                 );
@@ -1537,11 +1491,11 @@ const marketChart = function(startBlockNumber, endBlockNumber) {
         // console.log("CONSUMPTION TABLE:");
         // console.log(consumption.length);
 
-        if (generation.length == 0) {
+        if (generation.length === 0) {
           generation.push({ quantity: -99, price: -99 });
         }
 
-        if (consumption.length == 0) {
+        if (consumption.length === 0) {
           consumption.push({ quantity: -99, price: -99 });
         }
         endStartClear.push(generation);
@@ -1554,7 +1508,7 @@ const marketChart = function(startBlockNumber, endBlockNumber) {
       });
   }).catch(err => {
     console.log('ERROR marketChart: ' + err);
-    reject(err);
+    return [];
   });
 };
 
@@ -1563,11 +1517,11 @@ const marketAdd = function(table, quantity, price) {
     if (el) {
       console.log('EL: ' + JSON.stringify(el));
       // console.log("PRICE: " + el.price);
-      return el.price == parseInt(price);
+      return el.price === parseInt(price);
     }
   });
 
-  if (found != -1) {
+  if (found !== -1) {
     table[found].quantity += parseInt(quantity);
   } else {
     table.push({ quantity: parseInt(quantity), price: parseInt(price) });
@@ -1585,14 +1539,14 @@ const marketAdd = function(table, quantity, price) {
 const searchFor = function(blockNumber) {
   // console.log("A: " +JSON.stringify(dbBlocks));
   return dbBlocks.findIndex(element => {
-    return element.number == blockNumber;
+    return element.number === blockNumber;
   });
 };
 
 const searchForInArray = function(array, blockNumber) {
   return array.findIndex(element => {
     if (element) {
-      return element[0] == blockNumber;
+      return element[0] === blockNumber;
     } else {
       return -1;
     }
@@ -1602,7 +1556,7 @@ const searchForInArray = function(array, blockNumber) {
 const searchTsInfoDB = function(ts) {
   // console.log("A: " +JSON.stringify(dbBlocks));
   var rt = dbTransInfo.findIndex(element => {
-    return element.transactionHash == ts.hash;
+    return element.transactionHash === ts.hash;
   });
 
   // console.log("RETUNR: " + rt);
@@ -1612,7 +1566,7 @@ const searchTsInfoDB = function(ts) {
 const searchTsInfoDbElement = function(ts) {
   // console.log("A: " +JSON.stringify(dbBlocks));
   var rt = dbTransInfo.find(element => {
-    return element.transactionHash == ts.hash;
+    return element.transactionHash === ts.hash;
   });
 
   // console.log("RETUNR: " + rt);
@@ -1621,17 +1575,17 @@ const searchTsInfoDbElement = function(ts) {
 
 const searchForSilentBugs = function(hash) {
   return silentBugs.findIndex(element => {
-    return element[0] == hash;
+    return element[0] === hash;
   });
 };
 
 const saveTsInfoDB = function(ts) {
   var rs = dbTransInfo.findIndex(element => {
-    return element.transactionHash == ts.transactionHash;
+    return element.transactionHash === ts.transactionHash;
   });
 
   // console.log("RET: " + JSON.stringify(rs));
-  if (rs == -1) {
+  if (rs === -1) {
     // console.log("PUSH");
     dbTransInfo.push(ts);
   }
@@ -1665,22 +1619,12 @@ const getAccountInfo = function(start_block, end_block, account, nickname) {
   });
 };
 
-const getPendingTransactions = function() {
-  var subscription = web3.eth
-    .subscribe('pendingTransactions', (error, result) => {
-      if (!error) console.log(result);
-    })
-    .on('data', function(transaction) {
-      console.log('Pending: ' + transaction);
-    });
-};
-
 const getNumberOfTransactions = function(account) {
   return new Promise((resolve, reject) => {
     web3.eth
       .getTransactionCount(account)
       .then(res => {
-        if (res != null) {
+        if (res !== null) {
           // console.log("PAOK");
           resolve(res);
         }
@@ -1706,9 +1650,9 @@ const getContractDetails = function(startBlockNumber, endBlockNumber) {
         endBlockNumber = end;
 
         for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-          check = searchFor(i);
+          var check = searchFor(i);
 
-          if (check == -1) {
+          if (check === -1) {
             // DOESN'T EXIST
             var getBlock = web3.eth.getBlock(i, true);
             getBlockPromises.push(getBlock);
@@ -1718,7 +1662,7 @@ const getContractDetails = function(startBlockNumber, endBlockNumber) {
             var blockSaved = dbBlocks[check];
             // console.log("Get from DB. block: " + blockSaved.number);
             blockSaved.transactions.forEach(e => {
-              if (e.input != '0x') {
+              if (e.input !== '0x') {
                 transactionsReceiptsPromises.push(getTranscationInfo(e));
               }
             });
@@ -1734,9 +1678,9 @@ const getContractDetails = function(startBlockNumber, endBlockNumber) {
             // var receiptsPromises = [];
             blocks.forEach(block => {
               // console.log("BLOCK: " + block.number + " Number of transactions: " + block.transactions.length);
-              if (block != null && block.transactions != null) {
+              if (block !== null && block.transactions !== null) {
                 block.transactions.forEach(e => {
-                  if (e.input != '0x') {
+                  if (e.input !== '0x') {
                     transactionsReceiptsPromises.push(getTranscationInfo(e));
                   }
                 });
@@ -1745,7 +1689,7 @@ const getContractDetails = function(startBlockNumber, endBlockNumber) {
 
             Promise.all(transactionsReceiptsPromises)
               .then(receipts => {
-                endStartContracts = [start, end];
+                var endStartContracts = [start, end];
                 var transactionsReceiptsValid = [];
                 // console.log("Lenght of receipts: " + receipts.length);
                 receipts.forEach(rs => {
@@ -1781,7 +1725,7 @@ const getBalance = function(account, block) {
       web3.eth
         .getBalance(account, block)
         .then(res => {
-          if (res != null) {
+          if (res !== null) {
             // console.log("PAOK");
             resolve([block, res]);
           }
@@ -1794,7 +1738,7 @@ const getBalance = function(account, block) {
       web3.eth
         .getBalance(account)
         .then(res => {
-          if (res != null) {
+          if (res !== null) {
             // console.log("PAOK");
             resolve(res);
           }
@@ -1808,9 +1752,9 @@ const getBalance = function(account, block) {
 };
 
 const getLastBlockLocally = function() {
-  if (lastBlock != 0) {
+  if (lastBlock !== 0) {
     // console.log('Local');
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       resolve(lastBlock);
     });
   } else {
@@ -1825,10 +1769,10 @@ const getPreviousAccounts = function() {
 };
 
 const addToHistory = function(arg) {
-  acc = String(arg.hex).toLowerCase();
+  var acc = String(arg.hex).toLowerCase();
   arg.hex = acc;
   var found = previous_contracts_accounts.find(function(element) {
-    return element.hex == acc;
+    return element.hex === acc;
   });
 
   if (!found) {
@@ -1836,41 +1780,13 @@ const addToHistory = function(arg) {
     // console.log("Pushed arg: " + JSON.stringify(arg));
   } else {
     previous_contracts_accounts.some(r => {
-      if (r.hex == acc) {
-        r.name = arg.name != arg.hex ? arg.name : r.name;
+      if (r.hex === acc) {
+        r.name = arg.name !== arg.hex ? arg.name : r.name;
         // console.log("CHANGED TO: " + r.name);
         return true;
       }
     });
   }
-};
-
-const searchPrevAccounts = function(arg) {
-  var found = previous_contracts_accounts.find(function(element) {
-    return element.name == arg;
-  });
-
-  return found;
-};
-
-const is_hexadecimal = function(str) {
-  if (str[0] == 0 && str[1].toLowerCase() == 'x') {
-    return true;
-  } else {
-    return false;
-  }
-
-  // var a = parseInt(str,16);
-  // return (a.toString(16) ===str.toLowerCase())
-  // regexp = /^[0-9a-fA-F]+$/;
-  // // regexp.test(str)
-  // if (parseInt(str, 16)) {
-  //   console.log("ARG is hex");
-  //   return true;
-  // } else {
-  //   console.log("ARG is NOT hex");
-  //   return false;
-  // }
 };
 
 const getTransactionsByAccount = function(
@@ -1891,10 +1807,10 @@ const getTransactionsByAccount = function(
         endBlockNumber = end;
 
         for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-          check = searchFor(i);
+          var check = searchFor(i);
           // console.log("CHECK: " + check);
 
-          if (check == -1) {
+          if (check === -1) {
             // DOESN'T EXIST
             var getBlock = web3.eth.getBlock(i, true);
             getBlockPromises.push(getBlock);
@@ -1913,9 +1829,9 @@ const getTransactionsByAccount = function(
             for (var j = 0; j <= endBlockNumber - startBlockNumber; j++) {
               blocks.push(dbBlocks[check + j]);
               dbBlocks[check + j].transactions.forEach(e => {
-                fromA = e.from.toUpperCase();
+                var fromA = e.from.toUpperCase();
                 myaccount = myaccount.toUpperCase();
-                if (myaccount == '*' || myaccount == fromA) {
+                if (myaccount === '*' || myaccount === fromA) {
                   promiseRec.push(web3.eth.getTransactionReceipt(e.hash));
                 }
               });
@@ -1924,18 +1840,18 @@ const getTransactionsByAccount = function(
             Promise.all(promiseRec)
               .then(trans => {
                 blocks.forEach(block => {
-                  if (block != null && block.transactions != null) {
+                  if (block !== null && block.transactions !== null) {
                     block.transactions.forEach(e => {
-                      fromA = e.from.toUpperCase();
+                      var fromA = e.from.toUpperCase();
                       myaccount = myaccount.toUpperCase();
 
-                      if (myaccount == '*' || myaccount == fromA) {
-                        input = e.input.toString();
-                        fun = input.slice(0, 10);
+                      if (myaccount === '*' || myaccount === fromA) {
+                        var input = e.input.toString();
+                        var fun = input.slice(0, 10);
                         if (input.length > 10) {
                           input = input.slice(10);
                           input = '0x'.concat(input);
-                          help = web3.eth.abi.decodeParameters(
+                          var help = web3.eth.abi.decodeParameters(
                             ['int256', 'int256'],
                             input
                           );
@@ -1947,16 +1863,16 @@ const getTransactionsByAccount = function(
                         }
 
                         trans.some(el => {
-                          if (el.transactionHash == e.hash) {
-                            bug = e.gas == el.gasUsed ? 1 : 0;
-                            obj = new Object({
+                          if (el.transactionHash === e.hash) {
+                            var bug = e.gas === el.gasUsed ? 1 : 0;
+                            var obj = {
                               hash: e.hash,
                               blockNumber: e.blockNumber,
                               bug: bug,
                               gasUsed: el.gasUsed,
                               to: e.to,
                               input: input
-                            });
+                            };
                             transactionsR.push(obj);
                             return true;
                           }
@@ -1969,21 +1885,21 @@ const getTransactionsByAccount = function(
                 resolve(transactionsR);
               })
               .catch(err => {
-                if (err != 'ReferenceError: name is not define') {
+                if (err !== 'ReferenceError: name is not define') {
                   reject(err);
                   console.log('ERROR promiseRec: ' + err);
                 }
               });
           })
           .catch(err => {
-            if (err != 'ReferenceError: name is not define') {
+            if (err !== 'ReferenceError: name is not define') {
               reject(err);
               console.log('ERROR getBlockPromises: ' + err);
             }
           });
       })
       .catch(err => {
-        if (err != 'ReferenceError: name is not define') {
+        if (err !== 'ReferenceError: name is not define') {
           reject(err);
           console.log('ERROR getBlockNumber: ' + err);
         }
@@ -1995,38 +1911,12 @@ const getPeersNumber = function() {
   return web3.eth.net.getPeerCount();
 };
 
-const getTimeDateOfBlock = function(block) {
-  web3.eth.getBlock(block, true).then(res => {
-    var date = new Date(res.timestamp * 1000);
-    // Hours part from the timestamp
-    var hours = date.getHours();
-    // Minutes part from the timestamp
-    var minutes = '0' + date.getMinutes();
-    // Seconds part from the timestamp
-    var seconds = '0' + date.getSeconds();
-    var day = date.getDate();
-
-    // Will display time in 10:30:23 format
-    var formattedTime =
-      day + ' ' + hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
-    console.log(formattedTime);
-  });
-};
-
 const getGasPrice = function() {
   return web3.eth.getGasPrice();
 };
 
 const getLastBlock = function() {
   return web3.eth.getBlock('latest', true);
-};
-
-const clearContract = function() {
-  // var myContract =  new web3.eth.Contract(ABI, contract);
-  // myContract
-  // myContract.options.from = accountOfCentralNode;
-  // myContract.options.gasPrice = '20000000000000';
-  // myContract.options.gas = 5000000;
 };
 
 const decodeTime = function(timestamp) {
@@ -2052,47 +1942,117 @@ const flatten = function(arr) {
   }, []);
 };
 
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////// CUREENTLY NOT USING /////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////// COMMENT OUT TO USE //////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
 ////////////////////////////// PRINTS ///////////////////////////////////////
 
-const printBalanceOfAccounts = function() {
-  console.log('BALANCES');
-  for (var i = 0; i < accounts.length; i++) {
-    web3.eth
-      .getBalance(accounts[i][0])
-      .then(bal => {
-        console.log('Account: ' + accounts[i][0] + ' ,balance: ' + bal);
-      })
-      .catch(err => {
-        console.log('ERROR: ' + err);
-      });
-  }
-};
+// const printBalanceOfAccounts = function() {
+//   console.log('BALANCES');
+//   for (var i = 0; i < accounts.length; i++) {
+//     web3.eth
+//       .getBalance(accounts[i][0])
+//       .then(bal => {
+//         console.log('Account: ' + accounts[i][0] + ' ,balance: ' + bal);
+//       })
+//       .catch(err => {
+//         console.log('ERROR: ' + err);
+//       });
+//   }
+// };
 
-const printsAccountsResults = function() {
-  console.log('');
-  for (var i = 0; i < accounts.length; i++) {
-    console.log(
-      i +
-        1 +
-        ')' +
-        'Account: ' +
-        accounts[i][0] +
-        ' , gas spent: ' +
-        accounts[i][1] +
-        ' , # of transactions: ' +
-        accounts[i][2]
-    );
-  }
-  console.log('');
-};
+// const printsAccountsResults = function() {
+//   console.log('');
+//   for (var i = 0; i < accounts.length; i++) {
+//     console.log(
+//       i +
+//         1 +
+//         ')' +
+//         'Account: ' +
+//         accounts[i][0] +
+//         ' , gas spent: ' +
+//         accounts[i][1] +
+//         ' , # of transactions: ' +
+//         accounts[i][2]
+//     );
+//   }
+//   console.log('');
+// };
 
-const printTransactionInfo = function(e) {
-  console.log('');
-  console.log(
-    'Account: ' + e.from + ' ,TO: ' + e.to + ' , called FUNCTION: ' + e.input
-  );
-  console.log('');
-};
+//////////////////////////////// END /////////////////////////////////////////
+
+// USE TO FIND POSITION OF STORAGE IN SMART CONTRACT
+// const checkPositionStorage = function(contract) {
+//   for (var i = 0; i < 10; i++) {
+//     web3.eth.getStorageAt(contract, i).then(res => {
+//       console.log('Index: ' + i + ' , val: ' + parseInt(res));
+//     });
+//   }
+// };
+
+// const getPendingTransactions = function() {
+//   web3.eth.subscribe('pendingTransactions', (error, result) => {
+//     if (!error) console.log(result);
+//   })
+//   .on('data', function(transaction) {
+//     console.log('Pending: ' + transaction);
+//   });
+// };
+
+// const printTransactionInfo = function(e) {
+//   console.log('');
+//   console.log(
+//     'Account: ' + e.from + ' ,TO: ' + e.to + ' , called FUNCTION: ' + e.input
+//   );
+//   console.log('');
+// };
+
+// const searchPrevAccounts = function(arg) {
+//   var found = previous_contracts_accounts.find(function(element) {
+//     return element.name === arg;
+//   });
+
+//   return found;
+// };
+
+// const is_hexadecimal = function(str) {
+//   if (str[0] === 0 && str[1].toLowerCase() === 'x') {
+//     return true;
+//   } else {
+//     return false;
+//   }
+// };
+
+// const getTimeDateOfBlock = function(block) {
+//   web3.eth.getBlock(block, true).then(res => {
+//     var date = new Date(res.timestamp * 1000);
+//     // Hours part from the timestamp
+//     var hours = date.getHours();
+//     // Minutes part from the timestamp
+//     var minutes = '0' + date.getMinutes();
+//     // Seconds part from the timestamp
+//     var seconds = '0' + date.getSeconds();
+//     var day = date.getDate();
+
+//     // Will display time in 10:30:23 format
+//     var formattedTime =
+//       day + ' ' + hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+//     console.log(formattedTime);
+//   });
+// };
+
+// const clearContract = function() {
+//   // My ABI
+//   var ABI;
+//   var myContract =  new web3.eth.Contract(ABI, contract);
+//   myContract
+//   myContract.options.from = accountOfCentralNode;
+//   myContract.options.gasPrice = '20000000000000';
+//   myContract.options.gas = 5000000;
+// };
 
 //////////////// EXPORT FUNCTIONS ///////////////////////
 
@@ -2116,5 +2076,6 @@ module.exports = {
   getTimeToMineBlock,
   getTranscationInfoHash,
   getBlockInfoMinimal,
-  getPeersNumber
+  getPeersNumber,
+  getNumberOfTranscationsOfAccountPerBlock
 };

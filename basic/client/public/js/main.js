@@ -10,10 +10,10 @@ $(document).on('ready', function() {
 			$('#gas').html(data[1]);
 			$('#date').html(data[2]);
 
-			diff_chart = document.getElementById('diff_chart');
-			gasLimit_chart = document.getElementById('gasLimit_chart');
-			gasUsed_chart = document.getElementById('gasUsed_chart');
-			ts_number_chart = document.getElementById('ts_number_chart');
+			var diff_chart = document.getElementById('diff_chart');
+			var gasLimit_chart = document.getElementById('gasLimit_chart');
+			var gasUsed_chart = document.getElementById('gasUsed_chart');
+			var ts_number_chart = document.getElementById('ts_number_chart');
 
 			if (diff_chart) {
 				// console.log("diff_chart.data: " + JSON.stringify(diff_chart.data));
@@ -21,10 +21,11 @@ $(document).on('ready', function() {
 					title: 'Difficulty',
 					yaxis: { title: 'Difficulty of Block' }
 				};
+				var dataD;
 
 				if (diff_chart.data) {
 					var found = diff_chart.data[0].x.find(el => {
-						return el == data[0].number;
+						return el === data[0].number;
 					});
 
 					// console.log("FOUND: " + found);
@@ -55,7 +56,7 @@ $(document).on('ready', function() {
 							type: 'bar'
 						};
 
-						var dataD = [data_update];
+						dataD = [data_update];
 						// console.log("NEW DATA TO PUSH: " + JSON.stringify(dataD));
 
 						Plotly.update('diff_chart', dataD, layoutD);
@@ -64,20 +65,20 @@ $(document).on('ready', function() {
 					}
 				} else {
 					// console.log("INIT CHART");
-					block = [];
-					diff = [];
+					var block = [];
+					var diff = [];
 
 					block.push(data[0].number);
 					diff.push(data[0].difficulty);
 
-					var trace1D = {
+					var traceD = {
 						x: block,
 						y: diff,
 						name: 'Difficulty',
 						type: 'bar'
 					};
 
-					var dataD = [trace1D];
+					dataD = [traceD];
 
 					Plotly.plot('diff_chart', dataD, layoutD);
 				}
@@ -89,14 +90,15 @@ $(document).on('ready', function() {
 					title: 'Gas Limit',
 					yaxis: { title: 'gas' }
 				};
+				var dataD1;
 
 				if (gasLimit_chart.data) {
-					var found = gasLimit_chart.data[0].x.find(el => {
-						return el == data[0].number;
+					var found1 = gasLimit_chart.data[0].x.find(el => {
+						return el === data[0].number;
 					});
 
 					// console.log("FOUND: " + found);
-					if (found) {
+					if (found1) {
 						// console.log("ALREADY IN");
 					} else {
 						var blockN1 = [];
@@ -123,7 +125,7 @@ $(document).on('ready', function() {
 							type: 'bar'
 						};
 
-						var dataD1 = [data_update1];
+						dataD1 = [data_update1];
 						// console.log("NEW DATA TO PUSH: " + JSON.stringify(dataD));
 
 						Plotly.update('gasLimit_chart', dataD1, layoutD1);
@@ -132,20 +134,20 @@ $(document).on('ready', function() {
 					}
 				} else {
 					// console.log("INIT CHART");
-					block1 = [];
-					diff1 = [];
+					var block1 = [];
+					var diff1 = [];
 
 					block1.push(data[0].number);
 					diff1.push(data[0].gasLimit);
 
-					var trace1D = {
+					var traceD1 = {
 						x: block1,
 						y: diff1,
 						name: 'Gas Limit',
 						type: 'bar'
 					};
 
-					var dataD1 = [trace1D];
+					dataD1 = [traceD1];
 
 					Plotly.plot('gasLimit_chart', dataD1, layoutD1);
 				}
@@ -157,14 +159,15 @@ $(document).on('ready', function() {
 					title: 'Gas Spending',
 					yaxis: { title: 'gas' }
 				};
+				var dataD2;
 
 				if (gasUsed_chart.data) {
-					var found = gasUsed_chart.data[0].x.find(el => {
-						return el == data[0].number;
+					var found2 = gasUsed_chart.data[0].x.find(el => {
+						return el === data[0].number;
 					});
 
 					// console.log("FOUND: " + found);
-					if (found) {
+					if (found2) {
 						// console.log("ALREADY IN");
 					} else {
 						var blockN2 = [];
@@ -191,7 +194,7 @@ $(document).on('ready', function() {
 							type: 'bar'
 						};
 
-						var dataD2 = [data_update2];
+						dataD2 = [data_update2];
 						// console.log("NEW DATA TO PUSH: " + JSON.stringify(dataD));
 
 						Plotly.update('gasUsed_chart', dataD2, layoutD2);
@@ -200,8 +203,8 @@ $(document).on('ready', function() {
 					}
 				} else {
 					// console.log("INIT CHART");
-					block2 = [];
-					diff2 = [];
+					var block2 = [];
+					var diff2 = [];
 
 					block2.push(data[0].number);
 					diff2.push(data[0].gasUsed);
@@ -213,7 +216,7 @@ $(document).on('ready', function() {
 						type: 'bar'
 					};
 
-					var dataD2 = [traceD2];
+					dataD2 = [traceD2];
 
 					Plotly.plot('gasUsed_chart', dataD2, layoutD2);
 				}
@@ -225,14 +228,15 @@ $(document).on('ready', function() {
 					title: 'Transactions',
 					yaxis: { title: '# of ts' }
 				};
+				var dataD3;
 
 				if (ts_number_chart.data) {
-					var found = ts_number_chart.data[0].x.find(el => {
-						return el == data[0].number;
+					var found3 = ts_number_chart.data[0].x.find(el => {
+						return el === data[0].number;
 					});
 
 					// console.log("FOUND: " + found);
-					if (found) {
+					if (found3) {
 						// console.log("ALREADY IN");
 					} else {
 						var blockN3 = [];
@@ -259,7 +263,7 @@ $(document).on('ready', function() {
 							type: 'bar'
 						};
 
-						var dataD3 = [data_update3];
+						dataD3 = [data_update3];
 						// console.log("NEW DATA TO PUSH: " + JSON.stringify(dataD));
 
 						Plotly.update('ts_number_chart', dataD3, layoutD3);
@@ -268,8 +272,8 @@ $(document).on('ready', function() {
 					}
 				} else {
 					// console.log("INIT CHART");
-					block3 = [];
-					diff3 = [];
+					var block3 = [];
+					var diff3 = [];
 
 					block3.push(data[0].number);
 					diff3.push(data[0].transactions.length);
@@ -281,7 +285,7 @@ $(document).on('ready', function() {
 						type: 'bar'
 					};
 
-					var dataD3 = [traceD3];
+					dataD3 = [traceD3];
 
 					Plotly.plot('ts_number_chart', dataD3, layoutD3);
 				}
@@ -290,20 +294,20 @@ $(document).on('ready', function() {
 	}, 3000);
 
 	// console.log("CHECK");
-	price_chart = document.getElementById('price_chart');
-	array_block_gas_spent_account_chart = document.getElementById(
+	var price_chart = document.getElementById('price_chart');
+	var array_block_gas_spent_account_chart = document.getElementById(
 		'array_block_gas_spent_account_chart'
 	);
-	transactions_per_block_chart = document.getElementById(
+	var transactions_per_block_chart = document.getElementById(
 		'transactions_per_block_chart'
 	);
 
-	gas_per_block_chart = document.getElementById('gas_per_block_chart');
-	balance_of_account_per_block_chart = document.getElementById(
+	var gas_per_block_chart = document.getElementById('gas_per_block_chart');
+	var balance_of_account_per_block_chart = document.getElementById(
 		'balance_of_account_per_block_chart'
 	);
-	market_chart = document.getElementById('market_chart');
-	time_to_mine_chart = document.getElementById('time_to_mine_chart');
+	var market_chart = document.getElementById('market_chart');
+	var time_to_mine_chart = document.getElementById('time_to_mine_chart');
 
 	if (price_chart) {
 		var data_chart = price_chart.getAttribute('data-for');
@@ -379,28 +383,30 @@ $(document).on('ready', function() {
 	}
 
 	if (array_block_gas_spent_account_chart) {
-		var data1_chart = array_block_gas_spent_chart.getAttribute('data-for');
+		var data1_chart = array_block_gas_spent_account_chart.getAttribute(
+			'data-for'
+		);
 		var dataToArray1_chart = data1_chart.split(',');
 		// console.log("TEST array_block_gas_spent_account_chart: " + JSON.stringify(dataToArray1_chart));
 
-		var blocks = [];
+		var blocks1 = [];
 		var gasSpent = [];
 		var gasLimit = [];
 
-		for (var i = 0; i < dataToArray1_chart.length; i = i + 3) {
-			blocks.push(dataToArray1_chart[i]);
-			gasSpent.push(dataToArray1_chart[i + 1]);
-			gasLimit.push(dataToArray1_chart[i + 2]);
+		for (var j = 0; j < dataToArray1_chart.length; j = j + 3) {
+			blocks1.push(dataToArray1_chart[j]);
+			gasSpent.push(dataToArray1_chart[j + 1]);
+			gasLimit.push(dataToArray1_chart[j + 2]);
 		}
 
-		// console.log("Blocks: " + blocks[0]);
+		// console.log("Blocks: " + blocks1[0]);
 		// console.log("Prices: " + prices[0]);
 		// console.log("Quantity: " + quantity[0]);
 
 		// NEW CHART
 
 		var trace1 = {
-			x: blocks,
+			x: blocks1,
 			y: gasSpent,
 			name: 'gasSpent',
 			fill: 'tozeroy',
@@ -408,7 +414,7 @@ $(document).on('ready', function() {
 		};
 
 		var trace2 = {
-			x: blocks,
+			x: blocks1,
 			y: gasLimit,
 			name: 'gasLimit',
 			fill: 'tozeroy',
@@ -422,7 +428,7 @@ $(document).on('ready', function() {
 			yaxis: { title: 'Gas Spent' }
 		};
 
-		Plotly.plot('array_block_gas_spent_chart', data, layout);
+		Plotly.plot('array_block_gas_spent_account_chart', data, layout);
 	}
 
 	if (transactions_per_block_chart) {
@@ -430,23 +436,23 @@ $(document).on('ready', function() {
 		var dataToArray_chart = data_chart.split(',');
 		// console.log("TEST transactions_per_block_chart: " + JSON.stringify(dataToArray_chart));
 
-		var blocks = [];
+		var blocks5 = [];
 		var transcations = [];
 		var quantity = [];
 
-		for (var i = 0; i < dataToArray_chart.length; i = i + 2) {
-			blocks.push(dataToArray_chart[i]);
-			transcations.push(dataToArray_chart[i + 1]);
+		for (var k = 0; k < dataToArray_chart.length; k = k + 2) {
+			blocks5.push(dataToArray_chart[k]);
+			transcations.push(dataToArray_chart[k + 1]);
 		}
 
-		// console.log("Blocks: " + blocks[0]);
+		// console.log("Blocks: " + blocks5[0]);
 		// console.log("Prices: " + prices[0]);
 		// console.log("Quantity: " + quantity[0]);
 
 		// NEW CHART
 
 		var trace1 = {
-			x: blocks,
+			x: blocks5,
 			y: transcations,
 			fill: 'tozeroy',
 			type: 'scatter'
@@ -466,21 +472,21 @@ $(document).on('ready', function() {
 		var data1_chart = gas_per_block_chart.getAttribute('data-for');
 		var dataToArray1_chart = data1_chart.split(',');
 
-		var blocks = [];
+		var blocks2 = [];
 		var gasSpent = [];
 		var gasSent = [];
 		var gasLimit = [];
 
-		for (var i = 0; i < dataToArray1_chart.length; i = i + 4) {
-			blocks.push(dataToArray1_chart[i]);
-			gasSpent.push(dataToArray1_chart[i + 1]);
-			gasSent.push(dataToArray1_chart[i + 2]);
-			gasLimit.push(dataToArray1_chart[i + 3]);
+		for (var t = 0; t < dataToArray1_chart.length; t = t + 4) {
+			blocks2.push(dataToArray1_chart[t]);
+			gasSpent.push(dataToArray1_chart[t + 1]);
+			gasSent.push(dataToArray1_chart[t + 2]);
+			gasLimit.push(dataToArray1_chart[t + 3]);
 		}
 
 		// NEW CHART
 		var trace1 = {
-			x: blocks,
+			x: blocks2,
 			y: gasSpent,
 			name: 'gasSpent',
 			fill: 'tozeroy',
@@ -488,7 +494,7 @@ $(document).on('ready', function() {
 		};
 
 		var trace2 = {
-			x: blocks,
+			x: blocks2,
 			y: gasLimit,
 			name: 'gasLimit',
 			fill: 'tozeroy',
@@ -496,7 +502,7 @@ $(document).on('ready', function() {
 		};
 
 		var trace3 = {
-			x: blocks,
+			x: blocks2,
 			y: gasSent,
 			name: 'gasLimit',
 			fill: 'tozeroy',
@@ -519,17 +525,17 @@ $(document).on('ready', function() {
 		);
 		var dataToArray1_chart = data1_chart.split(',');
 
-		var blocks = [];
+		var blocks3 = [];
 		var balance = [];
 
-		for (var i = 0; i < dataToArray1_chart.length; i = i + 2) {
-			blocks.push(dataToArray1_chart[i]);
-			balance.push(dataToArray1_chart[i + 1]);
+		for (var l = 0; l < dataToArray1_chart.length; l = l + 2) {
+			blocks3.push(dataToArray1_chart[l]);
+			balance.push(dataToArray1_chart[l + 1]);
 		}
 
 		// NEW CHART
 		var trace1 = {
-			x: blocks,
+			x: blocks3,
 			y: balance,
 			name: 'balance',
 			fill: 'tozeroy',
@@ -548,8 +554,8 @@ $(document).on('ready', function() {
 
 	if (market_chart) {
 		console.log('CHART');
-		generation = document.getElementById('generation');
-		consumption = document.getElementById('consumption');
+		var generation = document.getElementById('generation');
+		var consumption = document.getElementById('consumption');
 
 		var data1_chart = generation.getAttribute('data-for');
 		var data2_chart = consumption.getAttribute('data-for');
@@ -610,17 +616,17 @@ $(document).on('ready', function() {
 		var data1_chart = time_to_mine_chart.getAttribute('data-for');
 		var dataToArray1_chart = data1_chart.split(',');
 
-		var blocks = [];
+		var blocks4 = [];
 		var balance = [];
 
 		for (var i = 2; i < dataToArray1_chart.length; i = i + 2) {
-			blocks.push(dataToArray1_chart[i]);
+			blocks4.push(dataToArray1_chart[i]);
 			balance.push(dataToArray1_chart[i + 1]);
 		}
 
 		// NEW CHART
 		var trace1 = {
-			x: blocks,
+			x: blocks4,
 			y: balance,
 			name: 'balance',
 			fill: 'tozeroy',
@@ -642,7 +648,7 @@ $('.clickclass').click(function(event) {
 	// If the input button is clicked, get the parent with class 'clickclass' and replace with other HTML.
 	console.log('Target id: ' + event.target.id);
 	console.log('Target val: ' + event.target);
-	val = $(event.target).text();
+	var val = $(event.target).text();
 	console.log('VAL: ' + JSON.stringify(val));
 	$('#contract').val(val);
 	// if (event.target.id == 'save_button') {
