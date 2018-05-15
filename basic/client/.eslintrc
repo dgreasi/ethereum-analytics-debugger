@@ -1,0 +1,17 @@
+{
+  "env": {
+    "browser": 1
+  },
+  "globals": {
+    "$": true
+  },
+  "rules": {
+    "eqeqeq": 1,
+    "indent": [
+          "error",
+          "tab"
+      ],
+  },
+  "plugins": [
+  ]
+}

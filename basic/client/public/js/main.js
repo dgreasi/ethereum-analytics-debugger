@@ -1,10 +1,8 @@
 // add scripts
 
 $(document).on('ready', function() {
-
 	setInterval(() => {
-		$.get( '/get_live',"", function(data) {
-
+		$.get('/get_live', '', function(data) {
 			$('#Block').html(data[0].number);
 			$('#difficulty').html(data[0].difficulty);
 			$('#gasLimit').html(data[0].gasLimit);
@@ -18,16 +16,15 @@ $(document).on('ready', function() {
 			ts_number_chart = document.getElementById('ts_number_chart');
 			market_chart = document.getElementById('market_chart');
 
-			
 			if (diff_chart) {
 				// console.log("diff_chart.data: " + JSON.stringify(diff_chart.data));
 				var layoutD = {
 					title: 'Difficulty',
-					yaxis: {title: 'Difficulty of Block'},
+					yaxis: { title: 'Difficulty of Block' }
 				};
 
 				if (diff_chart.data) {
-					var found = diff_chart.data[0].x.find((el) => {
+					var found = diff_chart.data[0].x.find(el => {
 						return el == data[0].number;
 					});
 
@@ -51,12 +48,12 @@ $(document).on('ready', function() {
 						}
 						// console.log("AFTER    BLOCK TO PUSH: " + blockN);
 						// console.log("AFTER    DIFF TO PUSH: " + diffN);
-						
+
 						var data_update = {
-						    x: blockN,
-						    y: diffN,
+							x: blockN,
+							y: diffN,
 							name: 'Difficulty',
-				  			type: 'bar'
+							type: 'bar'
 						};
 
 						var dataD = [data_update];
@@ -66,7 +63,7 @@ $(document).on('ready', function() {
 
 						// Plotly.plot('diff_chart', dataD, layoutD);
 					}
-				} else {					
+				} else {
 					// console.log("INIT CHART");
 					block = [];
 					diff = [];
@@ -75,10 +72,10 @@ $(document).on('ready', function() {
 					diff.push(data[0].difficulty);
 
 					var trace1D = {
-					  	x: block,
+						x: block,
 						y: diff,
 						name: 'Difficulty',
-			  			type: 'bar'
+						type: 'bar'
 					};
 
 					var dataD = [trace1D];
@@ -91,11 +88,11 @@ $(document).on('ready', function() {
 				// console.log("diff_chart.data: " + JSON.stringify(diff_chart.data));
 				var layoutD1 = {
 					title: 'Gas Limit',
-					yaxis: {title: 'gas'},
+					yaxis: { title: 'gas' }
 				};
 
 				if (gasLimit_chart.data) {
-					var found = gasLimit_chart.data[0].x.find((el) => {
+					var found = gasLimit_chart.data[0].x.find(el => {
 						return el == data[0].number;
 					});
 
@@ -119,12 +116,12 @@ $(document).on('ready', function() {
 						}
 						// console.log("AFTER    BLOCK TO PUSH: " + blockN);
 						// console.log("AFTER    DIFF TO PUSH: " + diffN);
-						
+
 						var data_update1 = {
-						    x: blockN1,
-						    y: diffN1,
+							x: blockN1,
+							y: diffN1,
 							name: 'Gas Limit',
-				  			type: 'bar'
+							type: 'bar'
 						};
 
 						var dataD1 = [data_update1];
@@ -134,7 +131,7 @@ $(document).on('ready', function() {
 
 						// Plotly.plot('diff_chart', dataD, layoutD);
 					}
-				} else {					
+				} else {
 					// console.log("INIT CHART");
 					block1 = [];
 					diff1 = [];
@@ -143,10 +140,10 @@ $(document).on('ready', function() {
 					diff1.push(data[0].gasLimit);
 
 					var trace1D = {
-					  	x: block1,
+						x: block1,
 						y: diff1,
 						name: 'Gas Limit',
-			  			type: 'bar'
+						type: 'bar'
 					};
 
 					var dataD1 = [trace1D];
@@ -159,11 +156,11 @@ $(document).on('ready', function() {
 				// console.log("diff_chart.data: " + JSON.stringify(diff_chart.data));
 				var layoutD2 = {
 					title: 'Gas Spending',
-					yaxis: {title: 'gas'},
+					yaxis: { title: 'gas' }
 				};
 
 				if (gasUsed_chart.data) {
-					var found = gasUsed_chart.data[0].x.find((el) => {
+					var found = gasUsed_chart.data[0].x.find(el => {
 						return el == data[0].number;
 					});
 
@@ -187,12 +184,12 @@ $(document).on('ready', function() {
 						}
 						// console.log("AFTER    BLOCK TO PUSH: " + blockN);
 						// console.log("AFTER    DIFF TO PUSH: " + diffN);
-						
+
 						var data_update2 = {
-						    x: blockN2,
-						    y: diffN2,
+							x: blockN2,
+							y: diffN2,
 							name: 'Gas Used',
-				  			type: 'bar'
+							type: 'bar'
 						};
 
 						var dataD2 = [data_update2];
@@ -202,7 +199,7 @@ $(document).on('ready', function() {
 
 						// Plotly.plot('diff_chart', dataD, layoutD);
 					}
-				} else {					
+				} else {
 					// console.log("INIT CHART");
 					block2 = [];
 					diff2 = [];
@@ -211,10 +208,10 @@ $(document).on('ready', function() {
 					diff2.push(data[0].gasUsed);
 
 					var traceD2 = {
-					  	x: block2,
+						x: block2,
 						y: diff2,
 						name: 'Gas Used',
-			  			type: 'bar'
+						type: 'bar'
 					};
 
 					var dataD2 = [traceD2];
@@ -227,11 +224,11 @@ $(document).on('ready', function() {
 				// console.log("diff_chart.data: " + JSON.stringify(diff_chart.data));
 				var layoutD3 = {
 					title: 'Transactions',
-					yaxis: {title: '# of ts'},
+					yaxis: { title: '# of ts' }
 				};
 
 				if (ts_number_chart.data) {
-					var found = ts_number_chart.data[0].x.find((el) => {
+					var found = ts_number_chart.data[0].x.find(el => {
 						return el == data[0].number;
 					});
 
@@ -255,12 +252,12 @@ $(document).on('ready', function() {
 						}
 						// console.log("AFTER    BLOCK TO PUSH: " + blockN);
 						// console.log("AFTER    DIFF TO PUSH: " + diffN);
-						
+
 						var data_update3 = {
-						    x: blockN3,
-						    y: diffN3,
+							x: blockN3,
+							y: diffN3,
 							name: '# of ts',
-				  			type: 'bar'
+							type: 'bar'
 						};
 
 						var dataD3 = [data_update3];
@@ -270,7 +267,7 @@ $(document).on('ready', function() {
 
 						// Plotly.plot('diff_chart', dataD, layoutD);
 					}
-				} else {					
+				} else {
 					// console.log("INIT CHART");
 					block3 = [];
 					diff3 = [];
@@ -279,10 +276,10 @@ $(document).on('ready', function() {
 					diff3.push(data[0].gasUsed);
 
 					var traceD3 = {
-					  	x: block3,
+						x: block3,
 						y: diff3,
 						name: '# of ts',
-			  			type: 'bar'
+						type: 'bar'
 					};
 
 					var dataD3 = [traceD3];
@@ -290,8 +287,6 @@ $(document).on('ready', function() {
 					Plotly.plot('ts_number_chart', dataD3, layoutD3);
 				}
 			}
-
-
 		});
 	}, 3000);
 
@@ -299,17 +294,17 @@ $(document).on('ready', function() {
 	price_chart = document.getElementById('price_chart');
 	array_block_gas_spent_account_chart = document.getElementById('array_block_gas_spent_account_chart');
 	transactions_per_block_chart = document.getElementById('transactions_per_block_chart');
+
 	gas_per_block_chart = document.getElementById('gas_per_block_chart');
-	balance_of_account_per_block_chart = document.getElementById('balance_of_account_per_block_chart');
+	balance_of_account_per_block_chart = document.getElementById(
+		'balance_of_account_per_block_chart'
+	);
 	market_chart = document.getElementById('market_chart');
 	time_to_mine_chart = document.getElementById('time_to_mine_chart');
 
-
-
-
 	if (price_chart) {
 		var data_chart = price_chart.getAttribute('data-for');
-		var dataToArray_chart = data_chart.split(",");
+		var dataToArray_chart = data_chart.split(',');
 		// console.log("TEST price_chart: " + JSON.stringify(dataToArray_chart));
 
 		var blocks = [];
@@ -318,19 +313,18 @@ $(document).on('ready', function() {
 		var quantity = [];
 		var zeros = [];
 
-		for (var i = 0; i < dataToArray_chart.length; i=i+6) {
+		for (var i = 0; i < dataToArray_chart.length; i = i + 6) {
 			blocks.push(dataToArray_chart[i]);
-			time.push(dataToArray_chart[i+1]);
+			time.push(dataToArray_chart[i + 1]);
 			zeros.push(0);
 			// console.log("TIME: " + dataToArray_chart[i+1]);
-			prices.push(dataToArray_chart[i+2]);
-			quantity.push(dataToArray_chart[i+3]);
+			prices.push(dataToArray_chart[i + 2]);
+			quantity.push(dataToArray_chart[i + 3]);
 		}
 
 		// console.log("Blocks: " + blocks[0]);
 		// console.log("Prices: " + prices[0]);
 		// console.log("Quantity: " + quantity[0]);
-
 
 		// console.log("blocks: " + blocks.length);
 		// console.log("time: " + time.length);
@@ -338,7 +332,7 @@ $(document).on('ready', function() {
 		// NEW CHART
 
 		var trace1 = {
-		  	x: blocks,
+			x: blocks,
 			y: prices,
 			name: 'Price data',
 			type: 'scatter'
@@ -352,32 +346,45 @@ $(document).on('ready', function() {
 			type: 'scatter'
 		};
 
+<<<<<<< HEAD
+=======
+		// var trace3 = {
+		// 	x: time,
+		// 	y: zeros,
+		// 	name: 'Time',
+		// 	xaxis: 'x2',
+		// 	type: 'scatter',
+		// 	marker: {
+		//             color: 'white'
+		//           }
+		// };
+
+>>>>>>> master
 		var data = [trace1, trace2];
 		// var data = [trace1, trace2];
 
-
 		var layout = {
-		  title: 'Clearing Price && Quantity',
-		  xaxis: {
-		  	title: 'Blocks',
-		  },
-		  yaxis: {
-		  	title: 'Price',
-		  	range: [0, 40]
-		  },
-		  yaxis2: {
-		    title: 'Quantity',
-		    titlefont: {color: 'rgb(148, 103, 189)'},
-		    tickfont: {color: 'rgb(148, 103, 189)'},
-		    overlaying: 'y',
-		    side: 'right'
-		  },
-		  xaxis2: {
-            titlefont: {color: 'white'}, 
-            tickfont: {color: 'rgb(148, 103, 189)'}, 
-            overlaying: 'x', 
-            side: 'top'
-      	  }
+			title: 'Clearing Price && Quantity',
+			xaxis: {
+				title: 'Blocks'
+			},
+			yaxis: {
+				title: 'Price',
+				range: [0, 40]
+			},
+			yaxis2: {
+				title: 'Quantity',
+				titlefont: { color: 'rgb(148, 103, 189)' },
+				tickfont: { color: 'rgb(148, 103, 189)' },
+				overlaying: 'y',
+				side: 'right'
+			},
+			xaxis2: {
+				titlefont: { color: 'white' },
+				tickfont: { color: 'rgb(148, 103, 189)' },
+				overlaying: 'x',
+				side: 'top'
+			}
 		};
 
 		Plotly.plot('price_chart', data, layout);
@@ -385,17 +392,22 @@ $(document).on('ready', function() {
 
 	if (array_block_gas_spent_account_chart) {
 		var data1_chart = array_block_gas_spent_chart.getAttribute('data-for');
+<<<<<<< HEAD
 		var dataToArray1_chart = data1_chart.split(",");
 		// console.log("TEST array_block_gas_spent_account_chart: " + JSON.stringify(dataToArray1_chart));
+=======
+		var dataToArray1_chart = data1_chart.split(',');
+		// console.log("TEST array_block_gas_spent_chart: " + JSON.stringify(dataToArray1_chart));
+>>>>>>> master
 
 		var blocks = [];
 		var gasSpent = [];
 		var gasLimit = [];
 
-		for (var i = 0; i < dataToArray1_chart.length; i=i+3) {
+		for (var i = 0; i < dataToArray1_chart.length; i = i + 3) {
 			blocks.push(dataToArray1_chart[i]);
-			gasSpent.push(dataToArray1_chart[i+1]);
-			gasLimit.push(dataToArray1_chart[i+2]);
+			gasSpent.push(dataToArray1_chart[i + 1]);
+			gasLimit.push(dataToArray1_chart[i + 2]);
 		}
 
 		// console.log("Blocks: " + blocks[0]);
@@ -405,11 +417,11 @@ $(document).on('ready', function() {
 		// NEW CHART
 
 		var trace1 = {
-		  	x: blocks,
+			x: blocks,
 			y: gasSpent,
 			name: 'gasSpent',
 			fill: 'tozeroy',
-  			type: 'scatter'
+			type: 'scatter'
 		};
 
 		var trace2 = {
@@ -423,26 +435,25 @@ $(document).on('ready', function() {
 		var data = [trace1, trace2];
 
 		var layout = {
-		  title: 'Gas Spent - Gas Limit - Blocks',
-		  yaxis: {title: 'Gas Spent'},
+			title: 'Gas Spent - Gas Limit - Blocks',
+			yaxis: { title: 'Gas Spent' }
 		};
 
 		Plotly.plot('array_block_gas_spent_chart', data, layout);
 	}
 
 	if (transactions_per_block_chart) {
-
 		var data_chart = transactions_per_block_chart.getAttribute('data-for');
-		var dataToArray_chart = data_chart.split(",");
+		var dataToArray_chart = data_chart.split(',');
 		// console.log("TEST transactions_per_block_chart: " + JSON.stringify(dataToArray_chart));
 
 		var blocks = [];
 		var transcations = [];
 		var quantity = [];
 
-		for (var i = 0; i < dataToArray_chart.length; i=i+2) {
+		for (var i = 0; i < dataToArray_chart.length; i = i + 2) {
 			blocks.push(dataToArray_chart[i]);
-			transcations.push(dataToArray_chart[i+1]);
+			transcations.push(dataToArray_chart[i + 1]);
 		}
 
 		// console.log("Blocks: " + blocks[0]);
@@ -452,7 +463,7 @@ $(document).on('ready', function() {
 		// NEW CHART
 
 		var trace1 = {
-		  	x: blocks,
+			x: blocks,
 			y: transcations,
 			fill: 'tozeroy',
 			type: 'scatter'
@@ -461,8 +472,8 @@ $(document).on('ready', function() {
 		var data = [trace1];
 
 		var layout = {
-		  title: 'Transactions Per Block',
-		  yaxis: {title: '# Transactions'},
+			title: 'Transactions Per Block',
+			yaxis: { title: '# Transactions' }
 		};
 
 		Plotly.plot('transactions_per_block_chart', data, layout);
@@ -470,27 +481,33 @@ $(document).on('ready', function() {
 
 	if (gas_per_block_chart) {
 		var data1_chart = gas_per_block_chart.getAttribute('data-for');
-		var dataToArray1_chart = data1_chart.split(",");
+		var dataToArray1_chart = data1_chart.split(',');
 
 		var blocks = [];
 		var gasSpent = [];
 		var gasSent = [];
 		var gasLimit = [];
 
+<<<<<<< HEAD
 		for (var i = 0; i < dataToArray1_chart.length; i=i+4) {
 			blocks.push(dataToArray1_chart[i]);
 			gasSpent.push(dataToArray1_chart[i+1]);
 			gasSent.push(dataToArray1_chart[i+2]);
 			gasLimit.push(dataToArray1_chart[i+3]);
+=======
+		for (var i = 0; i < dataToArray1_chart.length; i = i + 2) {
+			blocks.push(dataToArray1_chart[i]);
+			gasSpent.push(dataToArray1_chart[i + 1]);
+>>>>>>> master
 		}
 
 		// NEW CHART
 		var trace1 = {
-		  	x: blocks,
+			x: blocks,
 			y: gasSpent,
 			name: 'gasSpent',
 			fill: 'tozeroy',
-  			type: 'scatter'
+			type: 'scatter'
 		};
 
 		var trace2 = {
@@ -513,54 +530,56 @@ $(document).on('ready', function() {
 		var data = [trace1, trace2, trace3];
 
 		var layout = {
-		  title: 'Gas Spent - Blocks',
-		  yaxis: {title: 'Gas Spent'},
+			title: 'Gas Spent - Blocks',
+			yaxis: { title: 'Gas Spent' }
 		};
 
 		Plotly.plot('gas_per_block_chart', data, layout);
 	}
 
 	if (balance_of_account_per_block_chart) {
-		var data1_chart = balance_of_account_per_block_chart.getAttribute('data-for');
-		var dataToArray1_chart = data1_chart.split(",");
+		var data1_chart = balance_of_account_per_block_chart.getAttribute(
+			'data-for'
+		);
+		var dataToArray1_chart = data1_chart.split(',');
 
 		var blocks = [];
 		var balance = [];
 
-		for (var i = 0; i < dataToArray1_chart.length; i=i+2) {
+		for (var i = 0; i < dataToArray1_chart.length; i = i + 2) {
 			blocks.push(dataToArray1_chart[i]);
-			balance.push(dataToArray1_chart[i+1]);
+			balance.push(dataToArray1_chart[i + 1]);
 		}
 
 		// NEW CHART
 		var trace1 = {
-		  	x: blocks,
+			x: blocks,
 			y: balance,
 			name: 'balance',
 			fill: 'tozeroy',
-  			type: 'scatter'
+			type: 'scatter'
 		};
 
 		var data = [trace1];
 
 		var layout = {
-		  title: 'Balance of Account - Blocks',
-		  yaxis: {title: 'Balance'},
+			title: 'Balance of Account - Blocks',
+			yaxis: { title: 'Balance' }
 		};
 
 		Plotly.plot('balance_of_account_per_block_chart', data, layout);
 	}
 
 	if (market_chart) {
-		console.log("CHART");
+		console.log('CHART');
 		generation = document.getElementById('generation');
 		consumption = document.getElementById('consumption');
 
 		var data1_chart = generation.getAttribute('data-for');
 		var data2_chart = consumption.getAttribute('data-for');
 
-		var dataToArray1_chart = data1_chart.split(",");
-		var dataToArray2_chart = data2_chart.split(",");
+		var dataToArray1_chart = data1_chart.split(',');
+		var dataToArray2_chart = data2_chart.split(',');
 
 		console.log(JSON.stringify(dataToArray1_chart));
 
@@ -570,29 +589,28 @@ $(document).on('ready', function() {
 		var conPrice = [];
 		var conQuantity = [];
 
-		for (var i = 0; i < dataToArray1_chart.length; i=i+2) {
+		for (var i = 0; i < dataToArray1_chart.length; i = i + 2) {
 			genPrice.push(parseInt(dataToArray1_chart[i]));
-			genQuantity.push(parseInt(dataToArray1_chart[i+1]));
+			genQuantity.push(parseInt(dataToArray1_chart[i + 1]));
 		}
 
-		for (var i = 0; i < dataToArray2_chart.length; i=i+2) {
+		for (var i = 0; i < dataToArray2_chart.length; i = i + 2) {
 			conPrice.push(parseInt(dataToArray2_chart[i]));
-			conQuantity.push(parseInt(dataToArray2_chart[i+1]));
+			conQuantity.push(parseInt(dataToArray2_chart[i + 1]));
 		}
 
-		console.log("genPrice: " + JSON.stringify(genPrice));
-		console.log("genQuantity: " + JSON.stringify(genQuantity));
+		console.log('genPrice: ' + JSON.stringify(genPrice));
+		console.log('genQuantity: ' + JSON.stringify(genQuantity));
 
-		console.log("conPrice: " + JSON.stringify(conPrice));
-		console.log("conQuantity: " + JSON.stringify(conQuantity));
-
+		console.log('conPrice: ' + JSON.stringify(conPrice));
+		console.log('conQuantity: ' + JSON.stringify(conQuantity));
 
 		// NEW CHART
 		var trace1 = {
-		  	x: genQuantity,
+			x: genQuantity,
 			y: genPrice,
 			name: 'Generation',
-  			type: 'scatter'
+			type: 'scatter'
 		};
 
 		var trace2 = {
@@ -605,8 +623,8 @@ $(document).on('ready', function() {
 		var data = [trace1, trace2];
 
 		var layout = {
-		  title: 'Market State',
-		  yaxis: {title: 'Price'},
+			title: 'Market State',
+			yaxis: { title: 'Price' }
 		};
 
 		Plotly.plot('market_chart', data, layout);
@@ -614,127 +632,123 @@ $(document).on('ready', function() {
 
 	if (time_to_mine_chart) {
 		var data1_chart = time_to_mine_chart.getAttribute('data-for');
-		var dataToArray1_chart = data1_chart.split(",");
+		var dataToArray1_chart = data1_chart.split(',');
 
 		var blocks = [];
 		var balance = [];
 
-		for (var i = 2; i < dataToArray1_chart.length; i=i+2) {
+		for (var i = 2; i < dataToArray1_chart.length; i = i + 2) {
 			blocks.push(dataToArray1_chart[i]);
-			balance.push(dataToArray1_chart[i+1]);
+			balance.push(dataToArray1_chart[i + 1]);
 		}
 
 		// NEW CHART
 		var trace1 = {
-		  	x: blocks,
+			x: blocks,
 			y: balance,
 			name: 'balance',
 			fill: 'tozeroy',
-  			type: 'scatter'
+			type: 'scatter'
 		};
 
 		var data = [trace1];
 
 		var layout = {
-		  title: 'Time to Mine Block - Blocks',
-		  yaxis: {title: 'Time'},
+			title: 'Time to Mine Block - Blocks',
+			yaxis: { title: 'Time' }
 		};
 
 		Plotly.plot('time_to_mine_chart', data, layout);
 	}
 });
 
-
-$('.clickclass').click(function (event) {
-  // If the input button is clicked, get the parent with class 'clickclass' and replace with other HTML.
-  console.log("Target id: " + event.target.id);
-  console.log("Target val: " + event.target);
-  val = $(event.target).text();
-  console.log("VAL: " + JSON.stringify(val));
-  $( "#contract" ).val(val);
-  // if (event.target.id == 'save_button') {
-  //    myparent = event.target.parent();
-  //    myparent.html('some html code');
-  // }
-
+$('.clickclass').click(function(event) {
+	// If the input button is clicked, get the parent with class 'clickclass' and replace with other HTML.
+	console.log('Target id: ' + event.target.id);
+	console.log('Target val: ' + event.target);
+	val = $(event.target).text();
+	console.log('VAL: ' + JSON.stringify(val));
+	$('#contract').val(val);
+	// if (event.target.id == 'save_button') {
+	//    myparent = event.target.parent();
+	//    myparent.html('some html code');
+	// }
 });
 
-
-$( "#get_exp" ).click(function() {
-  // alert( "Handler for .click() called." );
-  $( "#id_function" ).val("1");
-  $( "#submit_global" ).click();
+$('#get_exp').click(function() {
+	// alert( "Handler for .click() called." );
+	$('#id_function').val('1');
+	$('#submit_global').click();
 });
 
-$( "#get_clr" ).click(function() {
-  // alert( "Handler for .click() called." );
-  $( "#id_function" ).val("2");
-  $( "#submit_global" ).click();
+$('#get_clr').click(function() {
+	// alert( "Handler for .click() called." );
+	$('#id_function').val('2');
+	$('#submit_global').click();
 });
 
-$( "#get_con_details" ).click(function() {
-  // alert( "Handler for .click() called." );
-  $( "#id_function" ).val("3");
-  $( "#submit_global" ).click();
+$('#get_con_details').click(function() {
+	// alert( "Handler for .click() called." );
+	$('#id_function').val('3');
+	$('#submit_global').click();
 });
 
-$( "#get_transactions_per_block" ).click(function() {
-  // alert( "Handler for .click() called." );
-  $( "#id_function" ).val("4");
-  $( "#submit_global" ).click();
+$('#get_transactions_per_block').click(function() {
+	// alert( "Handler for .click() called." );
+	$('#id_function').val('4');
+	$('#submit_global').click();
 });
 
-$( "#get_account_gas_spent" ).click(function() {
-  // alert( "Handler for .click() called." );
-  $( "#id_function" ).val("5");
-  $( "#submit_global" ).click();
+$('#get_account_gas_spent').click(function() {
+	// alert( "Handler for .click() called." );
+	$('#id_function').val('5');
+	$('#submit_global').click();
 });
 
-$( "#get_account_info" ).click(function() {
-  // alert( "Handler for .click() called." );
-  $( "#id_function" ).val("6");
-  $( "#submit_global" ).click();
+$('#get_account_info').click(function() {
+	// alert( "Handler for .click() called." );
+	$('#id_function').val('6');
+	$('#submit_global').click();
 });
 
-$( "#get_clr_last_block" ).click(function() {
-  // alert( "Handler for .click() called." );
-  $( "#id_function" ).val("7");
-  $( "#submit_global" ).click();
+$('#get_clr_last_block').click(function() {
+	// alert( "Handler for .click() called." );
+	$('#id_function').val('7');
+	$('#submit_global').click();
 });
 
-$( "#gas_per_block" ).click(function() {
-  // alert( "Handler for .click() called." );
-  $( "#id_function" ).val("8");
-  $( "#submit_global" ).click();
+$('#gas_per_block').click(function() {
+	// alert( "Handler for .click() called." );
+	$('#id_function').val('8');
+	$('#submit_global').click();
 });
 
-$( "#get_balance_account_per_block" ).click(function() {
-  // alert( "Handler for .click() called." );
-  $( "#id_function" ).val("9");
-  $( "#submit_global" ).click();
+$('#get_balance_account_per_block').click(function() {
+	// alert( "Handler for .click() called." );
+	$('#id_function').val('9');
+	$('#submit_global').click();
 });
 
-$( "#sync" ).click(function() {
-  // alert( "Handler for .click() called." );
-  $( "#id_function" ).val("10");
-  $( "#submit_global" ).click();
+$('#sync').click(function() {
+	// alert( "Handler for .click() called." );
+	$('#id_function').val('10');
+	$('#submit_global').click();
 });
 
-$( "#get_trs" ).click(function() {
-  // alert( "Handler for .click() called." );
-  $( "#id_function" ).val("11");
-  $( "#submit_global" ).click();
+$('#get_trs').click(function() {
+	// alert( "Handler for .click() called." );
+	$('#id_function').val('11');
+	$('#submit_global').click();
 });
 
-$( "#get_market_chart" ).click(function() {
-  // alert( "Handler for .click() called." );
-  $( "#id_function" ).val("12");
-  $( "#submit_global" ).click();
+$('#get_market_chart').click(function() {
+	// alert( "Handler for .click() called." );
+	$('#id_function').val('12');
+	$('#submit_global').click();
 });
 
-$( "#get_time_to_mine_block" ).click(function() {
-  // alert( "Handler for .click() called." );
-  $( "#id_function" ).val("13");
-  $( "#submit_global" ).click();
+$('#get_time_to_mine_block').click(function() {
+	// alert( "Handler for .click() called." );
+	$('#id_function').val('13');
+	$('#submit_global').click();
 });
-

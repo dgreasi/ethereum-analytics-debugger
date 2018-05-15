@@ -1,19 +1,39 @@
 {
   "env": {
-    "node": 1,
-    "browser": 1
+    "browser": true,
+    "es6": true,
+    "node": true
   },
+  "extends": [
+    "eslint:recommended",
+    "eslint-config-prettier"
+  ],
   "globals": {
     "dbBlocks": true,
     "dbTransInfo": true,
-    "dbClearings": true
+    "dbClearings": true,
     "silentBugs": true,
     "accounts": true,
     "previous_contracts_accounts": true
   },
   "rules": {
-    "eqeqeq": 1
-  },
-  "plugins": [
-  ]
+    "eqeqeq": "error",
+    "indent": [
+      "error",
+      2
+    ],
+    "linebreak-style": [
+      "error",
+      "unix"
+    ],
+    "no-console": ["off"],
+    "quotes": [
+      "error",
+      "single"
+    ],
+    "semi": [
+      "error",
+      "always"
+    ]
+  }
 }
