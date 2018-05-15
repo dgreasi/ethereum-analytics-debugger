@@ -405,7 +405,7 @@ $(document).on('ready', function() {
 
 		// NEW CHART
 
-		var trace1 = {
+		trace1 = {
 			x: blocks1,
 			y: gasSpent,
 			name: 'gasSpent',
@@ -413,7 +413,7 @@ $(document).on('ready', function() {
 			type: 'scatter'
 		};
 
-		var trace2 = {
+		trace2 = {
 			x: blocks1,
 			y: gasLimit,
 			name: 'gasLimit',
@@ -421,9 +421,9 @@ $(document).on('ready', function() {
 			type: 'scatter'
 		};
 
-		var data = [trace1, trace2];
+		data = [trace1, trace2];
 
-		var layout = {
+		layout = {
 			title: 'Gas Spent - Gas Limit - Blocks',
 			yaxis: { title: 'Gas Spent' }
 		};
@@ -432,13 +432,13 @@ $(document).on('ready', function() {
 	}
 
 	if (transactions_per_block_chart) {
-		var data_chart = transactions_per_block_chart.getAttribute('data-for');
-		var dataToArray_chart = data_chart.split(',');
+		data_chart = transactions_per_block_chart.getAttribute('data-for');
+		dataToArray_chart = data_chart.split(',');
 		// console.log("TEST transactions_per_block_chart: " + JSON.stringify(dataToArray_chart));
 
 		var blocks5 = [];
 		var transcations = [];
-		var quantity = [];
+		quantity = [];
 
 		for (var k = 0; k < dataToArray_chart.length; k = k + 2) {
 			blocks5.push(dataToArray_chart[k]);
@@ -451,16 +451,16 @@ $(document).on('ready', function() {
 
 		// NEW CHART
 
-		var trace1 = {
+		trace1 = {
 			x: blocks5,
 			y: transcations,
 			fill: 'tozeroy',
 			type: 'scatter'
 		};
 
-		var data = [trace1];
+		data = [trace1];
 
-		var layout = {
+		layout = {
 			title: 'Transactions Per Block',
 			yaxis: { title: '# Transactions' }
 		};
@@ -469,13 +469,13 @@ $(document).on('ready', function() {
 	}
 
 	if (gas_per_block_chart) {
-		var data1_chart = gas_per_block_chart.getAttribute('data-for');
-		var dataToArray1_chart = data1_chart.split(',');
+		data1_chart = gas_per_block_chart.getAttribute('data-for');
+		dataToArray1_chart = data1_chart.split(',');
 
 		var blocks2 = [];
-		var gasSpent = [];
+		gasSpent = [];
 		var gasSent = [];
-		var gasLimit = [];
+		gasLimit = [];
 
 		for (var t = 0; t < dataToArray1_chart.length; t = t + 4) {
 			blocks2.push(dataToArray1_chart[t]);
@@ -485,7 +485,7 @@ $(document).on('ready', function() {
 		}
 
 		// NEW CHART
-		var trace1 = {
+		trace1 = {
 			x: blocks2,
 			y: gasSpent,
 			name: 'gasSpent',
@@ -493,7 +493,7 @@ $(document).on('ready', function() {
 			type: 'scatter'
 		};
 
-		var trace2 = {
+		trace2 = {
 			x: blocks2,
 			y: gasLimit,
 			name: 'gasLimit',
@@ -509,9 +509,9 @@ $(document).on('ready', function() {
 			type: 'scatter'
 		};
 
-		var data = [trace1, trace2, trace3];
+		data = [trace1, trace2, trace3];
 
-		var layout = {
+		layout = {
 			title: 'Gas Spent - Blocks',
 			yaxis: { title: 'Gas Spent' }
 		};
@@ -520,10 +520,10 @@ $(document).on('ready', function() {
 	}
 
 	if (balance_of_account_per_block_chart) {
-		var data1_chart = balance_of_account_per_block_chart.getAttribute(
+		data1_chart = balance_of_account_per_block_chart.getAttribute(
 			'data-for'
 		);
-		var dataToArray1_chart = data1_chart.split(',');
+		dataToArray1_chart = data1_chart.split(',');
 
 		var blocks3 = [];
 		var balance = [];
@@ -534,7 +534,7 @@ $(document).on('ready', function() {
 		}
 
 		// NEW CHART
-		var trace1 = {
+		trace1 = {
 			x: blocks3,
 			y: balance,
 			name: 'balance',
@@ -542,9 +542,9 @@ $(document).on('ready', function() {
 			type: 'scatter'
 		};
 
-		var data = [trace1];
+		data = [trace1];
 
-		var layout = {
+		layout = {
 			title: 'Balance of Account - Blocks',
 			yaxis: { title: 'Balance' }
 		};
@@ -557,10 +557,10 @@ $(document).on('ready', function() {
 		var generation = document.getElementById('generation');
 		var consumption = document.getElementById('consumption');
 
-		var data1_chart = generation.getAttribute('data-for');
+		data1_chart = generation.getAttribute('data-for');
 		var data2_chart = consumption.getAttribute('data-for');
 
-		var dataToArray1_chart = data1_chart.split(',');
+		dataToArray1_chart = data1_chart.split(',');
 		var dataToArray2_chart = data2_chart.split(',');
 
 		console.log(JSON.stringify(dataToArray1_chart));
@@ -571,14 +571,14 @@ $(document).on('ready', function() {
 		var conPrice = [];
 		var conQuantity = [];
 
-		for (var i = 0; i < dataToArray1_chart.length; i = i + 2) {
+		for (i = 0; i < dataToArray1_chart.length; i = i + 2) {
 			genPrice.push(parseInt(dataToArray1_chart[i]));
 			genQuantity.push(parseInt(dataToArray1_chart[i + 1]));
 		}
 
-		for (var i = 0; i < dataToArray2_chart.length; i = i + 2) {
-			conPrice.push(parseInt(dataToArray2_chart[i]));
-			conQuantity.push(parseInt(dataToArray2_chart[i + 1]));
+		for (j = 0; j < dataToArray2_chart.length; j = j + 2) {
+			conPrice.push(parseInt(dataToArray2_chart[j]));
+			conQuantity.push(parseInt(dataToArray2_chart[j + 1]));
 		}
 
 		console.log('genPrice: ' + JSON.stringify(genPrice));
@@ -588,23 +588,23 @@ $(document).on('ready', function() {
 		console.log('conQuantity: ' + JSON.stringify(conQuantity));
 
 		// NEW CHART
-		var trace1 = {
+		trace1 = {
 			x: genQuantity,
 			y: genPrice,
 			name: 'Generation',
 			type: 'scatter'
 		};
 
-		var trace2 = {
+		trace2 = {
 			x: conQuantity,
 			y: conPrice,
 			name: 'Consumption',
 			type: 'scatter'
 		};
 
-		var data = [trace1, trace2];
+		data = [trace1, trace2];
 
-		var layout = {
+		layout = {
 			title: 'Market State',
 			yaxis: { title: 'Price' }
 		};
@@ -613,19 +613,19 @@ $(document).on('ready', function() {
 	}
 
 	if (time_to_mine_chart) {
-		var data1_chart = time_to_mine_chart.getAttribute('data-for');
-		var dataToArray1_chart = data1_chart.split(',');
+		data1_chart = time_to_mine_chart.getAttribute('data-for');
+		dataToArray1_chart = data1_chart.split(',');
 
 		var blocks4 = [];
-		var balance = [];
+		balance = [];
 
-		for (var i = 2; i < dataToArray1_chart.length; i = i + 2) {
+		for (i = 2; i < dataToArray1_chart.length; i = i + 2) {
 			blocks4.push(dataToArray1_chart[i]);
 			balance.push(dataToArray1_chart[i + 1]);
 		}
 
 		// NEW CHART
-		var trace1 = {
+		trace1 = {
 			x: blocks4,
 			y: balance,
 			name: 'balance',
@@ -633,9 +633,9 @@ $(document).on('ready', function() {
 			type: 'scatter'
 		};
 
-		var data = [trace1];
+		data = [trace1];
 
-		var layout = {
+		layout = {
 			title: 'Time to Mine Block - Blocks',
 			yaxis: { title: 'Time' }
 		};

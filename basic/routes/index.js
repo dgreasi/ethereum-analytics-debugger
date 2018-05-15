@@ -84,7 +84,7 @@ router.post('/get', function(req, res) {
           );
         });
     } else {
-      noData = "Contract doesn't exist.'";
+      noData = "Contract doesn't exist.";
       prvAC = analytics.getPreviousAccounts();
       analytics.getLastBlockLocally().then(block => {
         res.render('home', {
@@ -99,7 +99,7 @@ router.post('/get', function(req, res) {
     // GET STATE OF CONTRACT THROUGH TIME
 
     if (contract === '') {
-      noData = "Contract doesn't exist.'";
+      noData = "Contract doesn't exist.";
       prvAC = analytics.getPreviousAccounts();
       analytics.getLastBlockLocally().then(block => {
         res.render('home', {
@@ -137,7 +137,7 @@ router.post('/get', function(req, res) {
             });
           });
       } else {
-        noData = "Contract doesn't exist.'";
+        noData = "Contract doesn't exist.";
         prvAC = analytics.getPreviousAccounts();
         analytics.getLastBlockLocally().then(block => {
           res.render('home', {
@@ -378,7 +378,7 @@ router.post('/get', function(req, res) {
           });
         });
       } else {
-        noData = "Contract doesn't exist.'";
+        noData = "Contract doesn't exist.";
         prvAC = analytics.getPreviousAccounts();
         analytics.getLastBlockLocally().then(block => {
           res.render('home', {
@@ -542,7 +542,7 @@ router.post('/get', function(req, res) {
           });
         });
     } else {
-      noData = "Contract doesn't exist.'";
+      noData = "Contract doesn't exist.";
       prvAC = analytics.getPreviousAccounts();
       analytics.getLastBlockLocally().then(block => {
         res.render('home', {
@@ -699,7 +699,7 @@ router.post('/get', function(req, res) {
           });
         });
     } else {
-      noData = "Contract doesn't exist.'";
+      noData = "Contract doesn't exist.";
       prvAC = analytics.getPreviousAccounts();
       analytics.getLastBlockLocally().then(block => {
         res.render('home', {

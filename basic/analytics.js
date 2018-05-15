@@ -1354,17 +1354,17 @@ const marketChart = function(startBlockNumber, endBlockNumber) {
                   ts.transactionIndex
               );
 
-              if (first_clear == null) {
-                first_clear = {
-                  block: ts.blockNumber,
-                  index: ts.transactionIndex
-                };
-              } else {
+              if (first_clear) {
                 second_clear = {
                   block: ts.blockNumber,
                   index: ts.transactionIndex
                 };
                 return true;
+              } else {
+                first_clear = {
+                  block: ts.blockNumber,
+                  index: ts.transactionIndex
+                };
               }
             } else {
               // console.log("ELSE");
@@ -1437,7 +1437,7 @@ const marketChart = function(startBlockNumber, endBlockNumber) {
         console.log(consumption.length);
         // console.log(JSON.stringify(consumption));
 
-        if (first_clear == null && second_clear == null) {
+        if (first_clear === null && second_clear === null) {
           for (var j = 0; j < 65; j++) {
             dbBlocks[check + j].transactions.some(ts => {
               var inputSh = ts.input.toString();
