@@ -1,4 +1,4 @@
-var fs = require("fs");
+var fs = require('fs');
 var Web3 = require('web3');
 
 ////////////////////////////////////////////////////////////////////////////
@@ -9,11 +9,11 @@ var web3 = new Web3();
 web3.setProvider(new web3.providers.HttpProvider('http://localhost:8100'));
 
 var accounts = []; // Account hash - Gas spent - # Transactions
-var contract_first_approach = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3"; // 1st approach
-// var contract = "0x501897c4a684590ee69447974519e86811f0a47d"; // automated bid
-// var contract = "0x668e966f3f4cf884ad6eda65784ceacf89ef084a"; // new automated fixed
-var contract = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3"; // new automated fixed
-var accountOfCentralNode = "0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768";
+var contract_first_approach = '0xf176c2f03773b63a6e3659423d7380bfa276dcb3'; // 1st approach
+// var contract = '0x501897c4a684590ee69447974519e86811f0a47d'; // automated bid
+// var contract = '0x668e966f3f4cf884ad6eda65784ceacf89ef084a'; // new automated fixed
+var contract = '0xf176c2f03773b63a6e3659423d7380bfa276dcb3'; // new automated fixed
+var accountOfCentralNode = '0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768';
 
 var start = 17073;
 var end = null;
@@ -29,21 +29,21 @@ var end = null;
 // clearContract();
 // getClearingsThroughTime(start, end);
 // getBlockCleared().then(res => {
-//   console.log("Block Cleared: " + parseInt(res));
+//   console.log('Block Cleared: ' + parseInt(res));
 //   blockCleared = res;
 //   getBlockNumberNow().then(res => {
 //     blockNumber = res;
-//     console.log("Block NumberNow: " + parseInt(res));
+//     console.log('Block NumberNow: ' + parseInt(res));
 //     if ((blockNumber-blockCleared) > 60) {
-//       console.log("TRUE");
+//       console.log('TRUE');
 //     } else {
-//       console.log("FALSE, Distance: " + (blockNumber-blockCleared));
+//       console.log('FALSE, Distance: ' + (blockNumber-blockCleared));
 //     }
-//     console.log("");
+//     console.log('');
 //     getGenerationsLength().then(res => {
-//       console.log("Generation Length: " + parseInt(res));
+//       console.log('Generation Length: ' + parseInt(res));
 //       getConsumptionsLength().then(res => {
-//         console.log("Consumption Length: " + parseInt(res));
+//         console.log('Consumption Length: ' + parseInt(res));
 //       });
 //     });
 
@@ -57,27 +57,27 @@ web3.eth.getBlock(15000, true).then(res => {
   // Hours part from the timestamp
   var hours = date.getHours();
   // Minutes part from the timestamp
-  var minutes = "0" + date.getMinutes();
+  var minutes = '0' + date.getMinutes();
   // Seconds part from the timestamp
-  // var seconds = "0" + date.getSeconds();
+  // var seconds = '0' + date.getSeconds();
   // + ':' + seconds.substr(-2)
 
   // Will display time in 10:30:23 format
   var formattedTime = hours + ':' + minutes.substr(-2);
-  console.log("timestamp: " + formattedTime);
+  console.log('timestamp: ' + formattedTime);
 });
 
-// res = "0000000000000000000000000000000000000000000000000000000000076ae2000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000001";
+// res = '0000000000000000000000000000000000000000000000000000000000076ae2000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000001';
 // res1 = res.substr(0, 64);
-// res1 = "0x".concat(res1);
+// res1 = '0x'.concat(res1);
 // res2 = res.substr(64, 64);
-// res2 = "0x".concat(res2);
+// res2 = '0x'.concat(res2);
 // res3 = res.substr(128, 64);
-// res3 = "0x".concat(res3);
+// res3 = '0x'.concat(res3);
 
-// console.log("Res1: " + parseInt(res1));
-// console.log("Res2: " + parseInt(res2));
-// console.log("Res3: " + parseInt(res3));
+// console.log('Res1: ' + parseInt(res1));
+// console.log('Res2: ' + parseInt(res2));
+// console.log('Res3: ' + parseInt(res3));
 
 // getCode();
 
@@ -96,8 +96,8 @@ function getAccountTransactionsGasSpentClearings(startBlockNumber, endBlockNumbe
     startBlockNumber = start;
     endBlockNumber = end;
 
-    console.log("Using startBlockNumber: " + startBlockNumber);
-    console.log("Using endBlockNumber: " + endBlockNumber);
+    console.log('Using startBlockNumber: ' + startBlockNumber);
+    console.log('Using endBlockNumber: ' + endBlockNumber);
 
     for (var i = startBlockNumber; i <= endBlockNumber; i++) {
       var getBlock = web3.eth.getBlock(i, true);
@@ -107,14 +107,14 @@ function getAccountTransactionsGasSpentClearings(startBlockNumber, endBlockNumbe
     Promise.all(getBlockPromises).then(blocks => {
       var receiptsPromises = [];
       blocks.forEach(block => {
-        // console.log("BLOCK: " + block.number + " Number of transactions: " + block.transactions.length);
+        // console.log('BLOCK: ' + block.number + ' Number of transactions: ' + block.transactions.length);
         if (block != null && block.transactions != null) {
           // if ((block.number-start)%10 == 0) {
           //   getContractResults(block.number);
           // }
 
           block.transactions.forEach(e => {
-            if (e.input != "0x") {
+            if (e.input != '0x') {
               // printTransactionInfo(e);
               receiptsPromises.push(getTransactionReceiptFun(e.hash));
             }
@@ -127,13 +127,13 @@ function getAccountTransactionsGasSpentClearings(startBlockNumber, endBlockNumbe
         getContractResults();
         printsAccountsResults();
       }).catch(err => {
-        console.log("ERROR receiptsPromises: " + err);
+        console.log('ERROR receiptsPromises: ' + err);
       });
     }).catch(err => {
-      console.log("ERROR getBlockPromises: " + err);
+      console.log('ERROR getBlockPromises: ' + err);
     });
   }).catch(err => {
-    console.log("ERROR getBlockNumber: " + err);
+    console.log('ERROR getBlockNumber: ' + err);
   });
 }
 
@@ -146,8 +146,8 @@ function getNumberOfTranscationsOfAccountPerBlock(startBlockNumber, endBlockNumb
     startBlockNumber = start;
     endBlockNumber = end;
 
-    console.log("Using startBlockNumber: " + startBlockNumber);
-    console.log("Using endBlockNumber: " + endBlockNumber);
+    console.log('Using startBlockNumber: ' + startBlockNumber);
+    console.log('Using endBlockNumber: ' + endBlockNumber);
 
     for (var i = startBlockNumber; i <= endBlockNumber; i++) {
       var getBlock = web3.eth.getBlock(i, true);
@@ -165,25 +165,25 @@ function getNumberOfTranscationsOfAccountPerBlock(startBlockNumber, endBlockNumb
           block.transactions.forEach(e => {
             var fromA = e.from.toUpperCase();
             account = account.toUpperCase();
-            if (e.input != "0x" && fromA == account) {
+            if (e.input != '0x' && fromA == account) {
               numOfTran++;
             }
           });
 
-          console.log(block.number + "," + numOfTran);
+          console.log(block.number + ',' + numOfTran);
           
         } else {
-          console.log(block.number + "," + 0);          
+          console.log(block.number + ',' + 0);          
         }
 
 
       });
 
     }).catch(err => {
-      console.log("ERROR getBlockPromises: " + err);
+      console.log('ERROR getBlockPromises: ' + err);
     });
   }).catch(err => {
-    console.log("ERROR getBlockNumber: " + err);
+    console.log('ERROR getBlockNumber: ' + err);
   });
 }
 
@@ -193,7 +193,7 @@ function getTransactionReceiptFun(txHash) {
       saveAccountTransactionsSpentGas(res.from, res.gasUsed);
     }  
   }).catch(err => {
-    console.log("ERROR getTransactionReceipt: " + err);
+    console.log('ERROR getTransactionReceipt: ' + err);
   });
 }
 
@@ -220,17 +220,17 @@ function saveAccountTransactionsSpentGas(account, gas) {
 }
 
 function printsAccountsResults() {
-  console.log("");
+  console.log('');
   for (var i = 0; i < accounts.length; i++) {
-    console.log((i+1) + ")" + "Account: " + accounts[i][0] + " , gas spent: " + accounts[i][1] + " , # of transactions: " + accounts[i][2]);
+    console.log((i+1) + ')' + 'Account: ' + accounts[i][0] + ' , gas spent: ' + accounts[i][1] + ' , # of transactions: ' + accounts[i][2]);
   }
-  console.log("");
+  console.log('');
 }
 
 function printTransactionInfo(e) {
-  console.log("");
-  console.log("Account: " + e.from + " ,TO: " + e.to  + " , called FUNCTION: " + e.input);
-  console.log("");
+  console.log('');
+  console.log('Account: ' + e.from + ' ,TO: ' + e.to  + ' , called FUNCTION: ' + e.input);
+  console.log('');
 }
 
 ////////////////////////// Fix START && END block /////////////////////////
@@ -264,42 +264,42 @@ function getContractResults() {
   promisesAllgetClearing.push(getclearingType());
 
   Promise.all(promisesAllgetClearing).then(clearings => {
-    console.log("");
-    console.log("Clearing Price: " + parseInt(clearings[0]));
-    console.log("Clearing Quantity: " + parseInt(clearings[1]));
-    console.log("Clearing Type: " + parseInt(clearings[2]));
-    console.log("");
+    console.log('');
+    console.log('Clearing Price: ' + parseInt(clearings[0]));
+    console.log('Clearing Quantity: ' + parseInt(clearings[1]));
+    console.log('Clearing Type: ' + parseInt(clearings[2]));
+    console.log('');
   }).catch(err => {
-    console.log("ERROR: " + err);
+    console.log('ERROR: ' + err);
   });
 }
 
 function getClearingPrice() {
-  return web3.eth.call({to: contract, data: "0x901a40a7"});
+  return web3.eth.call({to: contract, data: '0x901a40a7'});
 }
 
 function getclearingQuantity() {
-  return web3.eth.call({to: contract, data: "0x14fffa15"});
+  return web3.eth.call({to: contract, data: '0x14fffa15'});
 }
 
 function getclearingType() {
-  return web3.eth.call({to: contract, data: "0xbc3d513f"});
+  return web3.eth.call({to: contract, data: '0xbc3d513f'});
 }
 
 function getBlockNumberNow() {
-  return web3.eth.call({to: contract, data: "0xdd2e6ab5"});
+  return web3.eth.call({to: contract, data: '0xdd2e6ab5'});
 }
 
 function getBlockCleared() {
-  return web3.eth.call({to: contract, data: "0x16eae402"});
+  return web3.eth.call({to: contract, data: '0x16eae402'});
 }
 
 function getConsumptionsLength() {
-  return web3.eth.call({to: contract, data: "0x2a783c27"});
+  return web3.eth.call({to: contract, data: '0x2a783c27'});
 }
 
 function getGenerationsLength() {
-  return web3.eth.call({to: contract, data: "0x00f35f54"});
+  return web3.eth.call({to: contract, data: '0x00f35f54'});
 }
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -320,9 +320,9 @@ function getClearingsThroughTime(startBlockNumber, endBlockNumber) {
     startBlockNumber = start;
     endBlockNumber = end;
 
-    console.log("Using startBlockNumber: " + startBlockNumber);
-    console.log("Using endBlockNumber: " + endBlockNumber);
-    // console.log("");
+    console.log('Using startBlockNumber: ' + startBlockNumber);
+    console.log('Using endBlockNumber: ' + endBlockNumber);
+    // console.log('');
 
     for (var i = startBlockNumber; i < endBlockNumber ; i=i+1) {
       storagePromises.push(getStorageAtBlock(i));
@@ -330,16 +330,16 @@ function getClearingsThroughTime(startBlockNumber, endBlockNumber) {
 
     Promise.all(storagePromises).then(res => {
       res.forEach(r => {
-        console.log("");
-        console.log("Block: " + r[0]);
-        console.log("Clearing Price: " + parseInt(r[1]));
-        console.log("Clearing Quantity: " + parseInt(r[2]));
-        console.log("Clearing Type: " + parseInt(r[3]));
+        console.log('');
+        console.log('Block: ' + r[0]);
+        console.log('Clearing Price: ' + parseInt(r[1]));
+        console.log('Clearing Quantity: ' + parseInt(r[2]));
+        console.log('Clearing Type: ' + parseInt(r[3]));
         // console.log(r);
-        console.log("");
+        console.log('');
       });
     }).catch(err => {
-      console.log("ERROR storagePromises: " + err);
+      console.log('ERROR storagePromises: ' + err);
     });
 
   });
@@ -363,14 +363,14 @@ function getStorageAtBlock(block) {
       result = flatten(result);
 
       resolve(result);
-      // console.log("BLOCK: " + block);
-      // console.log("Clearing Price: " + parseInt(clearings[0]));
-      // console.log("Clearing Quantity: " + parseInt(clearings[1]));
-      // console.log("Clearing Type: " + parseInt(clearings[2]));
-      // console.log("");
+      // console.log('BLOCK: ' + block);
+      // console.log('Clearing Price: ' + parseInt(clearings[0]));
+      // console.log('Clearing Quantity: ' + parseInt(clearings[1]));
+      // console.log('Clearing Type: ' + parseInt(clearings[2]));
+      // console.log('');
     }).catch(err => {
       reject(err);
-      console.log("ERROR: " + err);
+      console.log('ERROR: ' + err);
     });
   });
 }
@@ -396,8 +396,8 @@ function getStorageAtBlockType(block) {
 function checkPositionStorage() {
   for (var i = 0; i < 10; i++) {
     web3.eth.getStorageAt(contract, i).then(res => {
-      // console.log("Index: " + i +" , val: " + res);
-      console.log("Index: " + i +" , val: " + parseInt(res));
+      // console.log('Index: ' + i +' , val: ' + res);
+      console.log('Index: ' + i +' , val: ' + parseInt(res));
     });
   }
 }
@@ -410,21 +410,21 @@ function checkPositionStorage() {
 ///////////////////////////////////////////////////////////////////////////////
 
 function printBalanceOfAccounts() {
-  console.log("BALANCES");
+  console.log('BALANCES');
   for (var i = 0; i < accounts.length; i++) {
     web3.eth.getBalance(accounts[i][0]).then(bal => {
-      console.log("Account: " + accounts[i][0] + " ,balance: " + bal);
+      console.log('Account: ' + accounts[i][0] + ' ,balance: ' + bal);
     }).catch(err => {
-      console.log("ERROR: " + err);
+      console.log('ERROR: ' + err);
     });
   }
 }
 
 function printBalance(account) {
   web3.eth.getBalance(account).then(bal => {
-    console.log("Account: " + account + " ,balance: " + bal);
+    console.log('Account: ' + account + ' ,balance: ' + bal);
   }).catch(err => {
-    console.log("ERROR: " + err);
+    console.log('ERROR: ' + err);
   });
 }
 
@@ -433,8 +433,8 @@ function getPendingTransactions() {
     if (!error)
         console.log(result);
   })
-  .on("data", function(transaction){
-      console.log("Pending: " + transaction);
+  .on('data', function(transaction){
+      console.log('Pending: ' + transaction);
   });
 }
 
@@ -453,8 +453,8 @@ function getTransactionsByAccount(startBlockNumber, endBlockNumber, myaccount) {
     startBlockNumber = start;
     endBlockNumber = end;
 
-    console.log("Using startBlockNumber: " + startBlockNumber);
-    console.log("Using endBlockNumber: " + endBlockNumber);
+    console.log('Using startBlockNumber: ' + startBlockNumber);
+    console.log('Using endBlockNumber: ' + endBlockNumber);
 
     for (var i = startBlockNumber; i <= endBlockNumber; i++) {
       var getBlock = web3.eth.getBlock(i, true);
@@ -470,7 +470,7 @@ function getTransactionsByAccount(startBlockNumber, endBlockNumber, myaccount) {
           block.transactions.forEach(e => {
             var fromA = e.from.toUpperCase();
             myaccount = myaccount.toUpperCase();
-            if (myaccount == "*" || myaccount == e.from) {
+            if (myaccount == '*' || myaccount == e.from) {
               receiptsPromises.push(getTransactionReceiptFun(e.hash));
             }
 
@@ -484,13 +484,13 @@ function getTransactionsByAccount(startBlockNumber, endBlockNumber, myaccount) {
         getContractResults();
         printsAccountsResults();
       }).catch(err => {
-        console.log("ERROR receiptsPromises: " + err);
+        console.log('ERROR receiptsPromises: ' + err);
       });
     }).catch(err => {
-      console.log("ERROR getBlockPromises: " + err);
+      console.log('ERROR getBlockPromises: ' + err);
     });
   }).catch(err => {
-    console.log("ERROR getBlockNumber: " + err);
+    console.log('ERROR getBlockNumber: ' + err);
   });
 }
 
@@ -504,13 +504,13 @@ function getTimeDateOfBlock(block) {
     // Hours part from the timestamp
     var hours = date.getHours();
     // Minutes part from the timestamp
-    var minutes = "0" + date.getMinutes();
+    var minutes = '0' + date.getMinutes();
     // Seconds part from the timestamp
-    var seconds = "0" + date.getSeconds();
+    var seconds = '0' + date.getSeconds();
     var day = date.getDate();
 
     // Will display time in 10:30:23 format
-    var formattedTime = day + " " + hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+    var formattedTime = day + ' ' + hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
     console.log(formattedTime);
   });
 }
@@ -523,184 +523,184 @@ function flatten(arr) {
 
 var ABI = [
   {
-    "constant": true,
-    "inputs": [],
-    "name": "getGenerationsLength",
-    "outputs": [
+    'constant': true,
+    'inputs': [],
+    'name': 'getGenerationsLength',
+    'outputs': [
       {
-        "name": "",
-        "type": "uint256"
+        'name': '',
+        'type': 'uint256'
       }
     ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
+    'payable': false,
+    'stateMutability': 'view',
+    'type': 'function'
   },
   {
-    "constant": true,
-    "inputs": [],
-    "name": "clearing",
-    "outputs": [
+    'constant': true,
+    'inputs': [],
+    'name': 'clearing',
+    'outputs': [
       {
-        "name": "clearingQuantity",
-        "type": "int256"
+        'name': 'clearingQuantity',
+        'type': 'int256'
       },
       {
-        "name": "clearingPrice",
-        "type": "int256"
+        'name': 'clearingPrice',
+        'type': 'int256'
       },
       {
-        "name": "clearingType",
-        "type": "int256"
+        'name': 'clearingType',
+        'type': 'int256'
       }
     ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
+    'payable': false,
+    'stateMutability': 'view',
+    'type': 'function'
   },
   {
-    "constant": false,
-    "inputs": [
+    'constant': false,
+    'inputs': [
       {
-        "name": "_quantity",
-        "type": "int256"
+        'name': '_quantity',
+        'type': 'int256'
       },
       {
-        "name": "_price",
-        "type": "int256"
+        'name': '_price',
+        'type': 'int256'
       }
     ],
-    "name": "generationBid",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
+    'name': 'generationBid',
+    'outputs': [],
+    'payable': false,
+    'stateMutability': 'nonpayable',
+    'type': 'function'
   },
   {
-    "constant": true,
-    "inputs": [],
-    "name": "getClearingQuantity",
-    "outputs": [
+    'constant': true,
+    'inputs': [],
+    'name': 'getClearingQuantity',
+    'outputs': [
       {
-        "name": "",
-        "type": "int256"
+        'name': '',
+        'type': 'int256'
       }
     ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
+    'payable': false,
+    'stateMutability': 'view',
+    'type': 'function'
   },
   {
-    "constant": false,
-    "inputs": [],
-    "name": "marketClearing",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
+    'constant': false,
+    'inputs': [],
+    'name': 'marketClearing',
+    'outputs': [],
+    'payable': false,
+    'stateMutability': 'nonpayable',
+    'type': 'function'
   },
   {
-    "constant": true,
-    "inputs": [],
-    "name": "getConsumptionsLength",
-    "outputs": [
+    'constant': true,
+    'inputs': [],
+    'name': 'getConsumptionsLength',
+    'outputs': [
       {
-        "name": "",
-        "type": "uint256"
+        'name': '',
+        'type': 'uint256'
       }
     ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
+    'payable': false,
+    'stateMutability': 'view',
+    'type': 'function'
   },
   {
-    "constant": true,
-    "inputs": [],
-    "name": "blockNumberNow",
-    "outputs": [
+    'constant': true,
+    'inputs': [],
+    'name': 'blockNumberNow',
+    'outputs': [
       {
-        "name": "",
-        "type": "uint256"
+        'name': '',
+        'type': 'uint256'
       }
     ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
+    'payable': false,
+    'stateMutability': 'view',
+    'type': 'function'
   },
   {
-    "constant": false,
-    "inputs": [
+    'constant': false,
+    'inputs': [
       {
-        "name": "_quantity",
-        "type": "int256"
+        'name': '_quantity',
+        'type': 'int256'
       },
       {
-        "name": "_price",
-        "type": "int256"
+        'name': '_price',
+        'type': 'int256'
       }
     ],
-    "name": "consumptionBid",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
+    'name': 'consumptionBid',
+    'outputs': [],
+    'payable': false,
+    'stateMutability': 'nonpayable',
+    'type': 'function'
   },
   {
-    "constant": true,
-    "inputs": [],
-    "name": "market",
-    "outputs": [
+    'constant': true,
+    'inputs': [],
+    'name': 'market',
+    'outputs': [
       {
-        "name": "",
-        "type": "address"
+        'name': '',
+        'type': 'address'
       }
     ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
+    'payable': false,
+    'stateMutability': 'view',
+    'type': 'function'
   },
   {
-    "constant": true,
-    "inputs": [],
-    "name": "getClearingPrice",
-    "outputs": [
+    'constant': true,
+    'inputs': [],
+    'name': 'getClearingPrice',
+    'outputs': [
       {
-        "name": "",
-        "type": "int256"
+        'name': '',
+        'type': 'int256'
       }
     ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
+    'payable': false,
+    'stateMutability': 'view',
+    'type': 'function'
   },
   {
-    "constant": true,
-    "inputs": [],
-    "name": "getClearingType",
-    "outputs": [
+    'constant': true,
+    'inputs': [],
+    'name': 'getClearingType',
+    'outputs': [
       {
-        "name": "",
-        "type": "int256"
+        'name': '',
+        'type': 'int256'
       }
     ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
+    'payable': false,
+    'stateMutability': 'view',
+    'type': 'function'
   },
   {
-    "constant": false,
-    "inputs": [],
-    "name": "deleteMapArrays",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
+    'constant': false,
+    'inputs': [],
+    'name': 'deleteMapArrays',
+    'outputs': [],
+    'payable': false,
+    'stateMutability': 'nonpayable',
+    'type': 'function'
   },
   {
-    "inputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "constructor"
+    'inputs': [],
+    'payable': false,
+    'stateMutability': 'nonpayable',
+    'type': 'constructor'
   }
 ];
 
@@ -715,28 +715,28 @@ function clearContract() {
 }
 
 
-      // console.log("  tx hash          : " + res.hash + "\n"
-      //   + "   cumulativeGas   : " + res.cumulativeGasUsed + "\n"
-      //   + "   gasUsed         : " + res.gasUsed + "\n"
-      // + "   blockHash       : " + res.blockHash + "\n"
-      // + "   blockNumber     : " + res.blockNumber + "\n"
-      // + "   transactionIndex: " + res.transactionIndex + "\n"
-      //   + "   from            : " + res.from + "\n"
-      //   + "   to              : " + res.to);
+      // console.log('  tx hash          : ' + res.hash + '\n'
+      //   + '   cumulativeGas   : ' + res.cumulativeGasUsed + '\n'
+      //   + '   gasUsed         : ' + res.gasUsed + '\n'
+      // + '   blockHash       : ' + res.blockHash + '\n'
+      // + '   blockNumber     : ' + res.blockNumber + '\n'
+      // + '   transactionIndex: ' + res.transactionIndex + '\n'
+      //   + '   from            : ' + res.from + '\n'
+      //   + '   to              : ' + res.to);
 
       
 
 
 
-            // console.log("  tx hash          : " + e.hash + "\n"
-            //   + "   nonce           : " + e.nonce + "\n"
-            //   + "   blockHash       : " + e.blockHash + "\n"
-            //   + "   blockNumber     : " + e.blockNumber + "\n"
-            //   + "   transactionIndex: " + e.transactionIndex + "\n"
-            //   + "   from            : " + e.from + "\n" 
-            //   + "   to              : " + e.to + "\n"
-            //   + "   value           : " + e.value + "\n"
-            //   + "   time            : " + res.timestamp + " " + new Date(res.timestamp * 1000).toGMTString() + "\n"
-            //   + "   gasPrice        : " + e.gasPrice + "\n"
-            //   + "   gas             : " + e.gas + "\n"
-            //   + "   input           : " + e.input);
+            // console.log('  tx hash          : ' + e.hash + '\n'
+            //   + '   nonce           : ' + e.nonce + '\n'
+            //   + '   blockHash       : ' + e.blockHash + '\n'
+            //   + '   blockNumber     : ' + e.blockNumber + '\n'
+            //   + '   transactionIndex: ' + e.transactionIndex + '\n'
+            //   + '   from            : ' + e.from + '\n' 
+            //   + '   to              : ' + e.to + '\n'
+            //   + '   value           : ' + e.value + '\n'
+            //   + '   time            : ' + res.timestamp + ' ' + new Date(res.timestamp * 1000).toGMTString() + '\n'
+            //   + '   gasPrice        : ' + e.gasPrice + '\n'
+            //   + '   gas             : ' + e.gas + '\n'
+            //   + '   input           : ' + e.input);
