@@ -14,7 +14,6 @@ $(document).on('ready', function() {
 			gasLimit_chart = document.getElementById('gasLimit_chart');
 			gasUsed_chart = document.getElementById('gasUsed_chart');
 			ts_number_chart = document.getElementById('ts_number_chart');
-			market_chart = document.getElementById('market_chart');
 
 			if (diff_chart) {
 				// console.log("diff_chart.data: " + JSON.stringify(diff_chart.data));
@@ -273,7 +272,7 @@ $(document).on('ready', function() {
 					diff3 = [];
 
 					block3.push(data[0].number);
-					diff3.push(data[0].gasUsed);
+					diff3.push(data[0].transactions.length);
 
 					var traceD3 = {
 						x: block3,
@@ -292,8 +291,12 @@ $(document).on('ready', function() {
 
 	// console.log("CHECK");
 	price_chart = document.getElementById('price_chart');
-	array_block_gas_spent_account_chart = document.getElementById('array_block_gas_spent_account_chart');
-	transactions_per_block_chart = document.getElementById('transactions_per_block_chart');
+	array_block_gas_spent_account_chart = document.getElementById(
+		'array_block_gas_spent_account_chart'
+	);
+	transactions_per_block_chart = document.getElementById(
+		'transactions_per_block_chart'
+	);
 
 	gas_per_block_chart = document.getElementById('gas_per_block_chart');
 	balance_of_account_per_block_chart = document.getElementById(
@@ -377,7 +380,7 @@ $(document).on('ready', function() {
 
 	if (array_block_gas_spent_account_chart) {
 		var data1_chart = array_block_gas_spent_chart.getAttribute('data-for');
-		var dataToArray1_chart = data1_chart.split(",");
+		var dataToArray1_chart = data1_chart.split(',');
 		// console.log("TEST array_block_gas_spent_account_chart: " + JSON.stringify(dataToArray1_chart));
 
 		var blocks = [];
@@ -468,11 +471,11 @@ $(document).on('ready', function() {
 		var gasSent = [];
 		var gasLimit = [];
 
-		for (var i = 0; i < dataToArray1_chart.length; i=i+4) {
+		for (var i = 0; i < dataToArray1_chart.length; i = i + 4) {
 			blocks.push(dataToArray1_chart[i]);
-			gasSpent.push(dataToArray1_chart[i+1]);
-			gasSent.push(dataToArray1_chart[i+2]);
-			gasLimit.push(dataToArray1_chart[i+3]);
+			gasSpent.push(dataToArray1_chart[i + 1]);
+			gasSent.push(dataToArray1_chart[i + 2]);
+			gasLimit.push(dataToArray1_chart[i + 3]);
 		}
 
 		// NEW CHART
@@ -499,7 +502,6 @@ $(document).on('ready', function() {
 			fill: 'tozeroy',
 			type: 'scatter'
 		};
-
 
 		var data = [trace1, trace2, trace3];
 
