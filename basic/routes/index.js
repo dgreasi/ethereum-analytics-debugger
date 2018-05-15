@@ -235,7 +235,7 @@ router.post('/get', function(req, res, next) {
               account: contract,
               balance: accountMbalance,
               totalGasSpent: totalGas,
-              arrayBlockGasSpent: blockGas,
+              arrayBlockGasSpentAccount: blockGas,
               noData: noData,
               lastBlock: block,
               previous_contracts_accounts: prvAC

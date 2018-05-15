@@ -297,7 +297,7 @@ $(document).on('ready', function() {
 
 	// console.log("CHECK");
 	price_chart = document.getElementById('price_chart');
-	array_block_gas_spent_chart = document.getElementById('array_block_gas_spent_chart');
+	array_block_gas_spent_account_chart = document.getElementById('array_block_gas_spent_account_chart');
 	transactions_per_block_chart = document.getElementById('transactions_per_block_chart');
 	gas_per_block_chart = document.getElementById('gas_per_block_chart');
 	balance_of_account_per_block_chart = document.getElementById('balance_of_account_per_block_chart');
@@ -352,17 +352,6 @@ $(document).on('ready', function() {
 			type: 'scatter'
 		};
 
-		// var trace3 = {
-		// 	x: time,
-		// 	y: zeros,
-		// 	name: 'Time',
-		// 	xaxis: 'x2',
-		// 	type: 'scatter',
-		// 	marker: {
-  //             color: 'white'
-  //           }
-		// };
-
 		var data = [trace1, trace2];
 		// var data = [trace1, trace2];
 
@@ -394,10 +383,10 @@ $(document).on('ready', function() {
 		Plotly.plot('price_chart', data, layout);
 	}
 
-	if (array_block_gas_spent_chart) {
+	if (array_block_gas_spent_account_chart) {
 		var data1_chart = array_block_gas_spent_chart.getAttribute('data-for');
 		var dataToArray1_chart = data1_chart.split(",");
-		// console.log("TEST array_block_gas_spent_chart: " + JSON.stringify(dataToArray1_chart));
+		// console.log("TEST array_block_gas_spent_account_chart: " + JSON.stringify(dataToArray1_chart));
 
 		var blocks = [];
 		var gasSpent = [];
@@ -485,10 +474,14 @@ $(document).on('ready', function() {
 
 		var blocks = [];
 		var gasSpent = [];
+		var gasSent = [];
+		var gasLimit = [];
 
-		for (var i = 0; i < dataToArray1_chart.length; i=i+2) {
+		for (var i = 0; i < dataToArray1_chart.length; i=i+4) {
 			blocks.push(dataToArray1_chart[i]);
 			gasSpent.push(dataToArray1_chart[i+1]);
+			gasSent.push(dataToArray1_chart[i+2]);
+			gasLimit.push(dataToArray1_chart[i+3]);
 		}
 
 		// NEW CHART
@@ -500,7 +493,24 @@ $(document).on('ready', function() {
   			type: 'scatter'
 		};
 
-		var data = [trace1];
+		var trace2 = {
+			x: blocks,
+			y: gasLimit,
+			name: 'gasLimit',
+			fill: 'tozeroy',
+			type: 'scatter'
+		};
+
+		var trace3 = {
+			x: blocks,
+			y: gasSent,
+			name: 'gasLimit',
+			fill: 'tozeroy',
+			type: 'scatter'
+		};
+
+
+		var data = [trace1, trace2, trace3];
 
 		var layout = {
 		  title: 'Gas Spent - Blocks',

@@ -615,7 +615,12 @@ const getGasPerBlock =  function(startBlockNumber, endBlockNumber) {
       check = searchFor(startBlockNumber);
       if (check != -1) {
         for (var j = 0; j <= endBlockNumber - startBlockNumber; j++) {
-          startEndGasPerBlock.push([dbBlocks[check+j].number, dbBlocks[check+j].gasUsed]);
+          var total_gas_sent = 0;
+          dbBlocks[check+j].transactions.forEach(ts => {
+            total_gas_sent += ts.gas;
+          });
+
+          startEndGasPerBlock.push([dbBlocks[check+j].number, dbBlocks[check+j].gasUsed, total_gas_sent, dbBlocks[check+j].gasLimit]);
         }
       } else {
         console.log("ERROR - BLOCK DOESNT EXIST");
@@ -951,6 +956,7 @@ const getTranscationInfoHash = function(hash) {
             // console.log("Input: " + rs.input);
             res.input = rs.input;
             res.gasPrice = rs.gasPrice;
+            res.gas = rs.gas
             console.log("SAVE ON arDbTSInfo: ");
             // dbTransInfo.push(res);
             saveTsInfoDB(res);
@@ -1974,6 +1980,7 @@ module.exports = {
   syncStep,
   getTransactions,
   marketChart,
-  getTimeToMineBlock
+  getTimeToMineBlock,
+  getTranscationInfoHash
 }
 

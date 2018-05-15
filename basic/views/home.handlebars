@@ -370,8 +370,8 @@
     {{/if}}
 
     {{!-- GET GAS SPENT OF ACCOUNT --}}
-    {{#if arrayBlockGasSpent}}
-      <div id="array_block_gas_spent_chart" data-for="{{arrayBlockGasSpent}}" class="center"></div>
+    {{#if arrayBlockGasSpentAccount}}
+      <div id="array_block_gas_spent_account_chart" data-for="{{arrayBlockGasSpentAccount}}" class="center"></div>
     {{/if}}
 
     {{!-- GET TRANSACTIONS PER BLOCK --}}
@@ -530,7 +530,10 @@
         <thead>
             <th>#</th>
             <th>Block</th>
-            <th>Gas</th>
+            <th>Gas Spent</th>
+            <th>Gas Sent</th>
+            <th>Gas Limit</th>
+
         </thead> 
         <tbody> 
             {{#each gasPerBlock}} 
@@ -834,6 +837,10 @@
               <tr>
                   <td>gasUsed</td>
                   <td>{{ transaction_info.gasUsed }}</td>
+              </tr>
+              <tr>
+                  <td>gas Sent</td>
+                  <td>{{ transaction_info.gas }}</td>
               </tr>
               <tr>
                   <td>gasPrice</td>
