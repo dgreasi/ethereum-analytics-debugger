@@ -14,7 +14,8 @@
     "dbClearings": true,
     "silentBugs": true,
     "accounts": true,
-    "previous_contracts_accounts": true
+    "previous_contracts_accounts": true,
+    "Plotly": true
   },
   "rules": {
     "eqeqeq": "error",

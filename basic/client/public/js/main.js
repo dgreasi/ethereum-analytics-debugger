@@ -21,7 +21,6 @@ $(document).on('ready', function() {
 					title: 'Difficulty',
 					yaxis: { title: 'Difficulty of Block' }
 				};
-				let dataD;
 
 				if (diff_chart.data) {
 					let found = diff_chart.data[0].x.find(el => {
@@ -56,7 +55,7 @@ $(document).on('ready', function() {
 							type: 'bar'
 						};
 
-						dataD = [data_update];
+						let dataD = [data_update];
 						// console.log("NEW DATA TO PUSH: " + JSON.stringify(dataD));
 
 						Plotly.update('diff_chart', dataD, layoutD);
@@ -78,7 +77,7 @@ $(document).on('ready', function() {
 						type: 'bar'
 					};
 
-					dataD = [traceD];
+					let dataD = [traceD];
 
 					Plotly.plot('diff_chart', dataD, layoutD);
 				}
@@ -90,7 +89,6 @@ $(document).on('ready', function() {
 					title: 'Gas Limit',
 					yaxis: { title: 'gas' }
 				};
-				let dataD1;
 
 				if (gasLimit_chart.data) {
 					let found1 = gasLimit_chart.data[0].x.find(el => {
@@ -125,7 +123,7 @@ $(document).on('ready', function() {
 							type: 'bar'
 						};
 
-						dataD1 = [data_update1];
+						let dataD1 = [data_update1];
 						// console.log("NEW DATA TO PUSH: " + JSON.stringify(dataD));
 
 						Plotly.update('gasLimit_chart', dataD1, layoutD1);
@@ -147,7 +145,7 @@ $(document).on('ready', function() {
 						type: 'bar'
 					};
 
-					dataD1 = [traceD1];
+					let dataD1 = [traceD1];
 
 					Plotly.plot('gasLimit_chart', dataD1, layoutD1);
 				}
@@ -159,7 +157,6 @@ $(document).on('ready', function() {
 					title: 'Gas Spending',
 					yaxis: { title: 'gas' }
 				};
-				let dataD2;
 
 				if (gasUsed_chart.data) {
 					let found2 = gasUsed_chart.data[0].x.find(el => {
@@ -194,7 +191,7 @@ $(document).on('ready', function() {
 							type: 'bar'
 						};
 
-						dataD2 = [data_update2];
+						let dataD2 = [data_update2];
 						// console.log("NEW DATA TO PUSH: " + JSON.stringify(dataD));
 
 						Plotly.update('gasUsed_chart', dataD2, layoutD2);
@@ -216,7 +213,7 @@ $(document).on('ready', function() {
 						type: 'bar'
 					};
 
-					dataD2 = [traceD2];
+					let dataD2 = [traceD2];
 
 					Plotly.plot('gasUsed_chart', dataD2, layoutD2);
 				}
@@ -228,7 +225,6 @@ $(document).on('ready', function() {
 					title: 'Transactions',
 					yaxis: { title: '# of ts' }
 				};
-				let dataD3;
 
 				if (ts_number_chart.data) {
 					let found3 = ts_number_chart.data[0].x.find(el => {
@@ -263,7 +259,7 @@ $(document).on('ready', function() {
 							type: 'bar'
 						};
 
-						dataD3 = [data_update3];
+						let dataD3 = [data_update3];
 						// console.log("NEW DATA TO PUSH: " + JSON.stringify(dataD));
 
 						Plotly.update('ts_number_chart', dataD3, layoutD3);
@@ -285,7 +281,7 @@ $(document).on('ready', function() {
 						type: 'bar'
 					};
 
-					dataD3 = [traceD3];
+					let dataD3 = [traceD3];
 
 					Plotly.plot('ts_number_chart', dataD3, layoutD3);
 				}
@@ -393,10 +389,10 @@ $(document).on('ready', function() {
 		let gasSpent = [];
 		let gasLimit = [];
 
-		for (let j = 0; j < dataToArray1_chart.length; j = j + 3) {
-			blocks1.push(dataToArray1_chart[j]);
-			gasSpent.push(dataToArray1_chart[j + 1]);
-			gasLimit.push(dataToArray1_chart[j + 2]);
+		for (let i = 0; i < dataToArray1_chart.length; i = i + 3) {
+			blocks1.push(dataToArray1_chart[i]);
+			gasSpent.push(dataToArray1_chart[i + 1]);
+			gasLimit.push(dataToArray1_chart[i + 2]);
 		}
 
 		// console.log("Blocks: " + blocks1[0]);
@@ -405,7 +401,7 @@ $(document).on('ready', function() {
 
 		// NEW CHART
 
-		trace1 = {
+		let trace1 = {
 			x: blocks1,
 			y: gasSpent,
 			name: 'gasSpent',
@@ -413,7 +409,7 @@ $(document).on('ready', function() {
 			type: 'scatter'
 		};
 
-		trace2 = {
+		let trace2 = {
 			x: blocks1,
 			y: gasLimit,
 			name: 'gasLimit',
@@ -421,9 +417,9 @@ $(document).on('ready', function() {
 			type: 'scatter'
 		};
 
-		data = [trace1, trace2];
+		let data = [trace1, trace2];
 
-		layout = {
+		let layout = {
 			title: 'Gas Spent - Gas Limit - Blocks',
 			yaxis: { title: 'Gas Spent' }
 		};
@@ -432,35 +428,29 @@ $(document).on('ready', function() {
 	}
 
 	if (transactions_per_block_chart) {
-		data_chart = transactions_per_block_chart.getAttribute('data-for');
-		dataToArray_chart = data_chart.split(',');
+		let data_chart = transactions_per_block_chart.getAttribute('data-for');
+		let dataToArray_chart = data_chart.split(',');
 		// console.log("TEST transactions_per_block_chart: " + JSON.stringify(dataToArray_chart));
 
 		let blocks5 = [];
 		let transcations = [];
-		quantity = [];
 
-		for (let k = 0; k < dataToArray_chart.length; k = k + 2) {
-			blocks5.push(dataToArray_chart[k]);
-			transcations.push(dataToArray_chart[k + 1]);
+		for (let i = 0; i < dataToArray_chart.length; i = i + 2) {
+			blocks5.push(dataToArray_chart[i]);
+			transcations.push(dataToArray_chart[i + 1]);
 		}
 
-		// console.log("Blocks: " + blocks5[0]);
-		// console.log("Prices: " + prices[0]);
-		// console.log("Quantity: " + quantity[0]);
-
 		// NEW CHART
-
-		trace1 = {
+		let trace1 = {
 			x: blocks5,
 			y: transcations,
 			fill: 'tozeroy',
 			type: 'scatter'
 		};
 
-		data = [trace1];
+		let data = [trace1];
 
-		layout = {
+		let layout = {
 			title: 'Transactions Per Block',
 			yaxis: { title: '# Transactions' }
 		};
@@ -469,8 +459,8 @@ $(document).on('ready', function() {
 	}
 
 	if (blocks_info_chart) {
-		data1_chart = blocks_info_chart.getAttribute('data-for');
-		dataToArray1_chart = data1_chart.split(',');
+		let data1_chart = blocks_info_chart.getAttribute('data-for');
+		let dataToArray1_chart = data1_chart.split(',');
 
 		let blocks2 = [];
 		let gasSpent = [];
@@ -478,12 +468,12 @@ $(document).on('ready', function() {
 		let gasSent = [];
 		let gasLimit = [];
 
-		for (let t = 0; t < dataToArray1_chart.length; t = t + 5) {
-			blocks2.push(dataToArray1_chart[t]);
-			gasSpent.push(dataToArray1_chart[t + 1]);
-			block_size.push(dataToArray1_chart[t + 2]);
-			gasSent.push(dataToArray1_chart[t + 3]);
-			gasLimit.push(dataToArray1_chart[t + 4]);
+		for (let i = 0; i < dataToArray1_chart.length; i = i + 5) {
+			blocks2.push(dataToArray1_chart[i]);
+			gasSpent.push(dataToArray1_chart[i + 1]);
+			block_size.push(dataToArray1_chart[i + 2]);
+			gasSent.push(dataToArray1_chart[i + 3]);
+			gasLimit.push(dataToArray1_chart[i + 4]);
 		}
 
 		// NEW CHART
@@ -519,9 +509,9 @@ $(document).on('ready', function() {
 			type: 'scatter'
 		};
 
-		data = [trace1, trace2, trace3, trace4];
+		let data = [trace1, trace2, trace3, trace4];
 
-		layout = {
+		let layout = {
 			title: 'Blocks Info',
 			yaxis: { title: 'Value' }
 		};
@@ -530,10 +520,10 @@ $(document).on('ready', function() {
 	}
 
 	if (balance_of_account_per_block_chart) {
-		data1_chart = balance_of_account_per_block_chart.getAttribute(
+		let data1_chart = balance_of_account_per_block_chart.getAttribute(
 			'data-for'
 		);
-		dataToArray1_chart = data1_chart.split(',');
+		let dataToArray1_chart = data1_chart.split(',');
 
 		let blocks3 = [];
 		let balance = [];
@@ -544,7 +534,7 @@ $(document).on('ready', function() {
 		}
 
 		// NEW CHART
-		trace1 = {
+		let trace1 = {
 			x: blocks3,
 			y: balance,
 			name: 'balance',
@@ -552,9 +542,9 @@ $(document).on('ready', function() {
 			type: 'scatter'
 		};
 
-		data = [trace1];
+		let data = [trace1];
 
-		layout = {
+		let layout = {
 			title: 'Balance of Account - Blocks',
 			yaxis: { title: 'Balance' }
 		};
@@ -567,10 +557,10 @@ $(document).on('ready', function() {
 		let generation = document.getElementById('generation');
 		let consumption = document.getElementById('consumption');
 
-		data1_chart = generation.getAttribute('data-for');
+		let data1_chart = generation.getAttribute('data-for');
 		let data2_chart = consumption.getAttribute('data-for');
 
-		dataToArray1_chart = data1_chart.split(',');
+		let dataToArray1_chart = data1_chart.split(',');
 		let dataToArray2_chart = data2_chart.split(',');
 
 		console.log(JSON.stringify(dataToArray1_chart));
@@ -581,14 +571,14 @@ $(document).on('ready', function() {
 		let conPrice = [];
 		let conQuantity = [];
 
-		for (i = 0; i < dataToArray1_chart.length; i = i + 2) {
+		for (let i = 0; i < dataToArray1_chart.length; i = i + 2) {
 			genPrice.push(parseInt(dataToArray1_chart[i]));
 			genQuantity.push(parseInt(dataToArray1_chart[i + 1]));
 		}
 
-		for (j = 0; j < dataToArray2_chart.length; j = j + 2) {
-			conPrice.push(parseInt(dataToArray2_chart[j]));
-			conQuantity.push(parseInt(dataToArray2_chart[j + 1]));
+		for (let i = 0; i < dataToArray2_chart.length; i = i + 2) {
+			conPrice.push(parseInt(dataToArray2_chart[i]));
+			conQuantity.push(parseInt(dataToArray2_chart[i + 1]));
 		}
 
 		console.log('genPrice: ' + JSON.stringify(genPrice));
@@ -598,23 +588,23 @@ $(document).on('ready', function() {
 		console.log('conQuantity: ' + JSON.stringify(conQuantity));
 
 		// NEW CHART
-		trace1 = {
+		let trace1 = {
 			x: genQuantity,
 			y: genPrice,
 			name: 'Generation',
 			type: 'scatter'
 		};
 
-		trace2 = {
+		let trace2 = {
 			x: conQuantity,
 			y: conPrice,
 			name: 'Consumption',
 			type: 'scatter'
 		};
 
-		data = [trace1, trace2];
+		let data = [trace1, trace2];
 
-		layout = {
+		let layout = {
 			title: 'Market State',
 			yaxis: { title: 'Price' }
 		};
@@ -623,19 +613,19 @@ $(document).on('ready', function() {
 	}
 
 	if (time_to_mine_chart) {
-		data1_chart = time_to_mine_chart.getAttribute('data-for');
-		dataToArray1_chart = data1_chart.split(',');
+		let data1_chart = time_to_mine_chart.getAttribute('data-for');
+		let dataToArray1_chart = data1_chart.split(',');
 
 		let blocks4 = [];
-		balance = [];
+		let balance = [];
 
-		for (i = 2; i < dataToArray1_chart.length; i = i + 2) {
+		for (let i = 2; i < dataToArray1_chart.length; i = i + 2) {
 			blocks4.push(dataToArray1_chart[i]);
 			balance.push(dataToArray1_chart[i + 1]);
 		}
 
 		// NEW CHART
-		trace1 = {
+		let trace1 = {
 			x: blocks4,
 			y: balance,
 			name: 'balance',
@@ -643,9 +633,9 @@ $(document).on('ready', function() {
 			type: 'scatter'
 		};
 
-		data = [trace1];
+		let data = [trace1];
 
-		layout = {
+		let layout = {
 			title: 'Time to Mine Block - Blocks',
 			yaxis: { title: 'Time' }
 		};
