@@ -217,7 +217,7 @@ const getStepsFromNumberOfTs = function(startBlockNumber, endBlockNumber) {
       for (i = 0; i < endBlockNumber - start; i++) {
         num_ts += dbBlocks[checkBL - i].transactions.length;
         // console.log('Block: ' + dbBlocks[checkBL-i].number);
-        if (num_ts > 3500) {
+        if (num_ts > 2000) {
           break;
         }
       }

@@ -506,7 +506,7 @@ $(document).on('ready', function() {
 		let trace3 = {
 			x: blocks2,
 			y: gasSent,
-			name: 'gasLimit',
+			name: 'gasSent',
 			fill: 'tozeroy',
 			type: 'scatter'
 		};
