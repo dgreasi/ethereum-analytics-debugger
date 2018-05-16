@@ -17,6 +17,9 @@
     "previous_contracts_accounts": true,
     "Plotly": true
   },
+  "parserOptions": {
+    "sourceType": "module"
+  },
   "rules": {
     "eqeqeq": "error",
     "indent": [

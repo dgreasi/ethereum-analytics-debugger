@@ -10,10 +10,10 @@
     "precommit": "lint-staged",
     "prettify": "prettier --write \"**/*.js\"",
     "pretest": "npm run lint",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Linter successful! No others tests specified.\"",
     "start": "ts-node --max_old_space_size=500000000 server.js"
   },
-  "author": "Eric Ferraiuolo <eferraiuolo@gmail.com>",
+  "author": "Dimitrios Greasidis <dgreasidis@gmail.com>",
   "license": "BSD",
   "dependencies": {
     "body-parser": "^1.18.2",
