@@ -25,7 +25,7 @@ var lastBlock = 0;
 /////////////////// Smart Contract - Smart Grid Functions /////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-const syncStep = function(startBlockNumber, endBlockNumber, type) {
+export const syncStep = function(startBlockNumber, endBlockNumber, type) {
   return web3.eth
     .getBlockNumber()
     .then(res => {
@@ -298,7 +298,7 @@ const syncGetVarsStep = function(
 
 ////////// Get only transactions that are calls to functions of a Contract /////
 ///////////// IE a send Gas transaction will not be shown here /////////////////
-const getAccountTransactionsGasSpentClearings = function(
+export const getAccountTransactionsGasSpentClearings = function(
   startBlockNumber,
   endBlockNumber,
   contract_arg,
@@ -383,7 +383,7 @@ const getAccountTransactionsGasSpentClearings = function(
     });
 };
 
-const getTransactions = function(
+export const getTransactions = function(
   startBlockNumber,
   endBlockNumber,
   contract_arg,
@@ -476,7 +476,7 @@ const getTransactions = function(
     });
 };
 
-const getSpentGasOfAccount = function(
+export const getSpentGasOfAccount = function(
   startBlockNumber,
   endBlockNumber,
   account,
@@ -626,7 +626,7 @@ const getSpentGasOfAccount = function(
   });
 };
 
-const getGasPerBlock = function(startBlockNumber, endBlockNumber) {
+export const getGasPerBlock = function(startBlockNumber, endBlockNumber) {
   return new Promise(resolve => {
     syncStep(startBlockNumber, endBlockNumber, 2).then(() => {
       startBlockNumber = start;
@@ -658,7 +658,7 @@ const getGasPerBlock = function(startBlockNumber, endBlockNumber) {
   });
 };
 
-const getBalancePerBlockOfAccount = function(
+export const getBalancePerBlockOfAccount = function(
   startBlockNumber,
   endBlockNumber,
   account,
@@ -722,7 +722,7 @@ const getBlockInfoMinimalNoChecks = function(blockNumber) {
     });
 };
 
-const getBlockInfoMinimal = function(blockNumber) {
+export const getBlockInfoMinimal = function(blockNumber) {
   return new Promise(resolve => {
     var blockNumberPromise = web3.eth.getBlockNumber();
 
@@ -773,7 +773,10 @@ const getBlockInfoMinimal = function(blockNumber) {
   });
 };
 
-const getTransactionsPerBlock = function(startBlockNumber, endBlockNumber) {
+export const getTransactionsPerBlock = function(
+  startBlockNumber,
+  endBlockNumber
+) {
   return new Promise((resolve, reject) => {
     var getBlockPromises = [];
     var blockNumberPromise = web3.eth.getBlockNumber();
@@ -838,7 +841,7 @@ const getTransactionsPerBlock = function(startBlockNumber, endBlockNumber) {
   });
 };
 
-const getTimeToMineBlock = function(startBlockNumber, endBlockNumber) {
+export const getTimeToMineBlock = function(startBlockNumber, endBlockNumber) {
   console.time('getTimeToMineBlock');
   accounts = [];
   silentBugs = [];
@@ -885,7 +888,7 @@ const getTimeToMineBlock = function(startBlockNumber, endBlockNumber) {
     });
 };
 
-const getNumberOfTranscationsOfAccountPerBlock = function(
+export const getNumberOfTranscationsOfAccountPerBlock = function(
   startBlockNumber,
   endBlockNumber,
   account
@@ -956,7 +959,7 @@ const getTranscationInfo = function(e) {
     });
 };
 
-const getTranscationInfoHash = function(hash) {
+export const getTranscationInfoHash = function(hash) {
   return new Promise(resolve => {
     web3.eth
       .getTransaction(hash)
@@ -1130,7 +1133,7 @@ const checkStartEndInput = function(
 // More info about storage at specified block here:
 // https://medium.com/aigang-network/how-to-read-ethereum-contract-storage-44252c8af925
 
-const getClearingsThroughTime = function(
+export const getClearingsThroughTime = function(
   startBlockNumber,
   endBlockNumber,
   contract_arg,
@@ -1291,7 +1294,7 @@ const getStorageAtBlockType = function(block, contract_arg) {
 
 /////////////////////////// Get Clearing Values At Current STATE //////////////////////////////
 
-const getContractResults = function(contract_arg, nickname) {
+export const getContractResults = function(contract_arg, nickname) {
   var onj = { hex: contract_arg, name: nickname ? nickname : contract_arg };
   addToHistory(onj);
 
@@ -1327,7 +1330,7 @@ const getclearingType = function(contract_arg) {
 
 ///////////////////////////////////// MARKET CHART ///////////////////////////////////////////
 
-const marketChart = function(startBlockNumber, endBlockNumber) {
+export const marketChart = function(startBlockNumber, endBlockNumber) {
   return new Promise(resolve => {
     syncStep(startBlockNumber, endBlockNumber, 2)
       .then(() => {
@@ -1595,7 +1598,12 @@ const saveTsInfoDB = function(ts) {
 ////////////////////////// EXTRA HELP FUNCTIONS ///////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-const getAccountInfo = function(start_block, end_block, account, nickname) {
+export const getAccountInfo = function(
+  start_block,
+  end_block,
+  account,
+  nickname
+) {
   var onj = new Object({ hex: account, name: nickname ? nickname : account });
   addToHistory(onj);
 
@@ -1636,7 +1644,7 @@ const getNumberOfTransactions = function(account) {
   });
 };
 
-const getContractDetails = function(startBlockNumber, endBlockNumber) {
+export const getContractDetails = function(startBlockNumber, endBlockNumber) {
   var transactionsReceiptsPromises = [];
 
   return new Promise((resolve, reject) => {
@@ -1751,7 +1759,7 @@ const getBalance = function(account, block) {
   });
 };
 
-const getLastBlockLocally = function() {
+export const getLastBlockLocally = function() {
   if (lastBlock !== 0) {
     // console.log('Local');
     return new Promise(resolve => {
@@ -1763,7 +1771,7 @@ const getLastBlockLocally = function() {
   }
 };
 
-const getPreviousAccounts = function() {
+export const getPreviousAccounts = function() {
   // console.log("ACCOUNTS: " + JSON.stringify(previous_contracts_accounts));
   return previous_contracts_accounts;
 };
@@ -1907,15 +1915,15 @@ const getTransactionsByAccount = function(
   });
 };
 
-const getPeersNumber = function() {
+export const getPeersNumber = function() {
   return web3.eth.net.getPeerCount();
 };
 
-const getGasPrice = function() {
+export const getGasPrice = function() {
   return web3.eth.getGasPrice();
 };
 
-const getLastBlock = function() {
+export const getLastBlock = function() {
   return web3.eth.getBlock('latest', true);
 };
 
@@ -2053,29 +2061,3 @@ const flatten = function(arr) {
 //   myContract.options.gasPrice = '20000000000000';
 //   myContract.options.gas = 5000000;
 // };
-
-//////////////// EXPORT FUNCTIONS ///////////////////////
-
-module.exports = {
-  getAccountTransactionsGasSpentClearings,
-  getLastBlock,
-  getPreviousAccounts,
-  getGasPrice,
-  getLastBlockLocally,
-  getClearingsThroughTime,
-  getContractDetails,
-  getTransactionsPerBlock,
-  getSpentGasOfAccount,
-  getAccountInfo,
-  getContractResults,
-  getGasPerBlock,
-  getBalancePerBlockOfAccount,
-  syncStep,
-  getTransactions,
-  marketChart,
-  getTimeToMineBlock,
-  getTranscationInfoHash,
-  getBlockInfoMinimal,
-  getPeersNumber,
-  getNumberOfTranscationsOfAccountPerBlock
-};
