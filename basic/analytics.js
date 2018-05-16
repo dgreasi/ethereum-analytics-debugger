@@ -33,25 +33,25 @@ export const syncStep = function(startBlockNumber, endBlockNumber, type) {
       startBlockNumber = start;
       endBlockNumber = end;
 
-      var steps = getSteps(startBlockNumber, endBlockNumber);
+      return getSteps(startBlockNumber, endBlockNumber).then(steps => {
+        var stepCalls = [];
 
-      var stepCalls = [];
+        const syncFn = (type === 1 ? sync : syncBl).bind(this);
 
-      const syncFn = (type === 1 ? sync : syncBl).bind(this);
+        for (var i = 0; i < steps.length - 1; i++) {
+          const startBlockNumber = steps[i];
+          const endBlockNumber =
+            i < steps.length - 2 ? steps[i + 1] - 1 : steps[i + 1];
+          stepCalls.push(() => syncFn(startBlockNumber, endBlockNumber));
+        }
 
-      for (var i = 0; i < steps.length - 1; i++) {
-        const startBlockNumber = steps[i];
-        const endBlockNumber =
-          i < steps.length - 2 ? steps[i + 1] - 1 : steps[i + 1];
-        stepCalls.push(() => syncFn(startBlockNumber, endBlockNumber));
-      }
+        const mySeriesPromise = stepCalls.reduce(
+          (acc, crntFn) => acc.then(crntFn),
+          Promise.resolve()
+        );
 
-      const mySeriesPromise = stepCalls.reduce(
-        (acc, crntFn) => acc.then(crntFn),
-        Promise.resolve()
-      );
-
-      return mySeriesPromise;
+        return mySeriesPromise;
+      });
     })
     .then(() => {
       var endStartAccount = [start, end];
@@ -117,7 +117,7 @@ const syncBlocks = function(startBlockNumber, endBlockNumber) {
       var getBlock = getBlockInfoMinimalNoChecks(i);
       getBlockPromises.push(getBlock);
     } else {
-      console.log('BLOCK: ' + i + ' EXISTS ALREADY');
+      // console.log('BLOCK: ' + i + ' EXISTS ALREADY');
     }
   }
 
@@ -187,15 +187,46 @@ const syncTsReceipts = function(startBlockNumber, endBlockNumber) {
 };
 
 const getSteps = function(startBlockNumber, endBlockNumber) {
-  var startStep = startBlockNumber;
+  let startStep = startBlockNumber;
+  return getStepsFromNumberOfTs(startBlockNumber, endBlockNumber).then(r => {
+    console.log('RETURN OF getStepsNew is: ' + r);
 
-  var step = [startStep];
-  while (endBlockNumber - startStep > 1000) {
-    startStep = startStep + 1000;
-    step.push(startStep);
-  }
-  step.push(endBlockNumber);
-  return step;
+    // CREATE STEPS
+    let stepNumber = r;
+    let step = [startStep];
+    while (endBlockNumber - startStep > stepNumber) {
+      startStep = startStep + stepNumber;
+      step.push(startStep);
+    }
+    step.push(endBlockNumber);
+    return step;
+  });
+};
+
+const getStepsFromNumberOfTs = function(startBlockNumber, endBlockNumber) {
+  return syncBlocks(startBlockNumber, endBlockNumber).then(() => {
+    // console.log('Return val: ' + rs.length);
+    let start = endBlockNumber - 1000;
+    start = start > 0 ? start : endBlockNumber - 1000 - start + 1;
+
+    // console.log('STart is: ' + start);
+    let checkBL = searchFor(endBlockNumber);
+    let i;
+    let num_ts = 0;
+    if (checkBL >= 0) {
+      for (i = 0; i < endBlockNumber - start; i++) {
+        num_ts += dbBlocks[checkBL - i].transactions.length;
+        // console.log('Block: ' + dbBlocks[checkBL-i].number);
+        if (num_ts > 3500) {
+          break;
+        }
+      }
+    } else {
+      console.log('ERROR, dint found block');
+    }
+    // console.log('STEP is: ' + i);
+    return i;
+  });
 };
 
 const sortDB = function() {
@@ -626,7 +657,7 @@ export const getSpentGasOfAccount = function(
   });
 };
 
-export const getGasPerBlock = function(startBlockNumber, endBlockNumber) {
+export const blocksInfo = function(startBlockNumber, endBlockNumber) {
   return new Promise(resolve => {
     syncStep(startBlockNumber, endBlockNumber, 2).then(() => {
       startBlockNumber = start;
@@ -645,6 +676,7 @@ export const getGasPerBlock = function(startBlockNumber, endBlockNumber) {
           startEndGasPerBlock.push([
             dbBlocks[check + j].number,
             dbBlocks[check + j].gasUsed,
+            dbBlocks[check + j].size,
             total_gas_sent,
             dbBlocks[check + j].gasLimit
           ]);
@@ -954,7 +986,9 @@ const getTranscationInfo = function(e) {
       }
     })
     .catch(err => {
-      console.log('ERROR getTranscationInfo: ' + err);
+      console.log(
+        'ERROR getTranscationInfo (RERUN  TO GET ALL RECEIPTS): ' + err
+      );
       return [];
     });
 };

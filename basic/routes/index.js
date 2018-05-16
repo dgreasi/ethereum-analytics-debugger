@@ -391,8 +391,8 @@ router.post('/get', function(req, res) {
       }
     }
   } else if (id_function === '8') {
-    // GET GAS PER BLOCK
-    analytics.getGasPerBlock(start_block, end_block).then(val => {
+    // GET BLOCKS INFO
+    analytics.blocksInfo(start_block, end_block).then(val => {
       noData = null;
 
       if (val[1].length < 1) {
@@ -409,10 +409,10 @@ router.post('/get', function(req, res) {
       prvAC = analytics.getPreviousAccounts();
       analytics.getLastBlockLocally().then(block => {
         res.render('home', {
-          title: 'Ethereum Analytics Debugger - Get Gas Per Block',
+          title: 'Ethereum Analytics Debugger - Get Blocks Info',
           start: start,
           end: end,
-          gasPerBlock: val,
+          blocksInfo: val,
           noData: noData,
           lastBlock: block,
           previous_contracts_accounts: prvAC

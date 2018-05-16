@@ -108,8 +108,8 @@
         <span class="glyphicon glyphicon-th-list"></span>
       </button>
 
-      <button class="btn btn-default red_btn" id="gas_per_block" title="Blocks => Results">
-        Gas Per Block
+      <button class="btn btn-default red_btn" id="blocks_info" title="Blocks => Results">
+        Get Blocks Info
         <span class="glyphicon glyphicon-hdd"></span>
         <span class="glyphicon glyphicon-arrow-right green_btn"></span>
         <span class="glyphicon glyphicon-stats"></span>
@@ -380,8 +380,8 @@
     {{/if}}
 
     {{!-- GET GAS PER BLOCK --}}
-    {{#if gasPerBlock}}
-      <div id="gas_per_block_chart" data-for="{{gasPerBlock}}" class="center"></div>
+    {{#if blocksInfo}}
+      <div id="blocks_info_chart" data-for="{{blocksInfo}}" class="center"></div>
     {{/if}}
 
     {{!-- GET BALANCE OF ACCOUNT PER BLOCK --}}
@@ -531,9 +531,9 @@
             <th>#</th>
             <th>Block</th>
             <th>Gas Spent</th>
+            <th>Block Size</th>
             <th>Gas Sent</th>
             <th>Gas Limit</th>
-
         </thead> 
         <tbody> 
             {{#each gasPerBlock}} 
