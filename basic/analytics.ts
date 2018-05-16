@@ -1,4 +1,5 @@
-var Web3 = require('web3');
+import Web3 from 'web3';
+import { Block, TransactionReceipt } from 'web3/types';
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////// GLOBAL VARIABLES ////////////////////////////////
@@ -6,6 +7,16 @@ var Web3 = require('web3');
 
 var web3 = new Web3();
 web3.setProvider(new web3.providers.HttpProvider('http://localhost:8100'));
+
+interface ExtendedBlock extends Block {
+  time: string;
+}
+
+interface ExtendedTransactionReceipt extends TransactionReceipt {
+  input: string;
+  gasPrice: string;
+  gas: number;
+}
 
 // DATABASE TO BE
 var dbBlocks = []; // ARRAY OF BLOCKS
@@ -743,7 +754,7 @@ export const getBalancePerBlockOfAccount = function(
 const getBlockInfoMinimalNoChecks = function(blockNumber) {
   return web3.eth
     .getBlock(blockNumber, true)
-    .then(bl => {
+    .then((bl: ExtendedBlock) => {
       // bl.timestamp = this.decodeTime(bl.timestamp);
       bl.time = decodeTime(bl.timestamp);
       return bl;
@@ -763,7 +774,7 @@ export const getBlockInfoMinimal = function(blockNumber) {
         var check = searchFor(blockNumber);
 
         if (check === -1) {
-          web3.eth.getBlock(blockNumber, true).then(bl => {
+          web3.eth.getBlock(blockNumber, true).then((bl: ExtendedBlock) => {
             // console.log("GET BLOCK: " + blockNumber);
             // SAVE TO DB
             bl.timestamp = decodeTime(bl.timestamp);
@@ -784,7 +795,7 @@ export const getBlockInfoMinimal = function(blockNumber) {
         }
       } else {
         // console.log("VVVVVVVVVVVVV");
-        web3.eth.getBlock(res, true).then(bl => {
+        web3.eth.getBlock(res, true).then((bl: ExtendedBlock) => {
           // console.log("IN IFFFF GET BLOCK: " + res);
           // SAVE TO DB
           dbBlocks.push(bl);
@@ -970,7 +981,7 @@ export const getNumberOfTranscationsOfAccountPerBlock = function(
 const getTranscationInfo = function(e) {
   return web3.eth
     .getTransactionReceipt(e.hash)
-    .then(res => {
+    .then((res: ExtendedTransactionReceipt) => {
       if (res !== null) {
         // console.log("Input: " + rs.input);
         res.input = e.input;
@@ -1001,7 +1012,7 @@ export const getTranscationInfoHash = function(hash) {
         if (rs !== null) {
           web3.eth
             .getTransactionReceipt(rs.hash)
-            .then(res => {
+            .then((res: ExtendedTransactionReceipt) => {
               if (res !== null) {
                 // console.log("Input: " + rs.input);
                 res.input = rs.input;
@@ -1761,7 +1772,7 @@ export const getContractDetails = function(startBlockNumber, endBlockNumber) {
   });
 };
 
-const getBalance = function(account, block) {
+const getBalance = function(account, block?) {
   return new Promise((resolve, reject) => {
     if (block) {
       web3.eth
