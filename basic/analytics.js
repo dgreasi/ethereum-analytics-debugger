@@ -247,24 +247,30 @@ const syncContractVars = function(startBlockNumber, endBlockNumber, contract) {
       startBlockNumber = start;
       endBlockNumber = end;
 
-      var steps = getSteps(startBlockNumber, endBlockNumber);
+      getSteps(startBlockNumber, endBlockNumber).then(steps => {
+        console.log('steps: ' + JSON.stringify(steps));
 
-      var stepCalls = [];
-      for (var i = 0; i < steps.length - 1; i++) {
-        const startBlockNumber = steps[i];
-        const endBlockNumber =
-          i < steps.length - 2 ? steps[i + 1] - 1 : steps[i + 1];
-        stepCalls.push(() =>
-          syncGetVarsStep(startBlockNumber, endBlockNumber, contract)
+        let stepCalls = [];
+        console.log('steps.length: ' + steps.length);
+        for (let i = 0; i < steps.length - 1; i++) {
+          const startBlockNumber = steps[i];
+          const endBlockNumber =
+            i < steps.length - 2 ? steps[i + 1] - 1 : steps[i + 1];
+          console.log(
+            'START - END: ' + startBlockNumber + ' - ' + endBlockNumber
+          );
+          stepCalls.push(() =>
+            syncGetVarsStep(startBlockNumber, endBlockNumber, contract)
+          );
+        }
+        console.log('Lnegth of step calls: ' + stepCalls.length);
+        const mySeriesPromise = stepCalls.reduce(
+          (acc, crntFn) => acc.then(crntFn),
+          Promise.resolve()
         );
-      }
 
-      const mySeriesPromise = stepCalls.reduce(
-        (acc, crntFn) => acc.then(crntFn),
-        Promise.resolve()
-      );
-
-      return mySeriesPromise;
+        return mySeriesPromise;
+      });
     })
     .then(() => {
       var endStartAccount = [start, end];
@@ -281,13 +287,13 @@ const syncGetVarsStep = function(
   endBlockNumber,
   contract_arg
 ) {
-  return new Promise((resolve, reject) => {
+  return Promise.resolve().then(() => {
     var getContractVarPromises = [];
-
-    for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-      var checkCl = searchForInArray(dbClearings, i);
+    console.log('syncGetVarsStep');
+    for (let i = startBlockNumber; i <= endBlockNumber; i++) {
+      let checkCl = searchForInArray(dbClearings, i);
       if (checkCl === -1) {
-        var checkBL = searchFor(i);
+        let checkBL = searchFor(i);
         if (checkBL === -1) {
           console.log('BLOCK DINDNT FOUND');
         }
@@ -318,11 +324,11 @@ const syncGetVarsStep = function(
         console.log('DB dbClearings LENGTH: ' + dbClearings.length);
         console.log(' ');
 
-        resolve(dbClearings);
+        return dbClearings;
       })
       .catch(err => {
         console.log('ERROR syncGetVarsStep: ' + err);
-        reject(err);
+        return [];
       });
   });
 };
@@ -1173,7 +1179,7 @@ export const getClearingsThroughTime = function(
   contract_arg,
   nickname
 ) {
-  var onj = { hex: contract_arg, name: nickname ? nickname : contract_arg };
+  let onj = { hex: contract_arg, name: nickname ? nickname : contract_arg };
   addToHistory(onj);
 
   return new Promise(resolve => {
@@ -1185,20 +1191,21 @@ export const getClearingsThroughTime = function(
 
       sortDB();
 
-      var check = searchFor(startBlockNumber);
+      let check = searchFor(startBlockNumber);
       console.log(
         'FROM - TO BLOCK: ' + startBlockNumber + ' - ' + endBlockNumber
       );
 
       syncContractVars(startBlockNumber, endBlockNumber, contract_arg).then(
-        () => {
-          var res = [];
+        r => {
+          console.log(JSON.stringify(r));
+          let res = [];
 
           check = searchForInArray(dbClearings, startBlockNumber);
           // console.log("DBClearings");
-          for (var i = 0; i <= endBlockNumber - startBlockNumber; i++) {
+          for (let i = 0; i <= endBlockNumber - startBlockNumber; i++) {
             if (check === -1) {
-              console.log('Didnt found in dbClearings');
+              // console.log('Didnt found in dbClearings');
             } else {
               if (contract_arg === dbClearings[check + i][5]) {
                 // console.log("FOUND CONTRACT IN DB");
@@ -1210,7 +1217,7 @@ export const getClearingsThroughTime = function(
             }
           }
 
-          var endStartClear = [start, end];
+          let endStartClear = [start, end];
           // console.log(JSON.stringify(res));
           endStartClear.push(res);
           resolve(endStartClear);
@@ -1258,12 +1265,12 @@ const getStorageAtBlockPriceCheck = function(block, contract_arg) {
   return new Promise(resolve => {
     getStorageAtBlockPrice(block, contract_arg).then(rs => {
       if (rs === -99) {
-        console.log('CALLING getStorageAt AGAIN');
-        getStorageAtBlockPrice(block, contract_arg).then(r => {
-          console.log('RESOLVING: ' + parseInt(r));
-          resolve(r);
-        });
-        // resolve(rs);
+        // console.log('CALLING getStorageAt AGAIN');
+        // getStorageAtBlockPrice(block, contract_arg).then(r => {
+        //   console.log('RESOLVING: ' + parseInt(r));
+        //   resolve(r);
+        // });
+        resolve(rs);
       } else {
         resolve(rs);
       }
@@ -1284,10 +1291,11 @@ const getStorageAtBlockQuantityCheck = function(block, contract_arg) {
       if (rs === -99) {
         // console.log("CALLING getStorageAt AGAIN");
         // this.getStorageAtBlockQuantityCheck(block, contract_arg);
-        getStorageAtBlockQuantity(block, contract_arg).then(r => {
-          console.log('RESOLVING: ' + parseInt(r));
-          resolve(r);
-        });
+        // getStorageAtBlockQuantity(block, contract_arg).then(r => {
+        //   console.log('RESOLVING: ' + parseInt(r));
+        //   resolve(r);
+        // });
+        resolve(rs);
       } else {
         resolve(rs);
       }
