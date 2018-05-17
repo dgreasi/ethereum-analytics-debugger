@@ -72,135 +72,138 @@
     <hr>
 <!--     <button class="btn btn-default red_btn" data-toggle="modal" data-target="#get_accounts">Get Accounts</button> -->
       
-    <div>
+    <div class="container">
 
-      {{!-- data-toggle="modal" data-target="#get_experiment" --}}
-      <button class="btn btn-default blue_btn" id="get_exp" title="Blocks => Results">
-        Get Experiment
-        <span class="glyphicon glyphicon-exclamation-sign"></span>
-        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
-        <span class="glyphicon glyphicon-th-list"></span>
-      </button>
+        <div class="dropdown inline">
+          <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Basic Scenarios
+          <span class="caret"></span></button>
+          <ul class="dropdown-menu">
+            <li id="get_exp" title="Blocks => Results"><a href="#">
+              Get Experiment
+              <span class="glyphicon glyphicon-exclamation-sign"></span>
+              <span class="glyphicon glyphicon-arrow-right green_btn"></span>
+              <span class="glyphicon glyphicon-th-list"></span>
+            </a></li>
+            <li id="get_trs" title="Blocks => Results"><a href="#">
+              Get Transactions
+              <span class="glyphicon glyphicon-exclamation-sign"></span>
+              <span class="glyphicon glyphicon-arrow-right green_btn"></span>
+              <span class="glyphicon glyphicon-th-list"></span>
+            </a></li>
+            <li id="get_con_details" title="Blocks => Results"><a href="#">
+              Get Contracts
+              <span class="glyphicon glyphicon-hdd"></span>
+              <span class="glyphicon glyphicon-arrow-right green_btn"></span>
+              <span class="glyphicon glyphicon-th-list"></span>
+            </a></li>
+            <li id="sync" title="Sync with specified blocks"><a href="#">
+              Sync with Blocks
+              <span class="glyphicon glyphicon-refresh"></span>
+            </a></li>
+          </ul>
+        </div>
 
-      <button class="btn btn-default blue_btn" id="get_trs" title="Blocks => Results">
-        Get Transactions
-        <span class="glyphicon glyphicon-exclamation-sign"></span>
-        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
-        <span class="glyphicon glyphicon-th-list"></span>
-      </button>
+        <div class="dropdown inline">
+          <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Charts
+          <span class="caret"></span></button>
+          <ul class="dropdown-menu">
+            <li id="blocks_info" title="Blocks => Results"><a href="#">
+              Get Blocks Info
+              <span class="glyphicon glyphicon-hdd"></span>
+              <span class="glyphicon glyphicon-arrow-right green_btn"></span>
+              <span class="glyphicon glyphicon-stats"></span>
+            </a></li>
+            <li id="get_account_gas_spent" title="Address + Blocks => Chart" ><a href="#">
+              Get Gas Spent of Account
+              <span class="glyphicon glyphicon-exclamation-sign"></span>
+              <span class="glyphicon glyphicon glyphicon-plus-sign green_btn"></span>
+              <span class="glyphicon glyphicon-hdd"></span>
+              <span class="glyphicon glyphicon-arrow-right green_btn"></span>
+              <span class="glyphicon glyphicon-stats"></span>
+            </a></li>
+            <li id="get_balance_account_per_block" title="Address + Blocks => Chart"><a href="#">
+              Get Balance of Account per block
+              <span class="glyphicon glyphicon-exclamation-sign"></span>
+              <span class="glyphicon glyphicon glyphicon-plus-sign green_btn"></span>
+              <span class="glyphicon glyphicon-hdd"></span>
+              <span class="glyphicon glyphicon-arrow-right green_btn"></span>
+              <span class="glyphicon glyphicon-stats"></span>
+            </a></li>
+            <li id="get_transactions_per_block" title="Blocks => Chart"><a href="#">
+              Get Transactions Per Block
+              <span class="glyphicon glyphicon-hdd"></span>
+              <span class="glyphicon glyphicon-arrow-right green_btn"></span>
+              <span class="glyphicon glyphicon-stats"></span>
+            </a></li>
+            <li id="get_time_to_mine_block" title="Blocks => Chart"><a href="#">
+              Get Time to Mine Block
+              <span class="glyphicon glyphicon-hdd"></span>
+              <span class="glyphicon glyphicon-arrow-right green_btn"></span>
+              <span class="glyphicon glyphicon-stats"></span>
+            </a></li>
+          </ul>
+        </div> 
 
-      <button class="btn btn-default blue_btn" id="sync" title="Sync with specified blocks">
-        Sync with Blocks
-        <span class="glyphicon glyphicon-refresh"></span>
-      </button>
+        <div class="dropdown inline">
+          <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Specific Details
+          <span class="caret"></span></button>
+          <ul class="dropdown-menu">
+            <li data-toggle="modal" data-target="#get_block_info"><a href="#">
+              Get Block
+            </a></li>
+            <li data-toggle="modal" data-target="#get_transaction_info" title="Address => Results"><a href="#">
+              Get Transaction Info
+              <span class="glyphicon glyphicon-exclamation-sign"></span>
+              <span class="glyphicon glyphicon-arrow-right green_btn"></span>
+              <span class="glyphicon glyphicon-th-list"></span>
+            </a></li>
+            <li id="get_account_info"><a href="#">
+              Get Account Info
+              <span class="glyphicon glyphicon-exclamation-sign"></span>
+            </a></li>
+          </ul>
+        </div>
 
+        <div class="dropdown inline" title="Custom functions for specific contract">
+          <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Contracts
+          <span class="caret"></span></button>
+          <ul class="dropdown-menu">
+            <li id="get_clr" title="Address + Blocks => Chart"><a href="#">
+              Get State of Contract at Blocks
+              <span class="glyphicon glyphicon-exclamation-sign"></span>
+              <span class="glyphicon glyphicon glyphicon-plus-sign green_btn"></span>
+              <span class="glyphicon glyphicon-hdd"></span>
+              <span class="glyphicon glyphicon-arrow-right green_btn"></span>
+              <span class="glyphicon glyphicon-stats"></span>
+            </a></li>
+            <li id="get_clr_last_block" title="Address => Results"><a href="#">
+              State of Contract Now
+              <span class="glyphicon glyphicon-exclamation-sign"></span>
+              <span class="glyphicon glyphicon-arrow-right green_btn"></span>
+              <span class="glyphicon glyphicon-th-list"></span>
+            </a></li>
+            <li id="get_market_chart" title="Blocks => Chart"><a href="#">
+              Market Chart
+              <span class="glyphicon glyphicon-hdd"></span>
+              <span class="glyphicon glyphicon-arrow-right green_btn"></span>
+              <span class="glyphicon glyphicon-stats"></span>
+            </a></li>
+          </ul>
+        </div>
 
-      {{!-- </form> --}}
     </div>
 
+ 
     <div>
       <br>
-
-      <button class="btn btn-default red_btn" id="get_con_details" title="Blocks => Results">
-        Get Contracts
-        <span class="glyphicon glyphicon-hdd"></span>
-        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
-        <span class="glyphicon glyphicon-th-list"></span>
-      </button>
-
-      <button class="btn btn-default red_btn" id="blocks_info" title="Blocks => Results">
-        Get Blocks Info
-        <span class="glyphicon glyphicon-hdd"></span>
-        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
-        <span class="glyphicon glyphicon-stats"></span>
-      </button>
-
-      <button class="btn btn-default red_btn" id="get_account_gas_spent" title="Address + Blocks => Chart">
-        Get Gas Spent of Account
-        <span class="glyphicon glyphicon-exclamation-sign"></span>
-        <span class="glyphicon glyphicon glyphicon-plus-sign green_btn"></span>
-        <span class="glyphicon glyphicon-hdd"></span>
-        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
-        <span class="glyphicon glyphicon-stats"></span>
-      </button>
-
-      <button class="btn btn-default red_btn" id="get_balance_account_per_block" title="Address + Blocks => Chart">
-        Get Balance of Account per block
-        <span class="glyphicon glyphicon-exclamation-sign"></span>
-        <span class="glyphicon glyphicon glyphicon-plus-sign green_btn"></span>
-        <span class="glyphicon glyphicon-hdd"></span>
-        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
-        <span class="glyphicon glyphicon-stats"></span>
-      </button>
-
-      <button class="btn btn-default red_btn" id="get_transactions_per_block" title="Blocks => Chart">
-        Get Transactions Per Block
-        <span class="glyphicon glyphicon-hdd"></span>
-        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
-        <span class="glyphicon glyphicon-stats"></span>
-      </button>
-
-      <button class="btn btn-default red_btn" id="get_time_to_mine_block" title="Blocks => Chart">
-        Get Time to Mine Block
-        <span class="glyphicon glyphicon-hdd"></span>
-        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
-        <span class="glyphicon glyphicon-stats"></span>
-      </button>
-      
-    </div>
-
-    <div>
-
-      <br>
-      
-      <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_block_info">Get Block</button>
-
-      <button class="btn btn-default green_btn" data-toggle="modal" data-target="#get_transaction_info" title="Address => Results">
-        Get Transaction Info
-        <span class="glyphicon glyphicon-exclamation-sign"></span>
-        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
-        <span class="glyphicon glyphicon-th-list"></span>
-      </button>
-      
-      <button class="btn btn-default green_btn" id="get_account_info">Get Account Info</button>
-
       <form method="post" action="/get_peers">
         <button class="btn btn-default green_btn">Get # Peers</button>
       </form>
     </div>
 
-    <div>
+{{!--    <div>
       <b>Custom functions for specific contract</b>
-    </div>
-
-    <div>
-      <button class="btn btn-default magenta_btn" id="get_clr" title="Address + Blocks => Chart">
-        Get State of Contract at Blocks
-        <span class="glyphicon glyphicon-exclamation-sign"></span>
-        <span class="glyphicon glyphicon glyphicon-plus-sign green_btn"></span>
-        <span class="glyphicon glyphicon-hdd"></span>
-        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
-        <span class="glyphicon glyphicon-stats"></span>
-      </button>
-      
-      {{!-- <form method="post" action="/get_clearing"> --}}
-      <button class="btn btn-default magenta_btn" id="get_clr_last_block" title="Address => Results">
-        State of Contract Now
-        <span class="glyphicon glyphicon-exclamation-sign"></span>
-        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
-        <span class="glyphicon glyphicon-th-list"></span>
-      </button>
-
-      <button class="btn btn-default magenta_btn" id="get_market_chart" title="Blocks => Chart">
-        Market Chart
-        <span class="glyphicon glyphicon-hdd"></span>
-        <span class="glyphicon glyphicon-arrow-right green_btn"></span>
-        <span class="glyphicon glyphicon-stats"></span>
-      </button>
-
-    </div>
-    
-
+    </div> --}}
 
     {{!-- FORMS
     ######################################################################################
