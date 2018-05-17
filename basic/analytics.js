@@ -251,7 +251,6 @@ const syncContractVars = function(startBlockNumber, endBlockNumber, contract) {
         console.log('steps: ' + JSON.stringify(steps));
 
         let stepCalls = [];
-        console.log('steps.length: ' + steps.length);
         for (let i = 0; i < steps.length - 1; i++) {
           const startBlockNumber = steps[i];
           const endBlockNumber =
@@ -263,7 +262,7 @@ const syncContractVars = function(startBlockNumber, endBlockNumber, contract) {
             syncGetVarsStep(startBlockNumber, endBlockNumber, contract)
           );
         }
-        console.log('Lnegth of step calls: ' + stepCalls.length);
+        // console.log('Lnegth of step calls: ' + stepCalls.length);
         const mySeriesPromise = stepCalls.reduce(
           (acc, crntFn) => acc.then(crntFn),
           Promise.resolve()
@@ -274,6 +273,7 @@ const syncContractVars = function(startBlockNumber, endBlockNumber, contract) {
     })
     .then(() => {
       var endStartAccount = [start, end];
+      console.log('dbClearings length AAAAAAAAAAAAA: ' + dbClearings.length);
       return endStartAccount;
     })
     .catch(err => {
