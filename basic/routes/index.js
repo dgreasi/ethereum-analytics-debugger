@@ -97,10 +97,9 @@ router.post('/get', function(req, res) {
     }
   } else if (id_function === '2') {
     // GET STATE OF CONTRACT THROUGH TIME
-
-    if (contract === '') {
-      noData = "Contract doesn't exist.";
-      prvAC = analytics.getPreviousAccounts();
+    if (!contract) {
+      let noData = "Contract doesn't exist.";
+      let prvAC = analytics.getPreviousAccounts();
       analytics.getLastBlockLocally().then(block => {
         res.render('home', {
           title: 'Ethereum Analytics Debugger - Get Clearing Through Blocks',
@@ -110,12 +109,13 @@ router.post('/get', function(req, res) {
         });
       });
     } else {
-      ret = checkReturnHex(contract);
+      let ret = checkReturnHex(contract);
+
       if (ret) {
         analytics
           .getClearingsThroughTime(start_block, end_block, ret, nickname)
           .then(val => {
-            noData = null;
+            let noData = null;
 
             if (val[2].length < 1) {
               console.log('ASSING NoDATA get_clearing_through_time');
@@ -137,8 +137,8 @@ router.post('/get', function(req, res) {
             });
           });
       } else {
-        noData = "Contract doesn't exist.";
-        prvAC = analytics.getPreviousAccounts();
+        let noData = "Contract doesn't exist.";
+        let prvAC = analytics.getPreviousAccounts();
         analytics.getLastBlockLocally().then(block => {
           res.render('home', {
             title: 'Ethereum Analytics Debugger - Get Clearing Through Blocks',
@@ -498,7 +498,7 @@ router.post('/get', function(req, res) {
 
         res.render('home', {
           title:
-            'Ethereum Analytics Debugger - Sync throug specified blocks Complete',
+            'Ethereum Analytics Debugger - Sync through specified blocks Complete',
           start: val[0],
           end: val[1],
           lastBlock: block,
@@ -732,7 +732,7 @@ function checkReturnHex(arg) {
 }
 
 function isHex(str) {
-  if (str[0] === 0 && str[1].toLowerCase() === 'x') {
+  if (parseInt(str[0]) === 0 && str[1].toLowerCase() === 'x') {
     return true;
   } else {
     return false;
