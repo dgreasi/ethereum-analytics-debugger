@@ -98,6 +98,8 @@ Each line contains:
 > This function returns the number of peers of the ethereum node that we are connected on.
 
 ## Get Started
+### For Node version < 6 use release [1](https://github.com/Temeteron/Ethereum_analytics_debugger/releases/tag/1.0.0)
+
 1) Clone:
 ```
 $ git clone https://github.com/Temeteron/Ethereum_analytics_debugger.git
