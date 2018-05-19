@@ -108,8 +108,8 @@ const syncBl = function(startBlockNumber, endBlockNumber) {
 const syncBlocks = function(startBlockNumber, endBlockNumber) {
   var getBlockPromises = [];
 
-  for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-    var check = searchFor(i);
+  for (let i = startBlockNumber; i <= endBlockNumber; i++) {
+    let check = searchFor(i);
     // console.log("CHECK: " + check);
 
     if (check === -1) {
@@ -140,29 +140,31 @@ const syncBlocks = function(startBlockNumber, endBlockNumber) {
 const syncTsReceipts = function(startBlockNumber, endBlockNumber) {
   return Promise.resolve()
     .then(() => {
-      var transactionsReceiptsPromises = [];
+      let transactionsReceiptsPromises = [];
 
-      var check = searchFor(startBlockNumber);
+      let check = searchFor(startBlockNumber);
       if (check === -1) {
         console.log("DIDN'T found block");
       } else {
-        for (var i = 0; i <= endBlockNumber - startBlockNumber; i++) {
-          // console.log("CHECK: " + check);
-          var bl = dbBlocks[check + i];
-          if (bl !== null && bl.transactions !== null) {
-            // console.log("Block with transactions");
-            var ts = null;
-            bl.transactions.forEach(e => {
-              ts = searchTsInfoDbElement(e);
-              // console.log("TS DB: " + ts);
-              if (ts) {
-                console.log('TS EXISTS ALREADY');
-              } else {
-                if (e.input !== '0x') {
-                  transactionsReceiptsPromises.push(getTranscationInfo(e));
+        for (let i = 0; i <= endBlockNumber - startBlockNumber; i++) {
+          // console.log("CHECK: " + (check+i));
+          let bl = dbBlocks[check + i];
+          if (bl) {
+            if (bl.transactions) {
+              // console.log("Block with transactions");
+              let ts = null;
+              bl.transactions.forEach(e => {
+                ts = searchTsInfoDbElement(e);
+                // console.log("TS DB: " + ts);
+                if (ts) {
+                  console.log('TS EXISTS ALREADY');
+                } else {
+                  if (e.input !== '0x') {
+                    transactionsReceiptsPromises.push(getTranscationInfo(e));
+                  }
                 }
-              }
-            });
+              });
+            }
           }
         }
       }
@@ -206,15 +208,19 @@ const getSteps = function(startBlockNumber, endBlockNumber) {
 const getStepsFromNumberOfTs = function(startBlockNumber, endBlockNumber) {
   return syncBlocks(startBlockNumber, endBlockNumber).then(() => {
     // console.log('Return val: ' + rs.length);
-    let start = endBlockNumber - 1000;
-    start = start > 0 ? start : endBlockNumber - 1000 - start + 1;
+    let startN = startBlockNumber;
+    if (endBlockNumber - startBlockNumber > 1000) {
+      startN = endBlockNumber - 1000;
+      startN = startN > 0 ? startN : endBlockNumber - 1000 - startN + 1;
+    }
 
-    // console.log('STart is: ' + start);
+    // console.log('STart is: ' + startN);
     let checkBL = searchFor(endBlockNumber);
-    let i;
     let num_ts = 0;
+    let i;
     if (checkBL >= 0) {
-      for (i = 0; i < endBlockNumber - start; i++) {
+      for (i = 0; i <= endBlockNumber - startN; i++) {
+        // console.log('CHECK: ' + checkBL + ' - ' + i);
         num_ts += dbBlocks[checkBL - i].transactions.length;
         // console.log('Block: ' + dbBlocks[checkBL-i].number);
         if (num_ts > 2000) {
@@ -351,8 +357,8 @@ export const getAccountTransactionsGasSpentClearings = function(
       throw err;
     })
     .then(() => {
-      startBlockNumber = start;
-      endBlockNumber = end;
+      let startBlockNumber = start;
+      let endBlockNumber = end;
 
       sortDB();
 
@@ -361,8 +367,8 @@ export const getAccountTransactionsGasSpentClearings = function(
       console.log(
         'FROM - TO BLOCK: ' + startBlockNumber + ' - ' + endBlockNumber
       );
-      for (var j = 0; j <= endBlockNumber - startBlockNumber; j++) {
-        var bl = dbBlocks[check + j];
+      for (let j = 0; j <= endBlockNumber - startBlockNumber; j++) {
+        let bl = dbBlocks[check + j];
 
         if (bl && bl.transactions) {
           if (contract_arg) {
@@ -395,10 +401,10 @@ export const getAccountTransactionsGasSpentClearings = function(
                 // console.log("GETTING FROM DB");
                 createTableFromTxReceipt(ts);
               } else {
-                console.log(
-                  'ERROR - DIDINT FOUND TS RECEIPT getAccountTransactionsGasSpentClearings - ts:' +
-                    ts
-                );
+                // console.log(
+                //   'ERROR - DIDINT FOUND TS RECEIPT getAccountTransactionsGasSpentClearings - ts:' +
+                //     ts
+                // );
               }
             });
           }
@@ -408,6 +414,7 @@ export const getAccountTransactionsGasSpentClearings = function(
     .then(() => {
       var endStartAccount = [start, end];
       endStartAccount.push(silentBugs);
+      console.log('Accounts length: ' + accounts.length);
       endStartAccount.push(accounts);
 
       // console.log("RESOLVING");
@@ -1191,31 +1198,33 @@ export const getClearingsThroughTime = function(
       'FROM - TO BLOCK: ' + startBlockNumber + ' - ' + endBlockNumber
     );
 
-    syncContractVars(startBlockNumber, endBlockNumber, contract_arg).then(r => {
-      let startBlockNumber = start;
-      let endBlockNumber = end;
-      let res = [];
+    syncContractVars(startBlockNumber, endBlockNumber, contract_arg).then(
+      () => {
+        let startBlockNumber = start;
+        let endBlockNumber = end;
+        let res = [];
 
-      check = searchForInArray(dbClearings, startBlockNumber);
+        check = searchForInArray(dbClearings, startBlockNumber);
 
-      for (let i = 0; i <= endBlockNumber - startBlockNumber; i++) {
-        if (check === -1) {
-          console.log('Didnt found in dbClearings');
-        } else {
-          if (contract_arg === dbClearings[check + i][5]) {
-            // console.log("FOUND CONTRACT IN DB");
-            res.push(dbClearings[check + i]);
+        for (let i = 0; i <= endBlockNumber - startBlockNumber; i++) {
+          if (check === -1) {
+            console.log('Didnt found in dbClearings');
+          } else {
+            if (contract_arg === dbClearings[check + i][5]) {
+              // console.log("FOUND CONTRACT IN DB");
+              res.push(dbClearings[check + i]);
+            }
+            // else {
+            // console.log("DIFERRENT CONTRACTS: " + contract_arg + " - " + dbClearings[check+i][5]);
+            // }
           }
-          // else {
-          // console.log("DIFERRENT CONTRACTS: " + contract_arg + " - " + dbClearings[check+i][5]);
-          // }
         }
-      }
 
-      let endStartClear = [start, end];
-      endStartClear.push(res);
-      resolve(endStartClear);
-    });
+        let endStartClear = [start, end];
+        endStartClear.push(res);
+        resolve(endStartClear);
+      }
+    );
   });
 };
 

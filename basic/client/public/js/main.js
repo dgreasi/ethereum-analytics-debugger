@@ -87,7 +87,7 @@ $(document).on('ready', function() {
 				// console.log("diff_chart.data: " + JSON.stringify(diff_chart.data));
 				let layoutD1 = {
 					title: 'Gas Limit',
-					yaxis: { title: 'gas' }
+					yaxis: { title: 'gas limit' }
 				};
 
 				if (gasLimit_chart.data) {
@@ -155,7 +155,7 @@ $(document).on('ready', function() {
 				// console.log("diff_chart.data: " + JSON.stringify(diff_chart.data));
 				let layoutD2 = {
 					title: 'Gas Spending',
-					yaxis: { title: 'gas' }
+					yaxis: { title: 'gas used' }
 				};
 
 				if (gasUsed_chart.data) {

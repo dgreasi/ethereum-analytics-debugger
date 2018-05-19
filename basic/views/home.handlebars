@@ -201,169 +201,6 @@
       </form>
     </div>
 
-{{!--    <div>
-      <b>Custom functions for specific contract</b>
-    </div> --}}
-
-    {{!-- FORMS
-    ######################################################################################
-    ######################################################################################
-    ######################################################################################
-    ###################################################################################### --}}
-    {{!-- UNUSED - UNCOMMENT ROUTER TO USE --}}
-    <form method="post" action="/get_balance">
-      <div id="get_balance" class="modal fade" role="dialog">
-          <div class="modal-dialog">
-
-              <!-- Modal content-->
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal">&times;</button>
-                      <h4 class="modal-title">Get Balance of Account</h4>
-                  </div>
-
-                  <div class="modal-body">
-                    <div class="form-group">
-                        <label for="pwd">Account in Hex:</label>
-                        <input type="string" class="form-control" id="account" name="account" placeholder="Enter account" value="0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768">
-                    </div>
-
-                  </div>
-                  <div class="modal-footer">
-                      <input type="submit" value="Get" class="btn btn-default" ></input>
-                  </div>
-
-              </div>
-          </div>
-      </div>
-    </form>
-
-    <form method="post" action="/get_block_info">
-      <div id="get_block_info" class="modal fade" role="dialog">
-          <div class="modal-dialog">
-
-              <!-- Modal content-->
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal">&times;</button>
-                      <h4 class="modal-title">Get Block Info</h4>
-                  </div>
-
-                  <div class="modal-body">
-
-                    <div class="form-group">
-                        <label for="pwd">Block:</label>
-                        <input type="number" class="form-control" id="block" name="block" placeholder="Enter number" value="">
-                    </div>
-
-                  </div>
-                  <div class="modal-footer">
-                      <input type="submit" value="Get" class="btn btn-default" ></input>
-                  </div>
-
-              </div>
-          </div>
-      </div>
-    </form>
-
-    <form method="post" action="/get_transaction_info">
-      <div id="get_transaction_info" class="modal fade" role="dialog">
-          <div class="modal-dialog">
-
-              <!-- Modal content-->
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal">&times;</button>
-                      <h4 class="modal-title">Get Transaction Info</h4>
-                  </div>
-
-                  <div class="modal-body">
-                    <div class="form-group">
-                        <label for="pwd">Hash of Transaction:</label>
-                        <input class="form-control" id="hash" name="hash" placeholder="Enter hash" value="">
-                    </div>
-                  </div>
-
-                  <div class="modal-footer">
-                      <input type="submit" value="Get" class="btn btn-default" ></input>
-                  </div>
-
-              </div>
-          </div>
-      </div>
-    </form>
-
-    <div id="tips_modal" class="modal fade" role="dialog">
-      <div class="modal-dialog">
-
-          <!-- Modal content-->
-          <div class="modal-content">
-              <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-                  <h4 class="modal-title">Tips</h4>
-              </div>
-
-              <div class="modal-body">
-                <h3 class="blue_btn">Gas Limit of Block - Gas (Sent) - Gas Used</h3>
-                  <p>
-                    <b>"gasLimit":</b> set in the genesis file when initializing your private network. This var sets the limit of gas that a block can contain. A block contains a number of transactions that each one costs some gas. The cumulative (subtotal) gas of those transactions must be less than the gasLimit. This limit is a variable that is constantly changing from blockchain itself.
-                  </p>
-                  <br>
-                  <p>
-                    <b>"gas":</b> is an attribute in a transaction that represents the number of gas that the user specified, to be sent for this transaction. (It is NOT the gas that the transaction will cost)
-                  </p>
-                  <br>
-                  <p>
-                    <b>"gasUsed":</b> is an attribute in a transaction receipt (mined ts) and represents the needed gas of the executed transaction.
-                  </p>
-
-                <br>
-                <h4 class="blue_btn">Extra Info</h4>
-
-                  <p>
-                    If the <b>"gas"</b> isn't specified from the user it will be set to <b>90.000</b> by default. This may drive to a silent error. If the cost of a transaction to be executed is higher, then the transaction will not be executed (the code) but it will be mined.
-                  </p>
-                  
-                  <br>
-
-                  <p>
-                    The <b>"gasLimit"</b> is changing from the blockchain core. If you set the gasLimit in your genesis a very big number it will decrease gradually.
-                  </p>
-
-                <br>
-                <h4 class="blue_btn">Silent Bug Scenarios</h4>
-
-                  <p>
-                    1) A specific transaction (ts) costs <b>120.000</b> (not known, hypothesis), for example a call to a function of a contract. If the user will not specify the <b>"gas"</b> then the <b>"gas"</b> value will be <b>90.000</b> by default, which is insufficient for the transaction to be executed. The transaction will be mined and the attribute <b>"gasUsed"</b> in the transaction receipt will be <b>90.000</b> but the code will not be executed (the gas will be charged). You can't possibly know how much the transaction will cost. Thus, if you see the default value of <b>"gas"</b> in such a scenario your transaction didn't change the state of the contract (called the function). To avoid such silent errors you must specify a much higher <b>"gas"</b> value when you sent your transaction, but this may occur another silent error (scenario 3)
-                  </p>
-                  <br>
-                  <p>
-                    2) Everything same with the previous scenario except that now the user sents "gas" equivalent to <b>110.000</b>. The same silent error will occur because the computetional cost is <b>120.000</b> which is higher than the specified <b>"gas"</b> tha was sent. The <b>"gasUsed"</b> attribute in the transaction receipt will now be <b>110.000</b>. The solution is the same with scenario (1).
-                  </p>
-                  
-                  <p>
-                    2.1) How to detect quickly scenarios (1,2): Check if the <b>"gasUsed"</b> attribute in the transaction receipt is the same with the <b>"gas"</b> you sent (<b>90.000</b> if you didn't specified it)
-                  </p>
-                  <br>
-                  <p>
-                    3) The solution of the previous scenarios is to always set a high <b>"gas"</b> value, but this may conflict with the <b>"gasLimit"</b>. If the <b>"gas"</b> you specified is higher from the <b>"gasLimit"</b> then your transaction will be aborted. You may think that by setting a really high <b>"gasLimit"</b> the problem will be solved, but as i mentioned earlier the <b>"gasLimit"</b> is changing by the core of blockchain. This silent error is more rare than the previous but it may occur. There is no efficient solution but one is to use the provided chart <b>"Get Gas Spent of Account"</b> to check the values of the <b>"gasLimit"</b>. After running a long enough simulation you can find the minimun value of the <b>"gasLimit"</b> and set the gas you send between the most costly transaction and the minimun <b>"gasLimit"</b>.
-                  </p>
-
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
-              </div>
-
-          </div>
-      </div>
-    </div>
-
-    {{!--  VIEWS
-    ######################################################################################
-    ######################################################################################
-    ######################################################################################
-    ###################################################################################### --}}
-
     <hr>
     <br>
     <br>
@@ -975,6 +812,166 @@
       <div id="gasUsed_chart" class="size_live_chart"></div>
       
     </div>
+
+    <div id="tips_modal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">Tips</h4>
+              </div>
+
+              <div class="modal-body">
+                <h3 class="blue_btn">Gas Limit of Block - Gas (Sent) - Gas Used</h3>
+                  <p>
+                    <b>"gasLimit":</b> set in the genesis file when initializing your private network. This var sets the limit of gas that a block can contain. A block contains a number of transactions that each one costs some gas. The cumulative (subtotal) gas of those transactions must be less than the gasLimit. This limit is a variable that is constantly changing from blockchain itself.
+                  </p>
+                  <br>
+                  <p>
+                    <b>"gas":</b> is an attribute in a transaction that represents the number of gas that the user specified, to be sent for this transaction. (It is NOT the gas that the transaction will cost)
+                  </p>
+                  <br>
+                  <p>
+                    <b>"gasUsed":</b> is an attribute in a transaction receipt (mined ts) and represents the needed gas of the executed transaction.
+                  </p>
+
+                <br>
+                <h4 class="blue_btn">Extra Info</h4>
+
+                  <p>
+                    If the <b>"gas"</b> isn't specified from the user it will be set to <b>90.000</b> by default. This may drive to a silent error. If the cost of a transaction to be executed is higher, then the transaction will not be executed (the code) but it will be mined.
+                  </p>
+                  
+                  <br>
+
+                  <p>
+                    The <b>"gasLimit"</b> is changing from the blockchain core. If you set the gasLimit in your genesis a very big number it will decrease gradually.
+                  </p>
+
+                <br>
+                <h4 class="blue_btn">Silent Bug Scenarios</h4>
+
+                  <p>
+                    1) A specific transaction (ts) costs <b>120.000</b> (not known, hypothesis), for example a call to a function of a contract. If the user will not specify the <b>"gas"</b> then the <b>"gas"</b> value will be <b>90.000</b> by default, which is insufficient for the transaction to be executed. The transaction will be mined and the attribute <b>"gasUsed"</b> in the transaction receipt will be <b>90.000</b> but the code will not be executed (the gas will be charged). You can't possibly know how much the transaction will cost. Thus, if you see the default value of <b>"gas"</b> in such a scenario your transaction didn't change the state of the contract (called the function). To avoid such silent errors you must specify a much higher <b>"gas"</b> value when you sent your transaction, but this may occur another silent error (scenario 3)
+                  </p>
+                  <br>
+                  <p>
+                    2) Everything same with the previous scenario except that now the user sents "gas" equivalent to <b>110.000</b>. The same silent error will occur because the computetional cost is <b>120.000</b> which is higher than the specified <b>"gas"</b> tha was sent. The <b>"gasUsed"</b> attribute in the transaction receipt will now be <b>110.000</b>. The solution is the same with scenario (1).
+                  </p>
+                  
+                  <p>
+                    2.1) How to detect quickly scenarios (1,2): Check if the <b>"gasUsed"</b> attribute in the transaction receipt is the same with the <b>"gas"</b> you sent (<b>90.000</b> if you didn't specified it)
+                  </p>
+                  <br>
+                  <p>
+                    3) The solution of the previous scenarios is to always set a high <b>"gas"</b> value, but this may conflict with the <b>"gasLimit"</b>. If the <b>"gas"</b> you specified is higher from the <b>"gasLimit"</b> then your transaction will be aborted. You may think that by setting a really high <b>"gasLimit"</b> the problem will be solved, but as i mentioned earlier the <b>"gasLimit"</b> is changing by the core of blockchain. This silent error is more rare than the previous but it may occur. There is no efficient solution but one is to use the provided chart <b>"Get Gas Spent of Account"</b> to check the values of the <b>"gasLimit"</b>. After running a long enough simulation you can find the minimun value of the <b>"gasLimit"</b> and set the gas you send between the most costly transaction and the minimun <b>"gasLimit"</b>.
+                  </p>
+
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+              </div>
+
+          </div>
+      </div>
+    </div>
+
+        {{!-- FORMS
+    ######################################################################################
+    ######################################################################################
+    ######################################################################################
+    ###################################################################################### --}}
+    {{!-- UNUSED - UNCOMMENT ROUTER TO USE --}}
+{{!--     <form method="post" action="/get_balance">
+      <div id="get_balance" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Get Balance of Account</h4>
+                  </div>
+
+                  <div class="modal-body">
+                    <div class="form-group">
+                        <label for="pwd">Account in Hex:</label>
+                        <input type="string" class="form-control" id="account" name="account" placeholder="Enter account" value="0XAD56CEDB7D9EE48B3B93F682A9E2D87F80221768">
+                    </div>
+
+                  </div>
+                  <div class="modal-footer">
+                      <input type="submit" value="Get" class="btn btn-default" ></input>
+                  </div>
+
+              </div>
+          </div>
+      </div>
+    </form> --}}
+
+    <form method="post" action="/get_block_info">
+      <div id="get_block_info" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Get Block Info</h4>
+                  </div>
+
+                  <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="pwd">Block:</label>
+                        <input type="number" class="form-control" id="block" name="block" placeholder="Enter number" value="">
+                    </div>
+
+                  </div>
+                  <div class="modal-footer">
+                      <input type="submit" value="Get" class="btn btn-default" ></input>
+                  </div>
+
+              </div>
+          </div>
+      </div>
+    </form>
+
+    <form method="post" action="/get_transaction_info">
+      <div id="get_transaction_info" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Get Transaction Info</h4>
+                  </div>
+
+                  <div class="modal-body">
+                    <div class="form-group">
+                        <label for="pwd">Hash of Transaction:</label>
+                        <input class="form-control" id="hash" name="hash" placeholder="Enter hash" value="">
+                    </div>
+                  </div>
+
+                  <div class="modal-footer">
+                      <input type="submit" value="Get" class="btn btn-default" ></input>
+                  </div>
+
+              </div>
+          </div>
+      </div>
+    </form>
+
+    {{!--  VIEWS
+    ######################################################################################
+    ######################################################################################
+    ######################################################################################
+    ###################################################################################### --}}
+
     {{!-- <div>
       <h2 style="color: red;">
         <b>No transactions from this account at the specified blocks<b/>
