@@ -214,7 +214,9 @@ const getStepsFromNumberOfTs = function(startBlockNumber, endBlockNumber) {
       startN = startN > 0 ? startN : endBlockNumber - 1000 - startN + 1;
     }
 
-    // console.log('STart is: ' + startN);
+    console.log('STart is: ' + startN);
+    console.log('endBlockNumber is: ' + endBlockNumber);
+
     let checkBL = searchFor(endBlockNumber);
     let num_ts = 0;
     let i;
@@ -229,6 +231,7 @@ const getStepsFromNumberOfTs = function(startBlockNumber, endBlockNumber) {
       }
     } else {
       console.log('ERROR, dint found block');
+      i = 100;
     }
     // console.log('STEP is: ' + i);
     return i;
@@ -670,36 +673,43 @@ export const getSpentGasOfAccount = function(
 };
 
 export const blocksInfo = function(startBlockNumber, endBlockNumber) {
-  return new Promise(resolve => {
-    syncStep(startBlockNumber, endBlockNumber, 2).then(() => {
-      startBlockNumber = start;
-      endBlockNumber = end;
+  // return new Promise(resolve => {
+  return syncStep(startBlockNumber, endBlockNumber, 2).then(() => {
+    let startBlockNumber = start;
+    let endBlockNumber = end;
 
-      var startEndGasPerBlock = [startBlockNumber, endBlockNumber];
+    let startEndGasPerBlock = [startBlockNumber, endBlockNumber];
 
-      var check = searchFor(startBlockNumber);
-      if (check !== -1) {
-        for (var j = 0; j <= endBlockNumber - startBlockNumber; j++) {
-          var total_gas_sent = 0;
-          dbBlocks[check + j].transactions.forEach(ts => {
-            total_gas_sent += ts.gas;
-          });
+    let check = searchFor(startBlockNumber);
+    // console.log('Length: ' + dbBlocks.length);
+    // console.log('CHECK: ' + check);
+    if (check !== -1) {
+      for (let j = 0; j <= endBlockNumber - startBlockNumber; j++) {
+        if (dbBlocks[check + j]) {
+          // console.log('i: ' + j);
+          let total_gas_sent = 0;
+          if (dbBlocks[check + j].transactions) {
+            dbBlocks[check + j].transactions.forEach(ts => {
+              total_gas_sent += ts.gas;
+            });
 
-          startEndGasPerBlock.push([
-            dbBlocks[check + j].number,
-            dbBlocks[check + j].gasUsed,
-            dbBlocks[check + j].size,
-            total_gas_sent,
-            dbBlocks[check + j].gasLimit
-          ]);
+            startEndGasPerBlock.push([
+              dbBlocks[check + j].number,
+              dbBlocks[check + j].gasUsed,
+              dbBlocks[check + j].size,
+              total_gas_sent,
+              dbBlocks[check + j].gasLimit
+            ]);
+          }
         }
-      } else {
-        console.log('ERROR - BLOCK DOESNT EXIST');
       }
+    } else {
+      console.log('ERROR - BLOCK DOESNT EXIST');
+    }
 
-      resolve(startEndGasPerBlock);
-    });
+    return startEndGasPerBlock;
   });
+  // });
 };
 
 export const getBalancePerBlockOfAccount = function(
