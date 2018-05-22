@@ -162,7 +162,7 @@ router.post('/get', function(req, res) {
       prvAC = analytics.getPreviousAccounts();
       analytics.getLastBlockLocally().then(block => {
         res.render('home', {
-          title: 'Ethereum Analytics Debugger - Get Contract Details',
+          title: 'Ethereum Analytics Debugger - Get Contracts',
           start: val[0],
           end: val[1],
           contracts: val[2],

@@ -535,183 +535,197 @@ export const getSpentGasOfAccount = function(
   addToHistory(onj);
 
   return new Promise((resolve, reject) => {
-    syncStep(startBlockNumber, endBlockNumber, 1).then(() => {
-      startBlockNumber = start;
-      endBlockNumber = end;
+    syncStep(startBlockNumber, endBlockNumber, 1)
+      .catch(err => {
+        console.log('ERROR syncStep getSpentGasOfAccount: ' + err);
+        throw err;
+      })
+      .then(() => {
+        startBlockNumber = start;
+        endBlockNumber = end;
 
-      transactionsReceiptsPromises.push(getBalance(account));
+        transactionsReceiptsPromises.push(getBalance(account));
 
-      var check = searchFor(startBlockNumber);
-      for (var i = 0; i <= endBlockNumber - startBlockNumber; i++) {
-        // if (check !== -1) { // DOESN'T EXIST
-        if (dbBlocks[check + i]) {
-          if (dbBlocks[check + i].transactions) {
-            dbBlocks[check + i].transactions.forEach(e => {
-              if (e.input !== '0x' && searchTsInfoDB(e) === -1) {
-                console.log('ERROR - DIDINT FOUND TS RECEIPT');
-                // transactionsReceiptsPromises.push(this.getTranscationInfo(e));
-              }
-            });
+        var check = searchFor(startBlockNumber);
+        for (var i = 0; i <= endBlockNumber - startBlockNumber; i++) {
+          // if (check !== -1) { // DOESN'T EXIST
+          if (dbBlocks[check + i]) {
+            if (dbBlocks[check + i].transactions) {
+              dbBlocks[check + i].transactions.forEach(e => {
+                if (e.input !== '0x' && searchTsInfoDB(e) === -1) {
+                  console.log('ERROR - DIDINT FOUND TS RECEIPT');
+                  // transactionsReceiptsPromises.push(this.getTranscationInfo(e));
+                }
+              });
+            }
           }
+
+          // } else {
+          // console.log("ERROR - BLOCK DOESNT EXIST");
+
+          // }
         }
 
-        // } else {
-        // console.log("ERROR - BLOCK DOESNT EXIST");
+        Promise.all(transactionsReceiptsPromises)
+          .then(res => {
+            var startEndBalanceGasSpentReceipts = [start, end];
+            // push Balance of Account
+            startEndBalanceGasSpentReceipts.push(res[0]);
+            // Delete balance from initial array,
+            // Keep only the receipts
+            // res.shift();
 
-        // }
-      }
+            var gasSpentBlock = []; // Block - Gas Spent
+            var totalGasSpent = 0;
+            account = account.toUpperCase();
+            // account1 = account1.toUpperCase();
+            // account2 = account2.toUpperCase();
+            // account3 = account3.toUpperCase();
 
-      Promise.all(transactionsReceiptsPromises)
-        .then(res => {
-          var startEndBalanceGasSpentReceipts = [start, end];
-          // push Balance of Account
-          startEndBalanceGasSpentReceipts.push(res[0]);
-          // Delete balance from initial array,
-          // Keep only the receipts
-          // res.shift();
+            // GET POS of start Block in the saved Blocks
+            check = searchFor(start);
 
-          var gasSpentBlock = []; // Block - Gas Spent
-          var totalGasSpent = 0;
-          account = account.toUpperCase();
-          // account1 = account1.toUpperCase();
-          // account2 = account2.toUpperCase();
-          // account3 = account3.toUpperCase();
+            // checkTsInfoIndexStart = -1;
+            // while (checkTsInfoIndexStart === -1) {
 
-          // GET POS of start Block in the saved Blocks
-          check = searchFor(start);
+            var checkTsInfoIndexStart = dbTransInfo.findIndex(element => {
+              return element.blockNumber >= start;
+            });
 
-          // checkTsInfoIndexStart = -1;
-          // while (checkTsInfoIndexStart === -1) {
+            // }
 
-          var checkTsInfoIndexStart = dbTransInfo.findIndex(element => {
-            return element.blockNumber >= start;
-          });
+            // console.log("START INDEX: " + checkTsInfoIndexStart);
 
-          // }
+            // checkTsInfoIndexEnd = -1;
+            // while (checkTsInfoIndexEnd === -1) {
+            var checkTsInfoIndexEnd = -1;
 
-          // console.log("START INDEX: " + checkTsInfoIndexStart);
-
-          // checkTsInfoIndexEnd = -1;
-          // while (checkTsInfoIndexEnd === -1) {
-          var checkTsInfoIndexEnd = -1;
-
-          for (var k = dbTransInfo.length - 1; k > checkTsInfoIndexStart; k++) {
-            if (dbTransInfo[k].blockNumber <= end) {
-              checkTsInfoIndexEnd = k;
-              break;
-            }
-          }
-
-          // console.log("END INDEX: " + checkTsInfoIndexEnd);
-
-          // if (checkTsInfoIndexEnd === -1) {
-          //   console.log("START === END");
-          //   checkTsInfoIndexEnd = checkTsInfoIndexStart;
-          // }
-
-          var arDbTSInfo;
-          if (checkTsInfoIndexEnd === -1) {
-            arDbTSInfo = dbTransInfo.slice(checkTsInfoIndexStart);
-          } else {
-            arDbTSInfo = dbTransInfo.slice(
-              checkTsInfoIndexStart,
-              checkTsInfoIndexEnd + 1
-            );
-          }
-          // console.log("LENGTH arDbTSInfo AFTER: " + arDbTSInfo.length);
-          var j = 0;
-          var gasUsedInBlockOfAccount = 0;
-          // console.log("A: " +JSON.stringify(dbTransInfo));
-
-          // dbBlocks.forEach((res, index) => {
-          //   console.log(index + " : " + res.number);
-          // });
-          // console.log("CHECK: " + check);
-          // console.log("i: " + (end-start))
-
-          // FOR THE SPECIFIED BLOCKS
-          // FOR EACH BLOCK, CHECK TRANSACTIONS THAT ARE FROM THE SPECIFIED ACCOUNT
-          // SUMUP SPENT GAS OF TRANSACATIONS IN THE SAME BLOCK
-          // PUSH ARRAY [BLOCK NUMBER, GAS SPENT OF ACCOUNT, GAS LIMIT OF BLOCK]
-          for (var i = 0; i <= end - start; i++) {
-            while (
-              j < arDbTSInfo.length &&
-              arDbTSInfo[j].blockNumber <= dbBlocks[check + i].number
+            for (
+              var k = dbTransInfo.length - 1;
+              k > checkTsInfoIndexStart;
+              k++
             ) {
-              if (
-                arDbTSInfo[j].blockNumber === dbBlocks[check + i].number &&
-                account === arDbTSInfo[j].from.toUpperCase()
-              ) {
-                console.log('Account: ' + arDbTSInfo[j].from.toUpperCase());
-
-                gasUsedInBlockOfAccount += arDbTSInfo[j].gasUsed;
+              if (dbTransInfo[k].blockNumber <= end) {
+                checkTsInfoIndexEnd = k;
+                break;
               }
-              j++;
             }
 
-            gasSpentBlock.push([
-              dbBlocks[check + i].number,
-              gasUsedInBlockOfAccount,
-              dbBlocks[check + i].gasLimit
-            ]);
-            totalGasSpent += gasUsedInBlockOfAccount;
-            gasUsedInBlockOfAccount = 0;
-            j = 0;
-          }
+            // console.log("END INDEX: " + checkTsInfoIndexEnd);
 
-          // Push Total Gas Spent
-          startEndBalanceGasSpentReceipts.push(totalGasSpent);
-          // Push [Block - Gas Spent] Array
-          startEndBalanceGasSpentReceipts.push(gasSpentBlock);
+            // if (checkTsInfoIndexEnd === -1) {
+            //   console.log("START === END");
+            //   checkTsInfoIndexEnd = checkTsInfoIndexStart;
+            // }
 
-          console.timeEnd('SpentGasOfAccount');
-          resolve(startEndBalanceGasSpentReceipts);
-        })
-        .catch(err => {
-          console.log('ERROR transactionsReceiptsPromises: ' + err);
-          reject(err);
-        });
-    });
+            var arDbTSInfo;
+            if (checkTsInfoIndexEnd === -1) {
+              arDbTSInfo = dbTransInfo.slice(checkTsInfoIndexStart);
+            } else {
+              arDbTSInfo = dbTransInfo.slice(
+                checkTsInfoIndexStart,
+                checkTsInfoIndexEnd + 1
+              );
+            }
+            // console.log("LENGTH arDbTSInfo AFTER: " + arDbTSInfo.length);
+            var j = 0;
+            var gasUsedInBlockOfAccount = 0;
+            // console.log("A: " +JSON.stringify(dbTransInfo));
+
+            // dbBlocks.forEach((res, index) => {
+            //   console.log(index + " : " + res.number);
+            // });
+            // console.log("CHECK: " + check);
+            // console.log("i: " + (end-start))
+
+            // FOR THE SPECIFIED BLOCKS
+            // FOR EACH BLOCK, CHECK TRANSACTIONS THAT ARE FROM THE SPECIFIED ACCOUNT
+            // SUMUP SPENT GAS OF TRANSACATIONS IN THE SAME BLOCK
+            // PUSH ARRAY [BLOCK NUMBER, GAS SPENT OF ACCOUNT, GAS LIMIT OF BLOCK]
+            for (var i = 0; i <= end - start; i++) {
+              while (
+                j < arDbTSInfo.length &&
+                arDbTSInfo[j].blockNumber <= dbBlocks[check + i].number
+              ) {
+                if (
+                  arDbTSInfo[j].blockNumber === dbBlocks[check + i].number &&
+                  account === arDbTSInfo[j].from.toUpperCase()
+                ) {
+                  console.log('Account: ' + arDbTSInfo[j].from.toUpperCase());
+
+                  gasUsedInBlockOfAccount += arDbTSInfo[j].gasUsed;
+                }
+                j++;
+              }
+
+              gasSpentBlock.push([
+                dbBlocks[check + i].number,
+                gasUsedInBlockOfAccount,
+                dbBlocks[check + i].gasLimit
+              ]);
+              totalGasSpent += gasUsedInBlockOfAccount;
+              gasUsedInBlockOfAccount = 0;
+              j = 0;
+            }
+
+            // Push Total Gas Spent
+            startEndBalanceGasSpentReceipts.push(totalGasSpent);
+            // Push [Block - Gas Spent] Array
+            startEndBalanceGasSpentReceipts.push(gasSpentBlock);
+
+            console.timeEnd('SpentGasOfAccount');
+            resolve(startEndBalanceGasSpentReceipts);
+          })
+          .catch(err => {
+            console.log('ERROR transactionsReceiptsPromises: ' + err);
+            reject(err);
+          });
+      });
   });
 };
 
 export const blocksInfo = function(startBlockNumber, endBlockNumber) {
   // return new Promise(resolve => {
-  return syncStep(startBlockNumber, endBlockNumber, 2).then(() => {
-    let startBlockNumber = start;
-    let endBlockNumber = end;
+  return syncStep(startBlockNumber, endBlockNumber, 2)
+    .catch(err => {
+      console.log('ERROR syncStep blocksInfo: ' + err);
+      throw err;
+    })
+    .then(() => {
+      let startBlockNumber = start;
+      let endBlockNumber = end;
 
-    let startEndGasPerBlock = [startBlockNumber, endBlockNumber];
+      let startEndGasPerBlock = [startBlockNumber, endBlockNumber];
 
-    let check = searchFor(startBlockNumber);
-    // console.log('Length: ' + dbBlocks.length);
-    // console.log('CHECK: ' + check);
-    if (check !== -1) {
-      for (let j = 0; j <= endBlockNumber - startBlockNumber; j++) {
-        if (dbBlocks[check + j]) {
-          // console.log('i: ' + j);
-          let total_gas_sent = 0;
-          if (dbBlocks[check + j].transactions) {
-            dbBlocks[check + j].transactions.forEach(ts => {
-              total_gas_sent += ts.gas;
-            });
+      let check = searchFor(startBlockNumber);
+      // console.log('Length: ' + dbBlocks.length);
+      // console.log('CHECK: ' + check);
+      if (check !== -1) {
+        for (let j = 0; j <= endBlockNumber - startBlockNumber; j++) {
+          if (dbBlocks[check + j]) {
+            // console.log('i: ' + j);
+            let total_gas_sent = 0;
+            if (dbBlocks[check + j].transactions) {
+              dbBlocks[check + j].transactions.forEach(ts => {
+                total_gas_sent += ts.gas;
+              });
 
-            startEndGasPerBlock.push([
-              dbBlocks[check + j].number,
-              dbBlocks[check + j].gasUsed,
-              dbBlocks[check + j].size,
-              total_gas_sent,
-              dbBlocks[check + j].gasLimit
-            ]);
+              startEndGasPerBlock.push([
+                dbBlocks[check + j].number,
+                dbBlocks[check + j].gasUsed,
+                dbBlocks[check + j].size,
+                total_gas_sent,
+                dbBlocks[check + j].gasLimit
+              ]);
+            }
           }
         }
+      } else {
+        console.log('ERROR - BLOCK DOESNT EXIST');
       }
-    } else {
-      console.log('ERROR - BLOCK DOESNT EXIST');
-    }
 
-    return startEndGasPerBlock;
-  });
+      return startEndGasPerBlock;
+    });
   // });
 };
 
@@ -724,33 +738,38 @@ export const getBalancePerBlockOfAccount = function(
   var onj = { hex: account, name: nickname ? nickname : account };
   addToHistory(onj);
   return new Promise((resolve, reject) => {
-    syncStep(startBlockNumber, endBlockNumber, 2).then(() => {
-      let startBlockNumber = start;
-      let endBlockNumber = end;
+    syncStep(startBlockNumber, endBlockNumber, 2)
+      .catch(err => {
+        console.log('ERROR syncStep getBalancePerBlockOfAccount: ' + err);
+        throw err;
+      })
+      .then(() => {
+        let startBlockNumber = start;
+        let endBlockNumber = end;
 
-      let getBlockPromises = [];
+        let getBlockPromises = [];
 
-      for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-        getBlockPromises.push(getBalance(account, i));
-      }
+        for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+          getBlockPromises.push(getBalance(account, i));
+        }
 
-      Promise.all(getBlockPromises)
-        .then(blocks => {
-          // SAVE TO DB
+        Promise.all(getBlockPromises)
+          .then(blocks => {
+            // SAVE TO DB
 
-          // console.log("JSON: " + JSON.stringify(blocks));
+            // console.log("JSON: " + JSON.stringify(blocks));
 
-          let startEndBalancePerBlock = [start, end];
+            let startEndBalancePerBlock = [start, end];
 
-          startEndBalancePerBlock.push(blocks);
+            startEndBalancePerBlock.push(blocks);
 
-          resolve(startEndBalancePerBlock);
-        })
-        .catch(err => {
-          console.log('ERROR getBalancePerBlockOfAccount: ' + err);
-          reject(err);
-        });
-    });
+            resolve(startEndBalancePerBlock);
+          })
+          .catch(err => {
+            console.log('ERROR getBalancePerBlockOfAccount: ' + err);
+            reject(err);
+          });
+      });
   });
 };
 
@@ -823,31 +842,36 @@ export const getTransactionsPerBlock = function(
   startBlockNumber,
   endBlockNumber
 ) {
-  return syncStep(startBlockNumber, endBlockNumber, 2).then(() => {
-    let startBlockNumber = start;
-    let endBlockNumber = end;
+  return syncStep(startBlockNumber, endBlockNumber, 2)
+    .catch(err => {
+      console.log('ERROR syncStep getTransactionsPerBlock: ' + err);
+      throw err;
+    })
+    .then(() => {
+      let startBlockNumber = start;
+      let endBlockNumber = end;
 
-    let transactionsPerBlock = [startBlockNumber, endBlockNumber];
+      let transactionsPerBlock = [startBlockNumber, endBlockNumber];
 
-    let check = searchFor(startBlockNumber);
+      let check = searchFor(startBlockNumber);
 
-    if (check !== -1) {
-      for (let j = 0; j <= endBlockNumber - startBlockNumber; j++) {
-        if (dbBlocks[check + j]) {
-          if (dbBlocks[check + j].transactions) {
-            transactionsPerBlock.push([
-              dbBlocks[check + j].number,
-              dbBlocks[check + j].transactions.length
-            ]);
+      if (check !== -1) {
+        for (let j = 0; j <= endBlockNumber - startBlockNumber; j++) {
+          if (dbBlocks[check + j]) {
+            if (dbBlocks[check + j].transactions) {
+              transactionsPerBlock.push([
+                dbBlocks[check + j].number,
+                dbBlocks[check + j].transactions.length
+              ]);
+            }
           }
         }
+      } else {
+        console.log('ERROR - BLOCK DOESNT EXIST');
       }
-    } else {
-      console.log('ERROR - BLOCK DOESNT EXIST');
-    }
 
-    return transactionsPerBlock;
-  });
+      return transactionsPerBlock;
+    });
 };
 
 export const getTimeToMineBlock = function(startBlockNumber, endBlockNumber) {
@@ -858,7 +882,7 @@ export const getTimeToMineBlock = function(startBlockNumber, endBlockNumber) {
 
   return syncStep(startBlockNumber, endBlockNumber, 2)
     .catch(err => {
-      console.log('ERROR syncStep: ' + err);
+      console.log('ERROR syncStep getTimeToMineBlock: ' + err);
       throw err;
     })
     .then(() => {
@@ -1653,86 +1677,27 @@ const getNumberOfTransactions = function(account) {
 };
 
 export const getContractDetails = function(startBlockNumber, endBlockNumber) {
-  var transactionsReceiptsPromises = [];
+  return syncStep(startBlockNumber, endBlockNumber, 1)
+    .catch(err => {
+      console.log('ERROR syncStep getContractDetails: ' + err);
+      throw err;
+    })
+    .then(() => {
+      let startBlockNumber = start;
+      let endBlockNumber = end;
 
-  return new Promise((resolve, reject) => {
-    var getBlockPromises = [];
-    var blockNumberPromise = web3.eth.getBlockNumber();
+      let endStartContracts = [startBlockNumber, endBlockNumber];
+      let transactionsReceiptsValid = [];
 
-    blockNumberPromise
-      .then(res => {
-        checkStartEndInput(startBlockNumber, endBlockNumber, res);
-        startBlockNumber = start;
-        endBlockNumber = end;
-
-        for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-          var check = searchFor(i);
-
-          if (check === -1) {
-            // DOESN'T EXIST
-            var getBlock = web3.eth.getBlock(i, true);
-            getBlockPromises.push(getBlock);
-          } else {
-            // ALREADY SAVED
-
-            var blockSaved = dbBlocks[check];
-            // console.log("Get from DB. block: " + blockSaved.number);
-            blockSaved.transactions.forEach(e => {
-              if (e.input !== '0x') {
-                transactionsReceiptsPromises.push(getTranscationInfo(e));
-              }
-            });
-          }
+      dbTransInfo.forEach(rs => {
+        if (rs && rs.contractAddress) {
+          transactionsReceiptsValid.push(rs);
         }
-
-        Promise.all(getBlockPromises)
-          .then(blocks => {
-            // SAVE TO DB
-            dbBlocks = dbBlocks.concat(blocks);
-            // console.log("Blocks: " + JSON.stringify(dbBlocks));
-
-            // var receiptsPromises = [];
-            blocks.forEach(block => {
-              // console.log("BLOCK: " + block.number + " Number of transactions: " + block.transactions.length);
-              if (block !== null && block.transactions !== null) {
-                block.transactions.forEach(e => {
-                  if (e.input !== '0x') {
-                    transactionsReceiptsPromises.push(getTranscationInfo(e));
-                  }
-                });
-              }
-            });
-
-            Promise.all(transactionsReceiptsPromises)
-              .then(receipts => {
-                var endStartContracts = [start, end];
-                var transactionsReceiptsValid = [];
-                // console.log("Lenght of receipts: " + receipts.length);
-                receipts.forEach(rs => {
-                  if (rs && rs.contractAddress) {
-                    // console.log("Found contract");
-                    transactionsReceiptsValid.push(rs);
-                  }
-                });
-
-                endStartContracts.push(transactionsReceiptsValid);
-                resolve(endStartContracts);
-              })
-              .catch(err => {
-                console.log('ERROR receiptsPromises: ' + err);
-                reject(err);
-              });
-          })
-          .catch(err => {
-            console.log('ERROR getBlockPromises: ' + err);
-            reject(err);
-          });
-      })
-      .catch(err => {
-        console.log('ERROR getBlockNumber: ' + err);
-        reject(err);
       });
-  });
+
+      endStartContracts.push(transactionsReceiptsValid);
+      return endStartContracts;
+    });
 };
 
 const getBalance = function(account, block) {
