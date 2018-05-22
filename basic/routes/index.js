@@ -186,6 +186,7 @@ router.post('/get', function(req, res) {
       var start = val[0][0];
       var end = val[0][1];
       val.shift();
+      val.shift();
 
       var avgTs = 0;
 
@@ -445,7 +446,7 @@ router.post('/get', function(req, res) {
 
             // Array Block - Gas Spent
             balanceArray = val[2];
-            // console.log(JSON.stringify(balanceArray));
+            // console.log(val[0] + ' - ' + val[1]);
 
             if (balanceArray.length < 1) {
               noData =

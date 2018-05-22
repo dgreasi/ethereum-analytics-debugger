@@ -445,21 +445,21 @@ export const getTransactions = function(
       throw err;
     })
     .then(() => {
-      var receiptsPromises = [];
+      let receiptsPromises = [];
 
       startBlockNumber = start;
       endBlockNumber = end;
 
       sortDB();
 
-      var check = searchFor(startBlockNumber);
+      let check = searchFor(startBlockNumber);
       console.log(
         'FROM - TO BLOCK: ' + startBlockNumber + ' - ' + endBlockNumber
       );
-      var ts = null;
+      let ts = null;
       if (contract_arg) {
         for (var j = 0; j <= endBlockNumber - startBlockNumber; j++) {
-          var bl = dbBlocks[check + j];
+          let bl = dbBlocks[check + j];
           if (bl && bl.transactions) {
             // console.log("Block with transactions");
             var onj = {
@@ -486,8 +486,8 @@ export const getTransactions = function(
           }
         }
       } else {
-        for (var i = 0; i <= endBlockNumber - startBlockNumber; i++) {
-          var bl1 = dbBlocks[check + i];
+        for (let i = 0; i <= endBlockNumber - startBlockNumber; i++) {
+          let bl1 = dbBlocks[check + i];
           if (bl1 && bl1.transactions) {
             bl1.transactions.forEach(e => {
               ts = searchTsInfoDbElement(e);
@@ -508,7 +508,7 @@ export const getTransactions = function(
     })
     .then(res => {
       // SAVE TO DB
-      var endStartAccount = [start, end];
+      let endStartAccount = [start, end];
       endStartAccount.push(res);
 
       // setTimeout
@@ -544,13 +544,16 @@ export const getSpentGasOfAccount = function(
       var check = searchFor(startBlockNumber);
       for (var i = 0; i <= endBlockNumber - startBlockNumber; i++) {
         // if (check !== -1) { // DOESN'T EXIST
-
-        dbBlocks[check + i].transactions.forEach(e => {
-          if (e.input !== '0x' && searchTsInfoDB(e) === -1) {
-            console.log('ERROR - DIDINT FOUND TS RECEIPT');
-            // transactionsReceiptsPromises.push(this.getTranscationInfo(e));
+        if (dbBlocks[check + i]) {
+          if (dbBlocks[check + i].transactions) {
+            dbBlocks[check + i].transactions.forEach(e => {
+              if (e.input !== '0x' && searchTsInfoDB(e) === -1) {
+                console.log('ERROR - DIDINT FOUND TS RECEIPT');
+                // transactionsReceiptsPromises.push(this.getTranscationInfo(e));
+              }
+            });
           }
-        });
+        }
 
         // } else {
         // console.log("ERROR - BLOCK DOESNT EXIST");
@@ -718,47 +721,36 @@ export const getBalancePerBlockOfAccount = function(
   account,
   nickname
 ) {
+  var onj = { hex: account, name: nickname ? nickname : account };
+  addToHistory(onj);
   return new Promise((resolve, reject) => {
-    var onj = { hex: account, name: nickname ? nickname : account };
-    addToHistory(onj);
-    var getBlockPromises = [];
-    // var receiptsPromises = [];
-    var blockNumberPromise = web3.eth.getBlockNumber();
+    syncStep(startBlockNumber, endBlockNumber, 2).then(() => {
+      let startBlockNumber = start;
+      let endBlockNumber = end;
 
-    blockNumberPromise
-      .then(res => {
-        checkStartEndInput(startBlockNumber, endBlockNumber, res);
-        startBlockNumber = start;
-        endBlockNumber = end;
+      let getBlockPromises = [];
 
-        // console.log("Using startBlockNumber: " + startBlockNumber);
-        // console.log("Using endBlockNumber: " + endBlockNumber);
+      for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+        getBlockPromises.push(getBalance(account, i));
+      }
 
-        for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-          getBlockPromises.push(getBalance(account, i));
-        }
+      Promise.all(getBlockPromises)
+        .then(blocks => {
+          // SAVE TO DB
 
-        Promise.all(getBlockPromises)
-          .then(blocks => {
-            // SAVE TO DB
+          // console.log("JSON: " + JSON.stringify(blocks));
 
-            // console.log("JSON: " + JSON.stringify(blocks));
+          let startEndBalancePerBlock = [start, end];
 
-            var startEndBalancePerBlock = [start, end];
+          startEndBalancePerBlock.push(blocks);
 
-            startEndBalancePerBlock.push(blocks);
-
-            resolve(startEndBalancePerBlock);
-          })
-          .catch(err => {
-            console.log('ERROR getBlockPromises: ' + err);
-            reject(err);
-          });
-      })
-      .catch(err => {
-        console.log('ERROR getBlockNumber: ' + err);
-        reject(err);
-      });
+          resolve(startEndBalancePerBlock);
+        })
+        .catch(err => {
+          console.log('ERROR getBalancePerBlockOfAccount: ' + err);
+          reject(err);
+        });
+    });
   });
 };
 
@@ -831,67 +823,30 @@ export const getTransactionsPerBlock = function(
   startBlockNumber,
   endBlockNumber
 ) {
-  return new Promise((resolve, reject) => {
-    var getBlockPromises = [];
-    var blockNumberPromise = web3.eth.getBlockNumber();
+  return syncStep(startBlockNumber, endBlockNumber, 2).then(() => {
+    let startBlockNumber = start;
+    let endBlockNumber = end;
 
-    blockNumberPromise
-      .then(res => {
-        checkStartEndInput(startBlockNumber, endBlockNumber, res);
-        startBlockNumber = start;
-        endBlockNumber = end;
+    let transactionsPerBlock = [startBlockNumber, endBlockNumber];
 
-        // console.log("Using startBlockNumber: " + startBlockNumber);
-        // console.log("Using endBlockNumber: " + endBlockNumber);
+    let check = searchFor(startBlockNumber);
 
-        for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-          var check = searchFor(i);
-          // console.log("CHECK: " + check);
-
-          if (check === -1) {
-            // DOESN'T EXIST
-            var getBlock = web3.eth.getBlock(i, true);
-            getBlockPromises.push(getBlock);
+    if (check !== -1) {
+      for (let j = 0; j <= endBlockNumber - startBlockNumber; j++) {
+        if (dbBlocks[check + j]) {
+          if (dbBlocks[check + j].transactions) {
+            transactionsPerBlock.push([
+              dbBlocks[check + j].number,
+              dbBlocks[check + j].transactions.length
+            ]);
           }
         }
+      }
+    } else {
+      console.log('ERROR - BLOCK DOESNT EXIST');
+    }
 
-        Promise.all(getBlockPromises)
-          .then(blocks => {
-            // SAVE TO DB
-            dbBlocks = dbBlocks.concat(blocks);
-
-            dbBlocks.sort(function(a, b) {
-              return a.number - b.number;
-            });
-            // console.log("Blocks: " + JSON.stringify(dbBlocks));
-
-            var transactionsPerBlock = [];
-            transactionsPerBlock.push([startBlockNumber, endBlockNumber]);
-
-            for (var j = startBlockNumber; j <= endBlockNumber; j++) {
-              var rCheck = searchFor(j);
-              if (rCheck !== -1) {
-                transactionsPerBlock.push([
-                  j,
-                  dbBlocks[rCheck].transactions.length
-                ]);
-                // console.log("BLOCK NUMBER: " + dbBlocks[rCheck].number + " =?= " + j);
-              } else {
-                console.log('BLOCK: ' + j + " , doesn't exist!");
-              }
-            }
-
-            resolve(transactionsPerBlock);
-          })
-          .catch(err => {
-            console.log('ERROR getBlockPromises: ' + err);
-            reject(err);
-          });
-      })
-      .catch(err => {
-        console.log('ERROR getBlockNumber: ' + err);
-        reject(err);
-      });
+    return transactionsPerBlock;
   });
 };
 
@@ -1781,35 +1736,33 @@ export const getContractDetails = function(startBlockNumber, endBlockNumber) {
 };
 
 const getBalance = function(account, block) {
-  return new Promise((resolve, reject) => {
-    if (block) {
-      web3.eth
-        .getBalance(account, block)
-        .then(res => {
-          if (res !== null) {
-            // console.log("PAOK");
-            resolve([block, res]);
-          }
-        })
-        .catch(err => {
-          console.log('ERROR getBalance: ' + err);
-          reject(err);
-        });
-    } else {
-      web3.eth
-        .getBalance(account)
-        .then(res => {
-          if (res !== null) {
-            // console.log("PAOK");
-            resolve(res);
-          }
-        })
-        .catch(err => {
-          console.log('ERROR getBalance: ' + err);
-          reject(err);
-        });
-    }
-  });
+  if (block) {
+    return web3.eth
+      .getBalance(account, block)
+      .then(res => {
+        if (res !== null) {
+          // console.log("PAOK: " + res);
+          return [block, res];
+        }
+      })
+      .catch(err => {
+        console.log('ERROR getBalance: ' + err);
+        return [];
+      });
+  } else {
+    return web3.eth
+      .getBalance(account)
+      .then(res => {
+        if (res !== null) {
+          console.log('No block specified for balance of account');
+          return [99999, res];
+        }
+      })
+      .catch(err => {
+        console.log('ERROR getBalance: ' + err);
+        return [];
+      });
+  }
 };
 
 export const getLastBlockLocally = function() {

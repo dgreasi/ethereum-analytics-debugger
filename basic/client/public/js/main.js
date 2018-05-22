@@ -524,6 +524,7 @@ $(document).on('ready', function() {
 			'data-for'
 		);
 		let dataToArray1_chart = data1_chart.split(',');
+		// console.log(JSON.stringify(dataToArray1_chart));
 
 		let blocks3 = [];
 		let balance = [];
