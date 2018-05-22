@@ -714,6 +714,50 @@ router.post('/get', function(req, res) {
   }
 });
 
+router.post('/get_contract_abi', function(req, res, next) {
+  let sol_code = req.body.sol_code;
+  // console.log(JSON.stringify(sol_code));
+  if (sol_code) {
+    analytics.getABI(sol_code).then(val => {
+      if (val.length > 1) {
+        let prvAC = analytics.getPreviousAccounts();
+        analytics.getLastBlockLocally().then(block => {
+          res.render('home', {
+            title: 'Ethereum Analytics Debugger - Compiled Contracts',
+            lastBlock: block,
+            previous_contracts_accounts: prvAC,
+            warnings: val[1],
+            contracts_compiled: val[2]
+          });
+        });
+      } else {
+        let prvAC = analytics.getPreviousAccounts();
+        analytics.getLastBlockLocally().then(block => {
+          res.render('home', {
+            title: 'Ethereum Analytics Debugger - Error at Contract',
+            lastBlock: block,
+            previous_contracts_accounts: prvAC,
+            error_contract: val[0]
+          });
+        });
+      }
+    });
+  } else {
+    let noData = 'No solidity code submitted.';
+    let prvAC = analytics.getPreviousAccounts();
+    let contractsC = analytics.getCompiledContracts();
+    analytics.getLastBlockLocally().then(block => {
+      res.render('home', {
+        title: 'Ethereum Analytics Debugger - Compiled Contracts',
+        noData: noData,
+        lastBlock: block,
+        contracts_compiled: contractsC,
+        previous_contracts_accounts: prvAC
+      });
+    });
+  }
+});
+
 function checkReturnHex(arg) {
   var prvAC = analytics.getPreviousAccounts();
   if (isHex(arg)) {

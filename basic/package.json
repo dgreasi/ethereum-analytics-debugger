@@ -21,6 +21,7 @@
     "express-handlebars": "^3.0.0",
     "path": "^0.12.7",
     "plotly.js": "^1.33.1",
+    "solc": "^0.4.24",
     "web3": "^1.0.0-beta.34"
   },
   "devDependencies": {

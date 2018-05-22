@@ -1,4 +1,5 @@
 var Web3 = require('web3');
+var solc = require('solc');
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////// GLOBAL VARIABLES ////////////////////////////////
@@ -14,8 +15,8 @@ var dbTransInfo = []; // ARRAY OF TRANSACTION RECEIPTS
 var dbClearings = []; // BLOCK - PRICE - QUANTITY - TYPE
 var silentBugs = []; // TRANSACTION - GAS SENT - GAS SPENT
 var accounts = []; // Account hash - Gas sent - # Transactions
-
 var previous_contracts_accounts = []; //history of contracts-accounts searched
+var contracts_submitted = [];
 
 var start = 1;
 var end = 1000;
@@ -1360,6 +1361,49 @@ const getclearingType = function(contract_arg) {
   return web3.eth.call({ to: contract_arg, data: '0xbc3d513f' });
 };
 
+export const getABI = function(contract_code) {
+  return new Promise((resolve, reject) => {
+    let ret_arr = [];
+    // COMPILE SOLIDITY CODE
+    let input = contract_code;
+    let output = solc.compile(input, 1);
+
+    if (output.errors.toString().includes('Error')) {
+      console.log('ERROR WHILE COMPILING');
+      console.log(JSON.stringify(output.errors));
+      ret_arr.push(output.errors);
+      resolve(ret_arr);
+    } else {
+      let contracts_arr = output.contracts;
+      let contract_names = [];
+
+      // GET NAMES OF SMART CONTRACTS
+      for (let key in contracts_arr) {
+        console.log('Found Contract with name: ' + key);
+        contract_names.push(key);
+      }
+
+      // GET ABI OF FIRST SMART CONTRACT
+      let abi = JSON.parse(contracts_arr[contract_names[0]].interface);
+      // const bytecode = output.contracts[':DoubleAuction'].bytecode;
+      // const abi = JSON.parse(output.contracts['DoubleAuction'].interface);
+
+      // CREATE CONTRACT OBJECT
+      let contract = new web3.eth.Contract(abi);
+
+      // SAVE CONTRACT OBJECT TO GLOBAL VAR OF CONTRACTS
+      contracts_submitted.push({
+        contract_name: contract_names[0],
+        object: contract
+      });
+      ret_arr.push('true');
+      ret_arr.push(output.errors);
+      ret_arr.push(contracts_submitted);
+      resolve(ret_arr);
+    }
+  });
+};
+
 ///////////////////////////////////// MARKET CHART ///////////////////////////////////////////
 
 export const marketChart = function(startBlockNumber, endBlockNumber) {
@@ -1745,6 +1789,11 @@ export const getLastBlockLocally = function() {
 export const getPreviousAccounts = function() {
   // console.log("ACCOUNTS: " + JSON.stringify(previous_contracts_accounts));
   return previous_contracts_accounts;
+};
+
+export const getCompiledContracts = function() {
+  // console.log("ACCOUNTS: " + JSON.stringify(previous_contracts_accounts));
+  return contracts_submitted;
 };
 
 const addToHistory = function(arg) {

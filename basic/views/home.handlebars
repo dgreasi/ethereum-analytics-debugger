@@ -201,6 +201,13 @@
       </form>
     </div>
 
+    <form method="post" action="/get_contract_abi">
+      <div>
+        <input type="string" placeholder="Solidity Code" id="sol_code" name="sol_code">
+        <input type="submit" value="Get ABI" id="submit_contract" class="btn btn-default" ></input>
+      </div>
+    </form>
+
     <hr>
     <br>
     <br>
@@ -427,6 +434,54 @@
     {{#if totalTrans}}
       <div>
         Total # of Transactions: <b>{{ totalTrans }}</b>
+      </div>
+    {{/if}}
+
+    {{!-- CONTRACTS COMPILED --}}
+    {{#if contracts_compiled}}
+      {{#each contracts_compiled}}
+        <div>
+          Contract: <b>{{this.contract_name}}</b>
+          <table>
+            <thead>
+                <th>#</th>
+                <th>name</th>
+                <th>signature</th>
+                <th>type</th>
+            </thead> 
+            <tbody> 
+              {{#each this.object.options.jsonInterface}} 
+                <tr>
+                  <td>{{ @index }}</td>
+                  <td>{{ this.name }}</td>
+                  <td>{{ this.signature }}</td>
+                  <td>{{ this.type }}</td>
+                </tr>
+              {{/each}}
+            </tbody> 
+          </table>
+        </div>
+        <br>
+      {{/each}}
+    {{/if}}
+
+    {{#if warnings}}
+      <h2 class="red_btn">
+        Warnings while compiling:
+      </h2>
+      <div>
+        {{warnings}}
+      </div>
+    {{/if}}
+    
+
+    {{!-- ERROR WHILE COMPILING CONTRACT --}}
+    {{#if error_contract}}
+      <h2 class="red_btn">
+        Errors while compiling:
+      </h2>
+      <div>
+        {{error_contract}}
       </div>
     {{/if}}
 
