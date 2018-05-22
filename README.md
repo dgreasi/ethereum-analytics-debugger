@@ -100,12 +100,12 @@ Each line contains:
 ## Get Started
 ### For Node version < 6 use release [1](https://github.com/Temeteron/Ethereum_analytics_debugger/releases/tag/1.0.0)
 
-1) Clone:
+1) Download release at [releases](https://github.com/Temeteron/Ethereum_analytics_debugger/releases) or clone the latest:
 ```
 $ git clone https://github.com/Temeteron/Ethereum_analytics_debugger.git
 ```
 
-2) Cd to directory and install packages:
+2) Cd to directory and install packages (if you downloaded a release you must unzip the file):
 ```
 $ cd Ethereum_analytics_debugger/basic
 $ npm install
