@@ -30,6 +30,7 @@ router.post('/get', function(req, res) {
   var contract = req.body.contract;
   var nickname = req.body.nickname;
   var id_function = req.body.id_function;
+  var hash_function = req.body.hash_function;
   var noData, prvAC, ret, transactionsT, balanceArray;
   // console.log('Function: ' + id_function + ' , start + end: ' + start_block + ' - ' + end_block);
 
@@ -655,6 +656,41 @@ router.post('/get', function(req, res) {
         });
       });
     });
+  } else if (id_function === '14') {
+    if (contract) {
+      console.log(contract);
+      console.log(hash_function);
+      analytics.getReturnValueOfFunction(contract, hash_function).then(val => {
+        let prvAC = analytics.getPreviousAccounts();
+        let contractsC = analytics.getCompiledContracts();
+        analytics.getLastBlockLocally().then(block => {
+          res.render('home', {
+            title:
+              'Ethereum Analytics Debugger - Get Value of function: ' +
+              hash_function,
+            lastBlock: block,
+            contracts_compiled: contractsC,
+            previous_contracts_accounts: prvAC,
+            val_function_hash: val
+          });
+        });
+      });
+    } else {
+      let noData = 'No contract Specified.';
+      let prvAC = analytics.getPreviousAccounts();
+      let contractsC = analytics.getCompiledContracts();
+      analytics.getLastBlockLocally().then(block => {
+        res.render('home', {
+          title:
+            'Ethereum Analytics Debugger - Error at get Value of function: ' +
+            hash_function,
+          noData: noData,
+          lastBlock: block,
+          contracts_compiled: contractsC,
+          previous_contracts_accounts: prvAC
+        });
+      });
+    }
   } else {
     ret = checkReturnHex(contract);
 
@@ -720,6 +756,7 @@ router.post('/get_contract_abi', function(req, res, next) {
   if (sol_code) {
     analytics.getABI(sol_code).then(val => {
       if (val.length > 1) {
+        // console.log(JSON.stringify(val[2]));
         let prvAC = analytics.getPreviousAccounts();
         analytics.getLastBlockLocally().then(block => {
           res.render('home', {
@@ -757,6 +794,49 @@ router.post('/get_contract_abi', function(req, res, next) {
     });
   }
 });
+
+// router.get('/call_function_of_contract/:hash', function(req, res) {
+//   let function_addr = req.params.hash;
+//   // console.log(JSON.stringify(sol_code));
+//   if (sol_code) {
+//     analytics.getABI(sol_code).then(val => {
+//       if (val.length > 1) {
+//         // console.log(JSON.stringify(val[2]));
+//         let prvAC = analytics.getPreviousAccounts();
+//         analytics.getLastBlockLocally().then(block => {
+//           res.render('home', {
+//             title: 'Ethereum Analytics Debugger - Value of function_addr',
+//             lastBlock: block,
+//             previous_contracts_accounts: prvAC,
+
+//           });
+//         });
+//       } else {
+//         let prvAC = analytics.getPreviousAccounts();
+//         analytics.getLastBlockLocally().then(block => {
+//           res.render('home', {
+//             title: 'Ethereum Analytics Debugger - Error at Contract',
+//             lastBlock: block,
+//             previous_contracts_accounts: prvAC,
+//           });
+//         });
+//       }
+//     });
+//   } else {
+//     let noData = 'No Smart Contract specified.';
+//     let prvAC = analytics.getPreviousAccounts();
+//     let contractsC = analytics.getCompiledContracts();
+//     analytics.getLastBlockLocally().then(block => {
+//       res.render('home', {
+//         title: 'Ethereum Analytics Debugger - Compiled Contracts',
+//         noData: noData,
+//         lastBlock: block,
+//         contracts_compiled: contractsC,
+//         previous_contracts_accounts: prvAC
+//       });
+//     });
+//   }
+// });
 
 function checkReturnHex(arg) {
   var prvAC = analytics.getPreviousAccounts();

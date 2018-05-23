@@ -735,3 +735,11 @@ $('#get_time_to_mine_block').click(function() {
 	$('#id_function').val('13');
 	$('#submit_global').click();
 });
+
+$('#call_function_contract').click(function() {
+	let hash = $(this).text();
+	// alert($(this).text());
+	$('#id_function').val('14');
+	$('#hash_function').val(hash);
+	$('#submit_global').click();
+});

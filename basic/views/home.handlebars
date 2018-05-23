@@ -45,6 +45,8 @@
         <input type="string" class="form-control" id="nickname" name="nickname" placeholder="Nickname of hex(optional)" value="">
 
         <input type="string" class="hide" id="id_function" name="id_function">
+        
+        <input type="string" class="hide" id="hash_function" name="hash_function">
 
         <input type="submit" value="Get" id="submit_global" class="btn btn-default hide" ></input>
       </div>
@@ -414,7 +416,7 @@
         </thead> 
         <tbody> 
             {{#each silentBugs}} 
-            <tr>
+            <tr class="red_btn">
               <td>{{ @index }}</td>
               {{#each this}}
                 {{#if @index}}
@@ -437,6 +439,12 @@
       </div>
     {{/if}}
 
+    {{#if val_function_hash}}
+      <div>
+        Value: <b>{{ val_function_hash }}</b>
+      </div>
+    {{/if}}
+
     {{!-- CONTRACTS COMPILED --}}
     {{#if contracts_compiled}}
       {{#each contracts_compiled}}
@@ -454,7 +462,7 @@
                 <tr>
                   <td>{{ @index }}</td>
                   <td>{{ this.name }}</td>
-                  <td>{{ this.signature }}</td>
+                  <td><a href="#" id="call_function_contract">{{ this.signature }}</a></td>
                   <td>{{ this.type }}</td>
                 </tr>
               {{/each}}

@@ -977,6 +977,7 @@ const getTranscationInfo = function(e) {
         // console.log("Input: " + rs.input);
         res.input = e.input;
         res.gasPrice = e.gasPrice;
+        res.gas = e.gas;
         // res.gas = e.gas;
         // console.log("SAVE ON arDbTSInfo getTranscationInfo");
         // dbTransInfo.push(res);
@@ -1031,10 +1032,9 @@ export const getTranscationInfoHash = function(hash) {
 };
 
 const createTableFromTxReceipt = function(txRec) {
-  var check = searchForSilentBugs(txRec.transactionHash);
+  let check = searchForSilentBugs(txRec.transactionHash);
   if (check === -1) {
     if (txRec.gas === txRec.gasUsed) {
-      // console.log("FOUND NEW SILENT BUG");
       silentBugs.push([txRec.transactionHash, txRec.gas, txRec.gasUsed]);
     }
   }
@@ -1396,12 +1396,22 @@ export const getABI = function(contract_code) {
         contract_name: contract_names[0],
         object: contract
       });
+      console.log(JSON.stringify(contracts_submitted));
       ret_arr.push('true');
       ret_arr.push(output.errors);
       ret_arr.push(contracts_submitted);
       resolve(ret_arr);
     }
   });
+};
+
+export const getReturnValueOfFunction = function(
+  contract_address,
+  function_address
+) {
+  return web3.eth
+    .call({ to: contract_address, data: function_address })
+    .then(val => {});
 };
 
 ///////////////////////////////////// MARKET CHART ///////////////////////////////////////////
