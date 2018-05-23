@@ -1130,6 +1130,9 @@ const checkStartEndInput = function(
         // console.log("CHANGES");
         startBlockNumber = 1;
       }
+      if (endBlockNumber - startBlockNumber > 1000) {
+        end = startBlockNumber + 1000;
+      }
       start = startBlockNumber;
     } else {
       // console.log("CHANGES 1");
@@ -1396,7 +1399,7 @@ export const getABI = function(contract_code) {
         contract_name: contract_names[0],
         object: contract
       });
-      console.log(JSON.stringify(contracts_submitted));
+      // console.log(JSON.stringify(contracts_submitted));
       ret_arr.push('true');
       ret_arr.push(output.errors);
       ret_arr.push(contracts_submitted);
@@ -1407,11 +1410,64 @@ export const getABI = function(contract_code) {
 
 export const getReturnValueOfFunction = function(
   contract_address,
-  function_address
+  function_address,
+  nickname
 ) {
+  var onj = {
+    hex: contract_address,
+    name: nickname ? nickname : contract_address
+  };
+  addToHistory(onj);
   return web3.eth
     .call({ to: contract_address, data: function_address })
-    .then(val => {});
+    .catch(err => {
+      console.log('Catch ERROR: ' + JSON.stringify(err));
+      return false;
+    })
+    .then(val => {
+      console.log('VALUE: ' + JSON.stringify(val));
+      if (val !== '0x') {
+        let i, function_details;
+        for (i = 0; i < contracts_submitted.length; i++) {
+          let contr = contracts_submitted[i].object.options.jsonInterface;
+
+          let rt = contr.find(element => {
+            return element.signature === function_address;
+          });
+
+          if (rt) {
+            function_details = rt;
+            break;
+          }
+        }
+
+        // console.log("FOUND Cont: " + contracts_submitted[i].contract_name);
+        // console.log("FOUND Func: " + function_details.name);
+
+        let table_of_output = [];
+
+        function_details.outputs.forEach(outFn => {
+          table_of_output.push(outFn.type);
+        });
+
+        if (table_of_output.length > 0) {
+          let decoded_val = web3.eth.abi.decodeParameters(table_of_output, val);
+          // console.log(JSON.stringify(decoded_val));
+
+          let ret_obj = [
+            contracts_submitted[i].contract_name.substr(1),
+            function_details.name,
+            function_address,
+            decoded_val[0]
+          ];
+          return ret_obj;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    });
 };
 
 ///////////////////////////////////// MARKET CHART ///////////////////////////////////////////

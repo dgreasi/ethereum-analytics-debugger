@@ -657,33 +657,50 @@ router.post('/get', function(req, res) {
       });
     });
   } else if (id_function === '14') {
-    if (contract) {
-      console.log(contract);
-      console.log(hash_function);
-      analytics.getReturnValueOfFunction(contract, hash_function).then(val => {
-        let prvAC = analytics.getPreviousAccounts();
-        let contractsC = analytics.getCompiledContracts();
-        analytics.getLastBlockLocally().then(block => {
-          res.render('home', {
-            title:
-              'Ethereum Analytics Debugger - Get Value of function: ' +
-              hash_function,
-            lastBlock: block,
-            contracts_compiled: contractsC,
-            previous_contracts_accounts: prvAC,
-            val_function_hash: val
+    ret = checkReturnHex(contract);
+
+    if (ret) {
+      // console.log('Contract: ' + contract);
+      // console.log('Hash of function: ' + hash_function);
+
+      analytics
+        .getReturnValueOfFunction(contract, hash_function, nickname)
+        .then(val => {
+          let prvAC = analytics.getPreviousAccounts();
+          let contractsC = analytics.getCompiledContracts();
+          analytics.getLastBlockLocally().then(block => {
+            if (val) {
+              res.render('home', {
+                title:
+                  'Ethereum Analytics Debugger - Get Value of function: ' +
+                  hash_function,
+                lastBlock: block,
+                contracts_compiled: contractsC,
+                previous_contracts_accounts: prvAC,
+                call_general_fun: val
+              });
+            } else {
+              res.render('home', {
+                title:
+                  'Ethereum Analytics Debugger - Error getting return value',
+                lastBlock: block,
+                contracts_compiled: contractsC,
+                previous_contracts_accounts: prvAC,
+                noData:
+                  "The specified address of contract doesn't contain a function with hash: " +
+                  hash_function +
+                  ", or the function doesn't return a value"
+              });
+            }
           });
         });
-      });
     } else {
-      let noData = 'No contract Specified.';
+      let noData = 'No contract address Specified.';
       let prvAC = analytics.getPreviousAccounts();
       let contractsC = analytics.getCompiledContracts();
       analytics.getLastBlockLocally().then(block => {
         res.render('home', {
-          title:
-            'Ethereum Analytics Debugger - Error at get Value of function: ' +
-            hash_function,
+          title: 'Ethereum Analytics Debugger - Error at get Value of function',
           noData: noData,
           lastBlock: block,
           contracts_compiled: contractsC,
