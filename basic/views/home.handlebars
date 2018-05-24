@@ -156,11 +156,15 @@
               Get Account Info
               <span class="glyphicon glyphicon-exclamation-sign"></span>
             </a></li>
+            <li id="number_of_peers"><a href="#">
+              Get # Peers
+              <span class="glyphicon glyphicon-exclamation-sign"></span>
+            </a></li>
           </ul>
         </div>
 
         <div class="dropdown inline" title="Custom functions for specific contract">
-          <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Contracts
+          <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Custom Contracts
           <span class="caret"></span></button>
           <ul class="dropdown-menu">
             <li id="get_clr" title="Address + Blocks => Chart"><a href="#">
@@ -195,20 +199,16 @@
 
     </div>
 
- 
     <div>
       <br>
-      <form method="post" action="/get_peers">
-        <button class="btn btn-default green_btn">Get # Peers</button>
+      <form method="post" action="/get_contract_abi">
+        <div>
+          <input type="submit" value="Get ABI" id="submit_contract" class="btn btn-default" ></input>
+          <textarea placeholder="Solidity Code" class="form-control" rows="2" id="sol_code" name="sol_code"></textarea>
+        </div>
       </form>
     </div>
 
-    <form method="post" action="/get_contract_abi">
-      <div>
-        <input type="string" placeholder="Solidity Code" id="sol_code" name="sol_code">
-        <input type="submit" value="Get ABI" id="submit_contract" class="btn btn-default" ></input>
-      </div>
-    </form>
 
     <hr>
 {{!--     <br>
@@ -456,6 +456,15 @@
           </tbody> 
         </table>
       </div>
+      
+    {{/if}}
+
+    {{#if function_live_value}}
+      <div>
+        <br>
+        <div id="live_fn_chart">Live Chart</div>
+      </div>
+      <div id="function_live_value_chart" class="center"></div>
       <hr>
     {{/if}}
 
@@ -480,7 +489,12 @@
                 <tr>
                   <td>{{ @index }}</td>
                   <td>{{ this.name }}</td>
-                  <td><a href="#" class="call_function_contract" id="call_function_contract">{{ this.signature }}</a></td>
+                  {{#if this.outputs.length}}
+                    <td><a href="#" class="call_function_contract" id="call_function_contract">{{ this.signature }}</a></td>
+                  {{else}}
+                    <td>{{ this.signature }}</td>
+                  {{/if}}
+                  
                   <td>{{ this.type }}</td>
                 </tr>
               {{/each}}
@@ -1001,7 +1015,7 @@
 
                     <div class="form-group">
                         <label for="pwd">Block:</label>
-                        <input type="number" class="form-control" id="block" name="block" placeholder="Enter number" value="">
+                        <input type="number" class="form-control" id="blockinf" name="block" placeholder="Enter number" value="">
                     </div>
 
                   </div>

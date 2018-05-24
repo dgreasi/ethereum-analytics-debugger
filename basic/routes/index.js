@@ -677,7 +677,8 @@ router.post('/get', function(req, res) {
                 lastBlock: block,
                 contracts_compiled: contractsC,
                 previous_contracts_accounts: prvAC,
-                call_general_fun: val
+                call_general_fun: val,
+                function_live_value: true
               });
             } else {
               res.render('home', {
@@ -708,6 +709,20 @@ router.post('/get', function(req, res) {
         });
       });
     }
+  } else if (id_function === '15') {
+    analytics.getPeersNumber().then(peers => {
+      // console.log('PEERS: ' + peers);
+      var prvAC = analytics.getPreviousAccounts();
+      analytics.getLastBlockLocally().then(block => {
+        res.render('home', {
+          title: 'Ethereum Analytics Debugger - Get Peers',
+          infoP: '1',
+          peers: peers,
+          lastBlock: block,
+          previous_contracts_accounts: prvAC
+        });
+      });
+    });
   } else {
     ret = checkReturnHex(contract);
 
@@ -812,49 +827,6 @@ router.post('/get_contract_abi', function(req, res, next) {
   }
 });
 
-// router.get('/call_function_of_contract/:hash', function(req, res) {
-//   let function_addr = req.params.hash;
-//   // console.log(JSON.stringify(sol_code));
-//   if (sol_code) {
-//     analytics.getABI(sol_code).then(val => {
-//       if (val.length > 1) {
-//         // console.log(JSON.stringify(val[2]));
-//         let prvAC = analytics.getPreviousAccounts();
-//         analytics.getLastBlockLocally().then(block => {
-//           res.render('home', {
-//             title: 'Ethereum Analytics Debugger - Value of function_addr',
-//             lastBlock: block,
-//             previous_contracts_accounts: prvAC,
-
-//           });
-//         });
-//       } else {
-//         let prvAC = analytics.getPreviousAccounts();
-//         analytics.getLastBlockLocally().then(block => {
-//           res.render('home', {
-//             title: 'Ethereum Analytics Debugger - Error at Contract',
-//             lastBlock: block,
-//             previous_contracts_accounts: prvAC,
-//           });
-//         });
-//       }
-//     });
-//   } else {
-//     let noData = 'No Smart Contract specified.';
-//     let prvAC = analytics.getPreviousAccounts();
-//     let contractsC = analytics.getCompiledContracts();
-//     analytics.getLastBlockLocally().then(block => {
-//       res.render('home', {
-//         title: 'Ethereum Analytics Debugger - Compiled Contracts',
-//         noData: noData,
-//         lastBlock: block,
-//         contracts_compiled: contractsC,
-//         previous_contracts_accounts: prvAC
-//       });
-//     });
-//   }
-// });
-
 function checkReturnHex(arg) {
   var prvAC = analytics.getPreviousAccounts();
   if (isHex(arg)) {
@@ -888,22 +860,6 @@ function searchPrevAcc(prvAC, arg) {
 
   return found;
 }
-
-router.post('/get_peers', function(req, res) {
-  analytics.getPeersNumber().then(peers => {
-    // console.log('PEERS: ' + peers);
-    var prvAC = analytics.getPreviousAccounts();
-    analytics.getLastBlockLocally().then(block => {
-      res.render('home', {
-        title: 'Ethereum Analytics Debugger - Get Peers',
-        infoP: '1',
-        peers: peers,
-        lastBlock: block,
-        previous_contracts_accounts: prvAC
-      });
-    });
-  });
-});
 
 router.post('/get_block_info', function(req, res) {
   var block = req.body.block;
@@ -1023,14 +979,30 @@ router.get('/get_transaction/:hash', function(req, res) {
 
 router.get('/get_live', function(req, res) {
   // console.log('CALLED');
-  var promT = [];
+  let promT = [];
 
   promT.push(analytics.getLastBlock());
   promT.push(analytics.getGasPrice());
 
   Promise.all(promT).then(r => {
-    var dat = new Date();
+    let dat = new Date();
     r.push(dat);
+    // console.log('R: ' + JSON.stringify(r));
+    res.send(r);
+  });
+});
+
+router.get('/get_live_fn_chart', function(req, res) {
+  // console.log('CALLED');
+  let promT = [];
+
+  promT.push(analytics.getLastBlock());
+  promT.push(analytics.getReturnValueOfFunctionLiveChart());
+
+  Promise.all(promT).then(r => {
+    // let dat = new Date();
+    // r.push(dat);
+    // console.log(JSON.stringify(r));
     // console.log('R: ' + JSON.stringify(r));
     res.send(r);
   });

@@ -22,6 +22,9 @@ var start = 1;
 var end = 1000;
 var lastBlock = 0;
 
+var last_function_address = null;
+var last_contract_address = null;
+
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////// Smart Contract - Smart Grid Functions /////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -1417,6 +1420,7 @@ export const getReturnValueOfFunction = function(
     hex: contract_address,
     name: nickname ? nickname : contract_address
   };
+
   addToHistory(onj);
   return web3.eth
     .call({ to: contract_address, data: function_address })
@@ -1460,6 +1464,10 @@ export const getReturnValueOfFunction = function(
             function_address,
             decoded_val[0]
           ];
+
+          last_contract_address = contract_address;
+          last_function_address = function_address;
+
           return ret_obj;
         } else {
           return false;
@@ -1468,6 +1476,16 @@ export const getReturnValueOfFunction = function(
         return false;
       }
     });
+};
+
+export const getReturnValueOfFunctionLiveChart = function() {
+  console.log('COntract: ' + last_contract_address);
+  console.log('function_address: ' + last_function_address);
+  return getReturnValueOfFunction(
+    last_contract_address,
+    last_function_address,
+    ''
+  );
 };
 
 ///////////////////////////////////// MARKET CHART ///////////////////////////////////////////
