@@ -659,79 +659,203 @@ $('.clickclass').click(function(event) {
 });
 
 $('#get_exp').click(function() {
-	// alert( "Handler for .click() called." );
 	$('#id_function').val('1');
 	$('#submit_global').click();
 });
 
 $('#get_clr').click(function() {
-	// alert( "Handler for .click() called." );
 	$('#id_function').val('2');
 	$('#submit_global').click();
 });
 
 $('#get_con_details').click(function() {
-	// alert( "Handler for .click() called." );
 	$('#id_function').val('3');
 	$('#submit_global').click();
 });
 
 $('#get_transactions_per_block').click(function() {
-	// alert( "Handler for .click() called." );
 	$('#id_function').val('4');
 	$('#submit_global').click();
 });
 
 $('#get_account_gas_spent').click(function() {
-	// alert( "Handler for .click() called." );
 	$('#id_function').val('5');
 	$('#submit_global').click();
 });
 
 $('#get_account_info').click(function() {
-	// alert( "Handler for .click() called." );
 	$('#id_function').val('6');
 	$('#submit_global').click();
 });
 
 $('#get_clr_last_block').click(function() {
-	// alert( "Handler for .click() called." );
 	$('#id_function').val('7');
 	$('#submit_global').click();
 });
 
 $('#blocks_info').click(function() {
-	// alert( "Handler for .click() called." );
 	$('#id_function').val('8');
 	$('#submit_global').click();
 });
 
 $('#get_balance_account_per_block').click(function() {
-	// alert( "Handler for .click() called." );
 	$('#id_function').val('9');
 	$('#submit_global').click();
 });
 
 $('#sync').click(function() {
-	// alert( "Handler for .click() called." );
 	$('#id_function').val('10');
 	$('#submit_global').click();
 });
 
 $('#get_trs').click(function() {
-	// alert( "Handler for .click() called." );
 	$('#id_function').val('11');
 	$('#submit_global').click();
 });
 
 $('#get_market_chart').click(function() {
-	// alert( "Handler for .click() called." );
 	$('#id_function').val('12');
 	$('#submit_global').click();
 });
 
 $('#get_time_to_mine_block').click(function() {
-	// alert( "Handler for .click() called." );
 	$('#id_function').val('13');
 	$('#submit_global').click();
+});
+
+$('td > a.call_function_contract').click(function() {
+	let hash = $(this).text();
+	$('#id_function').val('14');
+	$('#hash_function').val(hash);
+	$('#submit_global').click();
+});
+
+$('#number_of_peers').click(function() {
+	$('#id_function').val('15');
+	$('#submit_global').click();
+});
+
+$('#live_fn_chart').click(function() {
+	// console.log('AAAAAAAAAAAAAAAAAAAAAAAAPAOK');
+	$(this).addClass('hide');
+	let fn_live_chart = document.getElementById('function_live_value_chart');
+
+	let layoutD = {
+		title: 'Return value of Function',
+		yaxis: { title: 'Value' }
+	};
+
+	// Init of chart on click
+	if (fn_live_chart) {
+		console.log('Got chart');
+		$.get('/get_live_fn_chart', '', function(data) {
+			let block_number = data[0].number;
+			let val_ret = data[1];
+
+			// console.log('block_number: ' + block_number);
+			// console.log('val_ret: ' + JSON.stringify(val_ret));
+
+			let block = [];
+			let val = [];
+
+			block.push(block_number);
+			val.push(val_ret[3]);
+
+			let traceD = {
+				x: block,
+				y: val,
+				name: 'Return Value',
+				type: 'scatter'
+			};
+
+			let dataD = [traceD];
+
+			Plotly.plot('function_live_value_chart', dataD, layoutD);
+		});
+	} else {
+		console.log('CHart: ' + JSON.stringify(fn_live_chart));
+	}
+
+	// Live chart - Update
+	setInterval(() => {
+		let fn_live_chart = document.getElementById(
+			'function_live_value_chart'
+		);
+		if (fn_live_chart) {
+			console.log('Got chart');
+			$.get('/get_live_fn_chart', '', function(data) {
+				let block_number = data[0].number;
+				let val_ret = data[1];
+
+				// console.log('block_number: ' + block_number);
+				// console.log('val_ret: ' + JSON.stringify(val_ret));
+
+				if (fn_live_chart.data) {
+					let found = fn_live_chart.data[0].x.find(el => {
+						return el === block_number;
+					});
+
+					// console.log("FOUND: " + found);
+					if (found) {
+						// console.log("ALREADY IN");
+					} else {
+						let blockN = [];
+						blockN = fn_live_chart.data[0].x;
+						let val = [];
+						val = fn_live_chart.data[0].y;
+
+						// console.log("BLOCK TO PUSH: " + blockN);
+						// console.log("DIFF TO PUSH: " + diffN);
+						blockN.push(data[0].number);
+						val.push(val_ret[3]);
+
+						if (blockN.length > 10) {
+							blockN.shift();
+							val.shift();
+						}
+						// console.log("AFTER    BLOCK TO PUSH: " + blockN);
+						// console.log("AFTER    DIFF TO PUSH: " + diffN);
+
+						let data_update = {
+							x: blockN,
+							y: val,
+							name: 'Return Value',
+							type: 'scatter'
+						};
+
+						let dataD = [data_update];
+						// console.log("NEW DATA TO PUSH: " + JSON.stringify(dataD));
+
+						Plotly.update(
+							'function_live_value_chart',
+							dataD,
+							layoutD
+						);
+
+						// Plotly.plot('diff_chart', dataD, layoutD);
+					}
+				} else {
+					// console.log("INIT CHART");
+					let block = [];
+					let val = [];
+
+					block.push(block_number);
+					val.push(val_ret[3]);
+
+					let traceD = {
+						x: block,
+						y: val,
+						name: 'Return Value',
+						type: 'scatter'
+					};
+
+					let dataD = [traceD];
+
+					Plotly.plot('function_live_value_chart', dataD, layoutD);
+				}
+			});
+		} else {
+			console.log('CHart: ' + JSON.stringify(fn_live_chart));
+		}
+	}, 3000);
 });
