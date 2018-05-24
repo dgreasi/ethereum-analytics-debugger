@@ -1397,6 +1397,15 @@ export const getABI = function(contract_code) {
       // CREATE CONTRACT OBJECT
       let contract = new web3.eth.Contract(abi);
 
+      contract.options.jsonInterface.forEach(el => {
+        if (el.outputs) {
+          if (el.outputs.length > 0 && el.outputs.length < 2) {
+            el.show = true;
+          } else {
+            el.show = false;
+          }
+        }
+      });
       // SAVE CONTRACT OBJECT TO GLOBAL VAR OF CONTRACTS
       contracts_submitted.push({
         contract_name: contract_names[0],

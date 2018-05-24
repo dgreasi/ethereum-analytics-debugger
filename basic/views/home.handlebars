@@ -490,10 +490,10 @@
                 <tr>
                   <td>{{ @index }}</td>
                   <td>{{ this.name }}</td>
-                  {{#if this.outputs.length}}
-                    <td><a href="#" class="call_function_contract" id="call_function_contract">{{ this.signature }}</a></td>
+                  {{#if this.show}}
+                      <td><a href="#" class="call_function_contract" id="call_function_contract">{{ this.signature }}</a></td>
                   {{else}}
-                    <td>{{ this.signature }}</td>
+                    <td class="red_btn">{{ this.signature }}</td>
                   {{/if}}
                   
                   <td>{{ this.type }}</td>
