@@ -1,15 +1,87 @@
-# Ethereum_analytics_debugger (WIP)
+# Ethereum_analytics_debugger
 A NodeJs project to get various analytics and debug a private ethereum network.
 
 ## Requirements
-1) A private ethereum network (Instructions to initiate one can be found [here](https://github.com/Temeteron/my_private_blockchain_network))
+1) An ethereum network (Instructions to initiate a local one can be found [here](https://github.com/Temeteron/my_private_blockchain_network))
 2) A node of this network locally running on your pc
 3) If you want to check state of contracts at past blocks you should start your node **from the first time** with the following parameters  **"--syncmode full --gcmode=archive"**, so that the node will be fully synced. An example of a start geth command follows:
 ```
 geth --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100 --rpcaddr=11.10.1.1 --rpccorsdomain "*" --syncmode full --gcmode=archive
 ```
+## Functions Table
+| #  | Features                          | Inspector | Other Tools |
+|:--:| --------------------------------- |:---------:|:-----------:|
+| 1  |  Get Block                        |     x     |      x      |
+| 2  |  Get Transaction                  |     x     |      x      |
+| 3  |  Explore 1,2                      |     x     |      x      |
+| 4  |  Get specified blocks             |     x     |             |
+| 5  |  Sync with a big number of blocks |     x     |             |
+| 6  |  Table (accounts, # ts, gas spent)|     x     |             |
+| 7  |  Get Ts through Blocks            |     x     |             |
+| 8  |  Chart Block Information          |     x     |      x      |
+| 9  |  Chart Gas Spent of Account       |     x     |             |
+| 10 |  Chart Balance of Account         |     x     |             |
+| 11 |  Chart Transactions Per Block     |     x     |      x      |
+| 12 |  Chart Time to Mine Block         |     x     |      x      |
+| 13 |  Get Account Info                 |     x     |             |
+| 14 |  Get  # Peers of Node             |     x     |             |
+| 15 |  Live Monitoring                  |     x     |             |
+| 16 |  Find Mined Cotracts              |     x     |             |
+| 17 |  Compile Contract - Get ABI       |     x     |             |
+| 18 |  Call get Functions of Contract   |     x     |             |
+| 19 |  Support Private Networks         |     x     |             |
+| 20 |  Support Public Networks          |     x     |      x      |
+| 21 |  Fast Setup                       |     x     |             |
+| 22 |  Good Documentation               |     x     |             |
 
-## Basic Functions
+## Get Started
+
+1) Download release at [releases](https://github.com/Temeteron/Ethereum_analytics_debugger/releases) or clone the latest:
+```
+$ git clone https://github.com/Temeteron/Ethereum_analytics_debugger.git
+
+```
+> For Node version < 6 use release [1](https://github.com/Temeteron/Ethereum_analytics_debugger/releases/tag/1.0.0)
+
+2) Cd to directory and install packages (if you downloaded a release you must unzip the file):
+```
+$ cd Ethereum_analytics_debugger/basic
+$ npm install
+```
+
+3) Start your local ethereum node with "geth" at rpcport 8100
+
+4) If you have different rpcport than 8100 and you can't change it, go to /basic/analytics.js and change the rpcport at line 9 to {my_port}:
+```
+web3.setProvider(new web3.providers.HttpProvider('http://localhost:{my_port}'));
+```
+
+5) Start NodeJs Server:
+```
+$ cd basic
+$ npm start
+```
+
+6) Use the web interface at [http://localhost:3000](http://localhost:3000)
+
+>The code of the functions is located at: analytics.js which is imported and used at /routes/index.js
+
+>Pure javascript and a bit of JQuery in the front are used. Handlebars and bootstrap are also being used. 
+
+>There is a version of the implementation that can be used for faster testing in terminal. Just run the terminal_analytics.js with node after choosing which functions you want to call.
+
+## Important
+The web3 library, which is the official library of Ethereum to enable communication between a nodejs server and an Ethereum Node, has bugs for node version >= 8.
+
+The only function that fails sometimes is:
+```
+web.eth.getTransactionReceipt()
+```
+You can rerun your scenario and this call will fail less times.
+
+On node < 8 it works just fine!
+
+## Analysis of Functions
 
 0) **Live Chart** - ARGS: ()
 
@@ -97,52 +169,7 @@ Each line contains:
 
 > This function returns the number of peers of the ethereum node that we are connected on.
 
-## Get Started
-### For Node version < 6 use release [1](https://github.com/Temeteron/Ethereum_analytics_debugger/releases/tag/1.0.0)
-
-1) Download release at [releases](https://github.com/Temeteron/Ethereum_analytics_debugger/releases) or clone the latest:
-```
-$ git clone https://github.com/Temeteron/Ethereum_analytics_debugger.git
-```
-
-2) Cd to directory and install packages (if you downloaded a release you must unzip the file):
-```
-$ cd Ethereum_analytics_debugger/basic
-$ npm install
-```
-
-3) Start your local ethereum node with "geth" at rpcport 8100
-
-4) If you have different rpcport than 8100 and you can't change it, go to /basic/analytics.js and change the rpcport at line 9 to {my_port}:
-```
-web3.setProvider(new web3.providers.HttpProvider('http://localhost:{my_port}'));
-```
-
-5) Start NodeJs Server:
-```
-$ cd basic
-$ npm start
-```
-
-6) Use the web interface at [http://localhost:3000](http://localhost:3000)
-
->The code of the functions is located at: analytics.js which is imported and used at /routes/index.js
-
->Pure javascript and a bit of JQuery in the front are used. Handlebars and bootstrap are also being used. 
-
->There is a version of the implementation that can be used for faster testing in terminal. Just run the terminal_analytics.js with node after choosing which functions you want to call.
-
-## Important
-The web3 library, which is the official library of Ethereum to enable communication between a nodejs server and an Ethereum Node, has bugs for node version >= 8.
-
-The only function that fails sometimes is:
-```
-web.eth.getTransactionReceipt()
-```
-You can rerun your scenario and this call will fail less times.
-
-On node < 8 it works just fine!
-
 ### Home Interface
 
 ![alt text](https://github.com/Temeteron/Ethereum_analytics_debugger/blob/master/Contracts%20and%20Info/img/basic_UI.png?raw=true "Home")
+
