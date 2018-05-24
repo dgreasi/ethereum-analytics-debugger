@@ -479,10 +479,11 @@
           Contract: <b>{{this.contract_name}}</b>
           <table>
             <thead>
-                <th>#</th>
-                <th>name</th>
-                <th>signature</th>
-                <th>type</th>
+                <th class="center_text">#</th>
+                <th class="center_text">name</th>
+                <th class="center_text">signature</th>
+                <th class="center_text">type</th>
+                <th class="center_text">output type</th>
             </thead> 
             <tbody> 
               {{#each this.object.options.jsonInterface}} 
@@ -496,6 +497,11 @@
                   {{/if}}
                   
                   <td>{{ this.type }}</td>
+                  <td>
+                    {{#each this.outputs}} 
+                      {{ this.type }}
+                    {{/each}}
+                  </td>
                 </tr>
               {{/each}}
             </tbody> 
