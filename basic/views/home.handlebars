@@ -45,6 +45,8 @@
         <input type="string" class="form-control" id="nickname" name="nickname" placeholder="Nickname of hex(optional)" value="">
 
         <input type="string" class="hide" id="id_function" name="id_function">
+        
+        <input type="string" class="hide" id="hash_function" name="hash_function">
 
         <input type="submit" value="Get" id="submit_global" class="btn btn-default hide" ></input>
       </div>
@@ -154,11 +156,15 @@
               Get Account Info
               <span class="glyphicon glyphicon-exclamation-sign"></span>
             </a></li>
+            <li id="number_of_peers"><a href="#">
+              Get # Peers
+              <span class="glyphicon glyphicon-exclamation-sign"></span>
+            </a></li>
           </ul>
         </div>
 
         <div class="dropdown inline" title="Custom functions for specific contract">
-          <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Contracts
+          <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Custom Contracts
           <span class="caret"></span></button>
           <ul class="dropdown-menu">
             <li id="get_clr" title="Address + Blocks => Chart"><a href="#">
@@ -193,17 +199,20 @@
 
     </div>
 
- 
     <div>
       <br>
-      <form method="post" action="/get_peers">
-        <button class="btn btn-default green_btn">Get # Peers</button>
+      <form method="post" action="/get_contract_abi">
+        <div>
+          <input type="submit" value="Get ABI" id="submit_contract" class="btn btn-default" ></input>
+          <textarea placeholder="Solidity Code" class="form-control" rows="2" id="sol_code" name="sol_code"></textarea>
+        </div>
       </form>
     </div>
 
+
     <hr>
-    <br>
-    <br>
+{{!--     <br>
+    <br> --}}
 
     {{!-- GET CLEARINGS --}}
     {{#if clearingTT}}
@@ -407,7 +416,7 @@
         </thead> 
         <tbody> 
             {{#each silentBugs}} 
-            <tr>
+            <tr class="red_btn">
               <td>{{ @index }}</td>
               {{#each this}}
                 {{#if @index}}
@@ -421,7 +430,6 @@
         </tbody> 
       </table>
       <hr>
-      {{!-- <br> --}}
     {{/if }}
     
     {{#if totalTrans}}
@@ -430,11 +438,98 @@
       </div>
     {{/if}}
 
+    {{#if call_general_fun}}
+      <div>
+        <table>
+          <thead>
+              <th>Contract name</th>
+              <th>Function name</th>
+              <th>Function address</th>
+              <th>Return value</th>
+          </thead> 
+          <tbody> 
+            <tr>
+              {{#each call_general_fun}} 
+                <td>{{ this }}</td>
+              {{/each}}
+            </tr>
+          </tbody> 
+        </table>
+      </div>
+      
+    {{/if}}
+
+    {{#if function_live_value}}
+      <div>
+        <br>
+        <div id="live_fn_chart">Live Chart</div>
+      </div>
+      <div id="function_live_value_chart" class="center"></div>
+      <hr>
+    {{/if}}
+
     {{#if noData}}
       <h4 class="red_btn">{{ noData }}</h4>
     {{/if}}
 
+    {{!-- CONTRACTS COMPILED --}}
+    {{#if contracts_compiled}}
+      {{#each contracts_compiled}}
+        <div>
+          Contract: <b>{{this.contract_name}}</b>
+          <table>
+            <thead>
+                <th class="center_text">#</th>
+                <th class="center_text">name</th>
+                <th class="center_text">signature</th>
+                <th class="center_text">type</th>
+                <th class="center_text">output type</th>
+            </thead> 
+            <tbody> 
+              {{#each this.object.options.jsonInterface}} 
+                <tr>
+                  <td>{{ @index }}</td>
+                  <td>{{ this.name }}</td>
+                  {{#if this.show}}
+                      <td><a href="#" class="call_function_contract" id="call_function_contract">{{ this.signature }}</a></td>
+                  {{else}}
+                    <td class="red_btn">{{ this.signature }}</td>
+                  {{/if}}
+                  
+                  <td>{{ this.type }}</td>
+                  <td>
+                    {{#each this.outputs}} 
+                      {{ this.type }}
+                    {{/each}}
+                  </td>
+                </tr>
+              {{/each}}
+            </tbody> 
+          </table>
+        </div>
+        <br>
+      {{/each}}
+    {{/if}}
 
+    {{#if warnings}}
+      <h2 class="red_btn">
+        Warnings while compiling:
+      </h2>
+      <div>
+        {{warnings}}
+      </div>
+    {{/if}}
+    
+
+    {{!-- ERROR WHILE COMPILING CONTRACT --}}
+    {{#if error_contract}}
+      <h2 class="red_btn">
+        Errors while compiling:
+      </h2>
+      <div>
+        {{error_contract}}
+      </div>
+    {{/if}}
     
 
     {{!-- NUMBER OF PEERS --}}
@@ -926,7 +1021,7 @@
 
                     <div class="form-group">
                         <label for="pwd">Block:</label>
-                        <input type="number" class="form-control" id="block" name="block" placeholder="Enter number" value="">
+                        <input type="number" class="form-control" id="blockinf" name="block" placeholder="Enter number" value="">
                     </div>
 
                   </div>

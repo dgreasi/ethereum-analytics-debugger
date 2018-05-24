@@ -1,4 +1,5 @@
 var Web3 = require('web3');
+var solc = require('solc');
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////// GLOBAL VARIABLES ////////////////////////////////
@@ -14,12 +15,15 @@ var dbTransInfo = []; // ARRAY OF TRANSACTION RECEIPTS
 var dbClearings = []; // BLOCK - PRICE - QUANTITY - TYPE
 var silentBugs = []; // TRANSACTION - GAS SENT - GAS SPENT
 var accounts = []; // Account hash - Gas sent - # Transactions
-
 var previous_contracts_accounts = []; //history of contracts-accounts searched
+var contracts_submitted = [];
 
 var start = 1;
 var end = 1000;
 var lastBlock = 0;
+
+var last_function_address = null;
+var last_contract_address = null;
 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////// Smart Contract - Smart Grid Functions /////////////////////
@@ -976,6 +980,7 @@ const getTranscationInfo = function(e) {
         // console.log("Input: " + rs.input);
         res.input = e.input;
         res.gasPrice = e.gasPrice;
+        res.gas = e.gas;
         // res.gas = e.gas;
         // console.log("SAVE ON arDbTSInfo getTranscationInfo");
         // dbTransInfo.push(res);
@@ -1030,10 +1035,9 @@ export const getTranscationInfoHash = function(hash) {
 };
 
 const createTableFromTxReceipt = function(txRec) {
-  var check = searchForSilentBugs(txRec.transactionHash);
+  let check = searchForSilentBugs(txRec.transactionHash);
   if (check === -1) {
     if (txRec.gas === txRec.gasUsed) {
-      // console.log("FOUND NEW SILENT BUG");
       silentBugs.push([txRec.transactionHash, txRec.gas, txRec.gasUsed]);
     }
   }
@@ -1128,6 +1132,9 @@ const checkStartEndInput = function(
       if (startBlockNumber <= 0) {
         // console.log("CHANGES");
         startBlockNumber = 1;
+      }
+      if (endBlockNumber - startBlockNumber > 1000) {
+        end = startBlockNumber + 1000;
       }
       start = startBlockNumber;
     } else {
@@ -1358,6 +1365,136 @@ const getclearingQuantity = function(contract_arg) {
 
 const getclearingType = function(contract_arg) {
   return web3.eth.call({ to: contract_arg, data: '0xbc3d513f' });
+};
+
+export const getABI = function(contract_code) {
+  return new Promise((resolve, reject) => {
+    let ret_arr = [];
+    // COMPILE SOLIDITY CODE
+    let input = contract_code;
+    let output = solc.compile(input, 1);
+
+    if (output.errors.toString().includes('Error')) {
+      console.log('ERROR WHILE COMPILING');
+      console.log(JSON.stringify(output.errors));
+      ret_arr.push(output.errors);
+      resolve(ret_arr);
+    } else {
+      let contracts_arr = output.contracts;
+      let contract_names = [];
+
+      // GET NAMES OF SMART CONTRACTS
+      for (let key in contracts_arr) {
+        console.log('Found Contract with name: ' + key);
+        contract_names.push(key);
+      }
+
+      // GET ABI OF FIRST SMART CONTRACT
+      let abi = JSON.parse(contracts_arr[contract_names[0]].interface);
+      // const bytecode = output.contracts[':DoubleAuction'].bytecode;
+      // const abi = JSON.parse(output.contracts['DoubleAuction'].interface);
+
+      // CREATE CONTRACT OBJECT
+      let contract = new web3.eth.Contract(abi);
+
+      contract.options.jsonInterface.forEach(el => {
+        if (el.outputs) {
+          if (el.outputs.length > 0 && el.outputs.length < 2) {
+            el.show = true;
+          } else {
+            el.show = false;
+          }
+        }
+      });
+      // SAVE CONTRACT OBJECT TO GLOBAL VAR OF CONTRACTS
+      contracts_submitted.push({
+        contract_name: contract_names[0],
+        object: contract
+      });
+      // console.log(JSON.stringify(contracts_submitted));
+      ret_arr.push('true');
+      ret_arr.push(output.errors);
+      ret_arr.push(contracts_submitted);
+      resolve(ret_arr);
+    }
+  });
+};
+
+export const getReturnValueOfFunction = function(
+  contract_address,
+  function_address,
+  nickname
+) {
+  var onj = {
+    hex: contract_address,
+    name: nickname ? nickname : contract_address
+  };
+
+  addToHistory(onj);
+  return web3.eth
+    .call({ to: contract_address, data: function_address })
+    .catch(err => {
+      console.log('Catch ERROR: ' + JSON.stringify(err));
+      return false;
+    })
+    .then(val => {
+      console.log('VALUE: ' + JSON.stringify(val));
+      if (val !== '0x') {
+        let i, function_details;
+        for (i = 0; i < contracts_submitted.length; i++) {
+          let contr = contracts_submitted[i].object.options.jsonInterface;
+
+          let rt = contr.find(element => {
+            return element.signature === function_address;
+          });
+
+          if (rt) {
+            function_details = rt;
+            break;
+          }
+        }
+
+        // console.log("FOUND Cont: " + contracts_submitted[i].contract_name);
+        // console.log("FOUND Func: " + function_details.name);
+
+        let table_of_output = [];
+
+        function_details.outputs.forEach(outFn => {
+          table_of_output.push(outFn.type);
+        });
+
+        if (table_of_output.length > 0) {
+          let decoded_val = web3.eth.abi.decodeParameters(table_of_output, val);
+          // console.log(JSON.stringify(decoded_val));
+
+          let ret_obj = [
+            contracts_submitted[i].contract_name.substr(1),
+            function_details.name,
+            function_address,
+            decoded_val[0]
+          ];
+
+          last_contract_address = contract_address;
+          last_function_address = function_address;
+
+          return ret_obj;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    });
+};
+
+export const getReturnValueOfFunctionLiveChart = function() {
+  console.log('COntract: ' + last_contract_address);
+  console.log('function_address: ' + last_function_address);
+  return getReturnValueOfFunction(
+    last_contract_address,
+    last_function_address,
+    ''
+  );
 };
 
 ///////////////////////////////////// MARKET CHART ///////////////////////////////////////////
@@ -1745,6 +1882,11 @@ export const getLastBlockLocally = function() {
 export const getPreviousAccounts = function() {
   // console.log("ACCOUNTS: " + JSON.stringify(previous_contracts_accounts));
   return previous_contracts_accounts;
+};
+
+export const getCompiledContracts = function() {
+  // console.log("ACCOUNTS: " + JSON.stringify(previous_contracts_accounts));
+  return contracts_submitted;
 };
 
 const addToHistory = function(arg) {
