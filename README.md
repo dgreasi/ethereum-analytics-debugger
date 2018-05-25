@@ -14,7 +14,7 @@ geth --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100
 | 1  |  Get Block                        |     x     |      x      |
 | 2  |  Get Transaction                  |     x     |      x      |
 | 3  |  Explore 1,2                      |     x     |      x      |
-| 4  |  Get specified blocks             |     x     |             |
+| 4  |  Get specified range of blocks    |     x     |             |
 | 5  |  Sync with a big number of blocks |     x     |             |
 | 6  |  Table (accounts, # ts, gas spent)|     x     |             |
 | 7  |  Get Ts through Blocks            |     x     |             |
@@ -23,10 +23,10 @@ geth --port 30299 --rpc --rpcapi="db,eth,net,web3,admin,personal" --rpcport 8100
 | 10 |  Chart Balance of Account         |     x     |             |
 | 11 |  Chart Transactions Per Block     |     x     |      x      |
 | 12 |  Chart Time to Mine Block         |     x     |      x      |
-| 13 |  Get Account Info                 |     x     |             |
-| 14 |  Get  # Peers of Node             |     x     |             |
+| 13 |  Get Account Detailed Info        |     x     |             |
+| 14 |  Get # Peers of Node              |     x     |             |
 | 15 |  Live Monitoring                  |     x     |             |
-| 16 |  Find Mined Cotracts              |     x     |             |
+| 16 |  Find Mined Contracts             |     x     |             |
 | 17 |  Compile Contract - Get ABI       |     x     |             |
 | 18 |  Call get Functions of Contract   |     x     |             |
 | 19 |  Support Private Networks         |     x     |             |
