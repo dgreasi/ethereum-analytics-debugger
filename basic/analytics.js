@@ -981,6 +981,7 @@ const getTranscationInfo = function(e) {
         res.input = e.input;
         res.gasPrice = e.gasPrice;
         res.gas = e.gas;
+        res.bug = e.gas === res.gasUsed ? 1 : 0;
         // res.gas = e.gas;
         // console.log("SAVE ON arDbTSInfo getTranscationInfo");
         // dbTransInfo.push(res);
@@ -1095,8 +1096,10 @@ const creteTableOfTransactions = function(txRec) {
       from: txRec.from,
       hash: txRec.transactionHash,
       to: txRec.to,
-      input: input
+      input: input,
+      bug: txRec.bug
     });
+
     resolve(obj);
   });
 };
@@ -1953,7 +1956,7 @@ const getTransactionsByAccount = function(
                 var fromA = e.from.toUpperCase();
                 myaccount = myaccount.toUpperCase();
                 if (myaccount === '*' || myaccount === fromA) {
-                  promiseRec.push(web3.eth.getTransactionReceipt(e.hash));
+                  promiseRec.push(getTranscationInfo(e));
                 }
               });
             }
@@ -1985,11 +1988,10 @@ const getTransactionsByAccount = function(
 
                         trans.some(el => {
                           if (el.transactionHash === e.hash) {
-                            var bug = e.gas === el.gasUsed ? 1 : 0;
                             var obj = {
                               hash: e.hash,
                               blockNumber: e.blockNumber,
-                              bug: bug,
+                              bug: el.bug,
                               gasUsed: el.gasUsed,
                               to: e.to,
                               input: input

@@ -633,14 +633,25 @@
         </thead> 
         <tbody>
             {{#each transactionsAll}}
-              <tr>
-                <td>{{ @index }}</td>
-                <td>{{ this.block }}</td>
-                <td>{{ this.from }}</td>
-                <td><a href="/get_transaction/{{this.hash}}">{{ this.hash }}</a></td>
-                <td>{{ this.to }}</td>
-                <td>{{ this.input }}</td>
-              </tr>
+              {{#if this.bug}}
+                <tr class="red_btn">
+                  <td>{{ @index }}</td>
+                  <td>{{ this.block }}</td>
+                  <td>{{ this.from }}</td>
+                  <td><a href="/get_transaction/{{this.hash}}">{{ this.hash }}</a></td>
+                  <td>{{ this.to }}</td>
+                  <td>{{ this.input }}</td>
+                </tr>
+              {{else}}
+                <tr>
+                  <td>{{ @index }}</td>
+                  <td>{{ this.block }}</td>
+                  <td>{{ this.from }}</td>
+                  <td><a href="/get_transaction/{{this.hash}}">{{ this.hash }}</a></td>
+                  <td>{{ this.to }}</td>
+                  <td>{{ this.input }}</td>
+                </tr>
+              {{/if}}
             {{/each}}
         </tbody> 
       </table>
