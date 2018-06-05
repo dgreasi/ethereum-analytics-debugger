@@ -184,8 +184,8 @@ router.post('/get', function(req, res) {
           'No available Info! Probably there are no blocks for the specified scenario.';
       }
 
-      var start = val[0][0];
-      var end = val[0][1];
+      var start = val[0];
+      var end = val[1];
       val.shift();
       val.shift();
 
@@ -234,7 +234,7 @@ router.post('/get', function(req, res) {
             noData = null;
 
             // Balance
-            var accountMbalance = val[2];
+            var accountMbalance = val[2][1];
             // Total Gas Spent
             var totalGas = val[3];
             // console.log(totalGas);
@@ -303,7 +303,7 @@ router.post('/get', function(req, res) {
           .then(val => {
             noData = null;
 
-            var accountMbalance = val[2][0];
+            var accountMbalance = val[2][1];
             var totalTransactions = val[2][1];
             // Delete first element from array
             // Keep transactions
@@ -403,8 +403,9 @@ router.post('/get', function(req, res) {
           'No available Info! Probably there are no blocks for the specified scenario.';
       }
 
-      var start = val[0][0];
-      var end = val[0][1];
+      var start = val[0];
+      var end = val[1];
+
       val.shift();
       val.shift();
 
@@ -902,7 +903,7 @@ router.get('/account/:acc', function(req, res) {
   analytics.getAccountInfo(1, 1, account, '').then(val => {
     var noData = null;
 
-    var accountMbalance = val[2][0];
+    var accountMbalance = val[2][0][1];
     var totalTransactions = val[2][1];
     // Delete first element from array
     // Keep transactions

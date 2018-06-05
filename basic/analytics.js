@@ -1848,6 +1848,8 @@ const getBalance = function(account, block) {
         if (res !== null) {
           // console.log("PAOK: " + res);
           return [block, res];
+        } else {
+          return [block, 0];
         }
       })
       .catch(err => {
@@ -1860,7 +1862,10 @@ const getBalance = function(account, block) {
       .then(res => {
         if (res !== null) {
           console.log('No block specified for balance of account');
+          console.log(res);
           return [99999, res];
+        } else {
+          return [block, 0];
         }
       })
       .catch(err => {
