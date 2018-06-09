@@ -607,7 +607,7 @@ export const getSpentGasOfAccount = function(
             for (
               var k = dbTransInfo.length - 1;
               k > checkTsInfoIndexStart;
-              k++
+              k--
             ) {
               if (dbTransInfo[k].blockNumber <= end) {
                 checkTsInfoIndexEnd = k;
