@@ -250,6 +250,8 @@ const sortDB = function() {
   dbTransInfo.sort(function(a, b) {
     return a.blockNumber - b.blockNumber;
   });
+
+  console.log('Sort DBs Successful');
 };
 
 const syncContractVars = function(startBlockNumber, endBlockNumber, contract) {
@@ -1192,7 +1194,7 @@ export const getClearingsThroughTime = function(
 
     sortDB();
 
-    let check = searchFor(startBlockNumber);
+    // let check = searchFor(startBlockNumber);
     console.log(
       'FROM - TO BLOCK: ' + startBlockNumber + ' - ' + endBlockNumber
     );
@@ -1203,7 +1205,7 @@ export const getClearingsThroughTime = function(
         let endBlockNumber = end;
         let res = [];
 
-        check = searchForInArray(dbClearings, startBlockNumber);
+        let check = searchForInArray(dbClearings, startBlockNumber);
 
         for (let i = 0; i <= endBlockNumber - startBlockNumber; i++) {
           if (check === -1) {
