@@ -1,6 +1,8 @@
 # Ethereum_analytics_debugger
 A NodeJs project to get various analytics and debug a private ethereum network.
+
 This project is my Thesis to obtain the MSc at Electrical and Computer Engineering.
+
 An electronic version of the Thesis can be found [here](https://drive.google.com/file/d/1m0WJyzX_TsVfcLtl4IWbqY_iHjX5Jei8/view).
 
 ## Requirements
